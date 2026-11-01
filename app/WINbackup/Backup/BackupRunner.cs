@@ -58,6 +58,7 @@ public sealed class BackupRunner
     public int ErrorCount, WarningCount;
     /// <summary>Já contou para o lembrete de doação (o relatório pode ser aberto mais de uma vez).</summary>
     public bool CountedForDonation;
+    public bool RebootAsked;
 
     public event Action? StateChanged;
 
@@ -215,6 +216,18 @@ public sealed class BackupRunner
             _install = Add("Instalar drivers (PnPUtil)", "Drivers", 85);
             return;
         }
+        if (Spec.Kind == JobKind.Restore)
+        {
+            if (Spec.RestoreSources.Any(s => s.Drivers))
+            {
+                _prep = Add("Preparar drivers", "Drivers", 3);
+                _install = Add("Instalar drivers (PnPUtil)", "Drivers", 17);
+            }
+            foreach (var name in Spec.Unavailable) Unavailable(Add(name, name, 0));
+            if (Spec.RestoreSources.Any(s => s.Folders == null || s.Folders.Count > 0 || s.Files?.Count > 0))
+                _files = Add("Arquivos e configurações", "Arquivos", 80);
+            return;
+        }
 
         var files = Spec.Folders.Count > 0;
         if (files && Spec.UseShadowCopy) _vss = Add("Shadow Copy (VSS)", Spec.FilesLabel, 0);
@@ -240,6 +253,8 @@ public sealed class BackupRunner
         {
             if (Spec.Kind == JobKind.RestoreDrivers)
                 await RunRestoreDriversAsync(token);
+            else if (Spec.Kind == JobKind.Restore)
+                await RunRestoreAsync(token);
             else
                 await RunBackupAsync(token);
 
@@ -305,6 +320,24 @@ public sealed class BackupRunner
         Percent = 100;
     }
 
+    async Task RunRestoreAsync(CancellationToken token)
+    {
+        var stamp = StartedAt.ToString("yyyy-MM-dd_HH-mm-ss");
+        OpenLog(Path.Combine(Settings.Folder, "logs", $"restaurar_{stamp}.log"));
+        foreach (var s in Spec.RestoreSources) Info($"Restaurando de {s.VersionPath}");
+        Info(Spec.Target switch
+        {
+            RestoreTarget.Folder => $"Destino: outra pasta ({Spec.TargetPath})",
+            RestoreTarget.OtherUser => $"Destino: outro usuário ({Spec.TargetPath})",
+            _ => "Destino: locais originais",
+        } + $" · se já existir: {Spec.Conflict switch { ConflictMode.Overwrite => "substituir", ConflictMode.KeepBoth => "manter os dois", _ => "pular" }}");
+        if (!Sys.IsAdmin) Warn("O app não está rodando como administrador: drivers e pastas protegidas podem falhar.");
+        await RestoreModule.RunAsync(this, _files, _prep, _install, token);
+        foreach (var name in Spec.Unavailable)
+            Modules.Add(new ModuleResult(name, "Ainda não disponível nesta versão", StepState.Unavailable));
+        Percent = 100;
+    }
+
     async Task RunRestoreDriversAsync(CancellationToken token)
     {
         var stamp = StartedAt.ToString("yyyy-MM-dd_HH-mm-ss");
@@ -319,10 +352,10 @@ public sealed class BackupRunner
         var failed = State == RunState.Failed || ErrorCount > 0;
         if (State == RunState.Canceled) return;
         if (failed ? !Settings.Data.NotifyErrors : !Settings.Data.NotifyDone) return;
-        var what = Spec.Kind == JobKind.RestoreDrivers ? "Restauração" : "Backup";
+        var what = Spec.IsRestore ? "Restauração" : "Backup";
         var title = State == RunState.Failed ? $"{what} falhou"
             : WarningCount + ErrorCount > 0 ? $"{what} concluído com {WarningCount + ErrorCount} avisos" : $"{what} concluído";
-        var body = Spec.Kind == JobKind.RestoreDrivers
+        var body = Spec.IsRestore
             ? (RebootRequired ? "Reinicie o computador para terminar." : "Drivers instalados.")
             : $"{Sys.Bytes(StoredBytes)} salvos em {Spec.Destination}" + (IntegrityOk && Spec.VerifyHash ? " · integridade conferida" : "");
         Notifier.Show(title, body);

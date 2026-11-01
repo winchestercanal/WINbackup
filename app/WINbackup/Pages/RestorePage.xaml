@@ -20,7 +20,6 @@
                     </StackPanel>
                 </Button>
             </Grid>
-            <c:PreviewNotice Text="Prévia: a restauração de arquivos entra numa próxima versão. Hoje dá para restaurar os drivers na tela Drivers, aba Restaurar. Os backups de arquivos ficam como pastas comuns no destino e podem ser copiados de volta pelo Explorer."/>
 
             <Grid x:Name="MainGrid" ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="340"/><ColumnDefinition/></Grid.ColumnDefinitions>
@@ -30,23 +29,17 @@
                             <TextBlock Text="Local do backup" FontSize="13" FontWeight="SemiBold"/>
                             <Grid ColumnSpacing="8">
                                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBox x:Name="SourceBox" Style="{StaticResource MonoInput}" AutomationProperties.Name="Local do backup"/>
+                                <TextBox x:Name="SourceBox" Style="{StaticResource MonoInput}" AutomationProperties.Name="Local do backup" KeyDown="OnSourceKey" LostFocus="OnSourceLostFocus"/>
                                 <Button Grid.Column="1" Style="{StaticResource SmallButton}" Padding="12,0" FontSize="12" Content="Procurar…" Click="OnBrowse"/>
                             </Grid>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource TableCard}">
-                        <StackPanel x:Name="VersionsPanel">
+                        <StackPanel>
                             <Border Padding="16,12" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
                                 <TextBlock Text="Versões" FontSize="13" FontWeight="SemiBold"/>
                             </Border>
-                        </StackPanel>
-                    </Border>
-                    <Border x:Name="PasswordCard" Style="{StaticResource Card}" Padding="16" Background="{StaticResource CyanBg}" BorderBrush="{StaticResource CyanLine}" Visibility="Collapsed">
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Senha do backup" FontSize="13" FontWeight="SemiBold"/>
-                            <PasswordBox AutomationProperties.Name="Senha do backup" CornerRadius="8"/>
-                            <TextBlock Text="Esta versão foi criptografada (AES-256)" FontSize="12" Foreground="{StaticResource NeonSoft}"/>
+                            <StackPanel x:Name="VersionsPanel"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -55,28 +48,35 @@
                     <StackPanel>
                         <Grid Padding="16,12" ColumnSpacing="10" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
                             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBlock Text="Conteúdo do backup" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                            <TextBox Grid.Column="1" Style="{StaticResource Input}" Width="180" Height="30" MinHeight="30" FontSize="12" PlaceholderText="Buscar arquivo…" AutomationProperties.Name="Buscar arquivo"/>
+                            <TextBlock x:Name="ContentTitle" Text="Conteúdo do backup" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBox x:Name="SearchBox" Grid.Column="1" Style="{StaticResource Input}" Width="200" Height="30" MinHeight="30" FontSize="12"
+                                     PlaceholderText="Buscar arquivo…" AutomationProperties.Name="Buscar arquivo" TextChanged="OnSearch"/>
                         </Grid>
                         <ItemsRepeater x:Name="Tree">
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="m:CheckItem">
-                                    <ToggleButton Style="{StaticResource CheckRow}" Padding="{x:Bind Indent}" BorderBrush="#121c33" IsChecked="{x:Bind IsChecked, Mode=TwoWay}" AutomationProperties.Name="{x:Bind Title}">
+                                    <ToggleButton Style="{StaticResource CheckRow}" Padding="{x:Bind Indent}" BorderBrush="#121c33" IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                                                  IsEnabled="{x:Bind Enabled, Mode=OneWay}" AutomationProperties.Name="{x:Bind Title}">
                                         <Grid ColumnSpacing="10">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                             <c:Icon Width="16" Height="16" Data="{x:Bind Icon}" Foreground="{x:Bind MetaBrush}"/>
-                                            <TextBlock Grid.Column="1" Text="{x:Bind Title}" FontSize="13" FontWeight="{x:Bind Weight}" VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind Title}" FontSize="13" FontWeight="{x:Bind Weight}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{x:Bind Subtitle}" FontSize="11.5" Foreground="{StaticResource TextLabel}" FontFamily="{StaticResource Mono}"
+                                                           TextTrimming="CharacterEllipsis" Visibility="{x:Bind FlagVisibility}"/>
+                                            </StackPanel>
                                             <TextBlock Grid.Column="2" Text="{x:Bind Meta}" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                                         </Grid>
                                     </ToggleButton>
                                 </DataTemplate>
                             </ItemsRepeater.ItemTemplate>
                         </ItemsRepeater>
+                        <TextBlock x:Name="TreeEmpty" Margin="16,14" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Visibility="Collapsed"/>
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <Grid ColumnSpacing="16">
+            <Grid x:Name="OptionsGrid" ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <Border Style="{StaticResource Card}" Padding="16">
                     <StackPanel Spacing="10">
@@ -84,11 +84,12 @@
                         <Border Style="{StaticResource SegHost}" Background="{StaticResource SurfaceDeep}" HorizontalAlignment="Stretch">
                             <Grid ColumnSpacing="4">
                                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <RadioButton Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Pular" IsChecked="True"/>
-                                <RadioButton Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Substituir"/>
-                                <RadioButton Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Manter os dois"/>
+                                <RadioButton x:Name="ConfSkip" Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Pular" IsChecked="True"/>
+                                <RadioButton x:Name="ConfOver" Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Substituir"/>
+                                <RadioButton x:Name="ConfBoth" Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" GroupName="conf" Content="Manter os dois"/>
                             </Grid>
                         </Border>
+                        <TextBlock Style="{StaticResource Small}" Text="Arquivos iguais aos do backup (mesmo tamanho e data) são sempre pulados."/>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16">
@@ -97,27 +98,33 @@
                         <Border Style="{StaticResource SegHost}" Background="{StaticResource SurfaceDeep}" HorizontalAlignment="Stretch">
                             <Grid ColumnSpacing="4">
                                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <RadioButton Style="{StaticResource SegSmall}" Height="32" GroupName="target" Content="Usuário atual" Tag="me" IsChecked="True" Checked="OnTarget"/>
-                                <RadioButton Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" GroupName="target" Content="Outro usuário" Tag="user" Checked="OnTarget"/>
-                                <RadioButton Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" GroupName="target" Content="Outra pasta" Tag="path" Checked="OnTarget"/>
+                                <RadioButton x:Name="TargetMe" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="target" Content="Locais originais" IsChecked="True" Checked="OnTarget"/>
+                                <RadioButton x:Name="TargetUser" Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="target" Content="Outro usuário" Checked="OnTarget"/>
+                                <RadioButton x:Name="TargetFolder" Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="target" Content="Outra pasta" Checked="OnTarget"/>
                             </Grid>
                         </Border>
-                        <TextBox x:Name="TargetBox" Style="{StaticResource MonoInput}" Height="34" MinHeight="34" Visibility="Collapsed" AutomationProperties.Name="Destino da restauração"/>
+                        <Grid x:Name="TargetRow" ColumnSpacing="8" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBox x:Name="TargetBox" Style="{StaticResource MonoInput}" Height="34" MinHeight="34" AutomationProperties.Name="Destino da restauração"/>
+                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Height="34" Padding="12,0" FontSize="12" Content="Procurar…" Click="OnBrowseTarget"/>
+                        </Grid>
+                        <TextBlock x:Name="TargetHint" Style="{StaticResource Small}"
+                                   Text="Cada pasta volta para onde estava. Documentos, Imagens e Área de Trabalho vão para onde essas pastas estão hoje (OneDrive incluído)."/>
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <Border Style="{StaticResource Card}" Padding="16,14">
+            <Border x:Name="RebootCard" Style="{StaticResource Card}" Padding="16,14">
                 <Grid ColumnSpacing="14">
                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                    <c:ToggleRow x:Name="NoReboot" Title="Não reiniciar o computador após instalar drivers" Description="Os drivers são instalados normalmente; só o reinício automático é pulado" Danger="True"/>
+                    <c:ToggleRow x:Name="NoReboot" Title="Não reiniciar o computador após instalar drivers" Description="Os drivers são instalados normalmente; só o reinício no fim é pulado" Danger="True"/>
                     <TextBlock x:Name="NoRebootStatus" Grid.Column="1" Text="Reinicia após os drivers" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                 </Grid>
             </Border>
 
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
                 <Button Style="{StaticResource SecondaryButton}" Content="Cancelar" Click="OnCancel"/>
-                <Button x:Name="RestoreButton" Style="{StaticResource PrimaryButton}" Click="OnSoon"/>
+                <Button x:Name="RestoreButton" Style="{StaticResource PrimaryButton}" Content="Restaurar" Click="OnRestore"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

@@ -18,7 +18,10 @@ WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar 
 | Atividade | Último backup e destino reais |
 | Opções | SHA-256 e notificações valem; o resto marcado "Em breve" |
 
-**Prévia (layout fiel ao protótipo, dados de exemplo, botões avisam "Em breve")**: Programas, Configurações, Saves de jogos, Navegadores, Restaurar backup (arquivos), Pós-formatação, Agendamentos, criptografia, modo portátil, linha de comando.
+| Restaurar backup | Versões reais do destino, conteúdo por grupo e pasta, busca de arquivos soltos; restaura para os locais originais (Documentos, Imagens etc. vão para onde essas pastas estão hoje, inclusive OneDrive), para outro usuário ou para outra pasta; Pular / Substituir / Manter os dois; confere SHA-256; drivers primeiro |
+| Pós-formatação | Pega a versão mais recente de drivers, Criadores e arquivos e restaura nessa ordem. Configs de programas substituem as padrão; arquivos pessoais nunca são sobrescritos. Pede para reiniciar no fim se os drivers precisarem (a menos que "Não reiniciar" esteja ligado) |
+
+**Prévia (layout fiel ao protótipo, dados de exemplo, botões avisam "Em breve")**: Programas, Configurações do Windows, Saves de jogos, Navegadores, Agendamentos, criptografia, modo portátil, linha de comando.
 
 Nos presets, as etapas que ainda não existem aparecem como "Em breve nesta versão" no progresso e no relatório. O preset Gamer ainda não tem nada executável, por isso o app avisa em vez de começar.
 

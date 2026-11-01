@@ -59,7 +59,7 @@ public static class FilesModule
             }
             var stored = folder.Name;
             for (var i = 2; !usedNames.Add(Path.Combine(folder.Group, stored)); i++) stored = $"{folder.Name} ({i})";
-            m.Folders.Add(new ManifestFolder { Key = folder.Key, Name = stored, Source = folder.Path });
+            m.Folders.Add(new ManifestFolder { Key = folder.Key, Name = stored, Source = folder.Path, Group = folder.Group });
             var storedRoot = Path.Combine(folder.Group, stored);
             // A pasta e as subpastas vazias também fazem parte do backup
             Directory.CreateDirectory(Path.Combine(r.VersionPath, storedRoot));

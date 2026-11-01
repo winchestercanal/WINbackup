@@ -2,7 +2,7 @@ using WINbackup.Services;
 
 namespace WINbackup.Backup;
 
-public enum JobKind { Backup, RestoreDrivers }
+public enum JobKind { Backup, RestoreDrivers, Restore }
 
 /// <summary>Group = pasta do backup onde ela fica ("Arquivos", "Criadores\Photoshop"…).</summary>
 public record FolderSpec(string Key, string Name, string Path, bool Sensitive, bool Custom, string Group = "Arquivos");
@@ -24,6 +24,16 @@ public class JobSpec
     public List<string> Unavailable { get; init; } = new();
 
     public string? DriverSource { get; init; }
+
+    // Restauração
+    public List<RestoreSource> RestoreSources { get; init; } = new();
+    public RestoreTarget Target { get; init; }
+    public string? TargetPath { get; init; }
+    public ConflictMode Conflict { get; init; }
+    /// <summary>Instala os drivers sem pedir para reiniciar no fim (padrão: pede).</summary>
+    public bool NoReboot { get; init; }
+
+    public bool IsRestore => Kind != JobKind.Backup;
 
     public bool VerifyHash { get; init; } = Settings.Data.VerifyHash;
     public bool UseShadowCopy { get; init; } = Settings.Data.UseShadowCopy;

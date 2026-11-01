@@ -17,6 +17,8 @@ public class Manifest
     public string Kind { get; set; } = "Completo";
     public string Computer { get; set; } = Environment.MachineName;
     public string User { get; set; } = Environment.UserName;
+    /// <summary>Pasta do usuário no momento do backup (para restaurar em outro usuário ou depois de formatar).</summary>
+    public string UserProfile { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     public string? BasedOn { get; set; }
     public bool Completed { get; set; }
     public bool Encrypted { get; set; }
@@ -53,6 +55,8 @@ public class ManifestFolder
     public string Key { get; set; } = "";
     public string Name { get; set; } = "";
     public string Source { get; set; } = "";
+    /// <summary>Pasta do backup onde ela está: "Arquivos" ou "Criadores\Photoshop"…</summary>
+    public string Group { get; set; } = "Arquivos";
 }
 
 public class ManifestFile

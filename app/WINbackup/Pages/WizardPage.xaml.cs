@@ -3,13 +3,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Documents;
+using WINbackup.Backup;
 using WINbackup.Controls;
 using WINbackup.Models;
 using WINbackup.Services;
 
 namespace WINbackup.Pages;
 
-/// <summary>Prévia do assistente pós-formatação: 6 etapas em ordem, com o fluxo do "Não reiniciar".</summary>
+/// <summary>Assistente pós-formatação: restaura, em ordem, o mais recente de cada parte do backup.</summary>
 public sealed partial class WizardPage : Page
 {
     record Step(string Key, string Name, string Desc);
@@ -19,22 +20,30 @@ public sealed partial class WizardPage : Page
         new("drv", "Drivers", "Instala os .inf de terceiros (Wi-Fi primeiro, para ter internet)"),
         new("apps", "Programas", "winget import + lista dos que precisam de instalação manual"),
         new("win", "Configurações do Windows", "Wi-Fi, tema, fontes, impressoras, variáveis, hosts"),
-        new("cfg", "Configurações de apps", "Terminal, PowerShell, VS Code, Git, OBS, Komorebi…"),
+        new("cfg", "Configurações de apps", "Presets, workspaces e plugins de Adobe, DaVinci, OBS, Stream Deck… (Criadores)"),
         new("files", "Arquivos pessoais e saves", "Volta para as pastas originais, incluindo o OneDrive"),
         new("nav", "Navegadores", "Favoritos, Speed Dial e lista de extensões"),
     ];
 
-    readonly Dictionary<string, bool> _on = Steps.ToDictionary(s => s.Key, _ => true);
+    /// <summary>Etapas que ainda não existem nesta versão.</summary>
+    static readonly HashSet<string> Soon = ["apps", "win", "nav"];
+
+    readonly Dictionary<string, bool> _on = Steps.ToDictionary(s => s.Key, s => !Soon.Contains(s.Key));
+
+    // O mais recente de cada parte: versão e pastas
+    (string Path, Manifest M, List<ManifestFolder> Folders)? _files, _creators;
+    (string Path, Manifest M)? _drivers;
 
     public WizardPage()
     {
         InitializeComponent();
         Responsive.StackWhenNarrow(MainGrid, 960);
-        var last = Destinations.Versions().FirstOrDefault();
-        FoundText.Inlines.Add(new Run { Text = last == null ? "Nenhum backup encontrado em " : "Backup encontrado em " });
-        FoundText.Inlines.Add(new Run { Text = last ?? (string.IsNullOrEmpty(Settings.Data.Destination) ? "[destino]" : Settings.Data.Destination),
-            FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontWeight = FontWeights.SemiBold });
-        if (last != null) FoundText.Inlines.Add(new Run { Text = " · " + (Backup.Manifest.Load(last)?.Kind ?? "Completo") });
+        FindSources();
+        var dest = string.IsNullOrEmpty(Settings.Data.Destination) ? "[destino]" : Settings.Data.Destination;
+        var found = _files != null || _creators != null || _drivers != null;
+        FoundText.Inlines.Add(new Run { Text = found ? "Backups encontrados em " : "Nenhum backup encontrado em " });
+        FoundText.Inlines.Add(new Run { Text = dest, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontWeight = FontWeights.SemiBold });
+        foreach (var key in new[] { "drv", "cfg", "files" }) _on[key] = Available(key);
 
         NotifyEnd.IsOn = true;
         NoReboot.Toggled += async (row, on) =>
@@ -44,6 +53,38 @@ public sealed partial class WizardPage : Page
         };
         Build();
     }
+
+    /// <summary>Versões completas, da mais nova para a mais antiga: a primeira que tiver cada parte ganha.</summary>
+    void FindSources()
+    {
+        foreach (var path in Destinations.Versions())
+        {
+            var m = Manifest.Load(path);
+            if (m is not { Completed: true }) continue;
+            var groups = m.Folders.Select(f => (F: f, G: RestoreModule.GroupOf(m, f))).ToList();
+            var files = groups.Where(x => x.G == "Arquivos").Select(x => x.F).ToList();
+            var creators = groups.Where(x => x.G.StartsWith("Criadores")).Select(x => x.F).ToList();
+            if (_files == null && files.Count > 0) _files = (path, m, files);
+            if (_creators == null && creators.Count > 0) _creators = (path, m, creators);
+            if (_drivers == null && (Directory.Exists(Path.Combine(path, "Drivers")) || File.Exists(Path.Combine(path, "Drivers_Backup.zip")))) _drivers = (path, m);
+        }
+    }
+
+    static string When(string path) => HomePage.VersionDate(path)?.ToString("dd/MM HH:mm") ?? "";
+
+    static string Size(Manifest m, List<ManifestFolder> folders)
+    {
+        var keys = folders.Select(f => f.Key).ToHashSet();
+        return Sys.Bytes(m.Files.Where(f => keys.Contains(f.Folder)).Sum(f => f.Size));
+    }
+
+    bool Available(string key) => key switch
+    {
+        "drv" => _drivers != null,
+        "cfg" => _creators != null,
+        "files" => _files != null,
+        _ => false,
+    };
 
     void Build()
     {
@@ -56,11 +97,12 @@ public sealed partial class WizardPage : Page
             if (on) active++;
             var (note, noteBrush) = s.Key switch
             {
-                "drv" => NoReboot.IsOn ? ("Sem reinício (por sua conta)", UI.Brush("#ff8fa1")) : ("Reinicia e continua", UI.Warn),
-                "apps" => ("[N] programas", UI.Muted),
-                "cfg" => ("Depois dos programas", UI.Muted),
-                "files" => ("[TAMANHO]", UI.Muted),
-                "nav" => ("Fecha os navegadores", UI.Warn),
+                _ when Soon.Contains(s.Key) => ("Em breve", UI.Label),
+                _ when !Available(s.Key) => ("Sem backup", UI.Label),
+                "drv" => ($"{_drivers!.Value.M.Drivers.Count} drivers · {When(_drivers.Value.Path)}" + (NoReboot.IsOn ? "\nsem reinício (por sua conta)" : "\npede para reiniciar no fim"),
+                          NoReboot.IsOn ? UI.Brush("#ff8fa1") : UI.Warn),
+                "cfg" => ($"{Size(_creators!.Value.M, _creators.Value.Folders)} · {When(_creators.Value.Path)}\nsubstitui as configs padrão", UI.Muted),
+                "files" => ($"{Size(_files!.Value.M, _files.Value.Folders)} · {When(_files.Value.Path)}\npula o que já existir", UI.Muted),
                 _ => ("", UI.Muted),
             };
             var g = new Grid { ColumnSpacing = 16, Padding = new Thickness(18, 16, 18, 16), Opacity = on ? 1 : 0.5,
@@ -84,17 +126,65 @@ public sealed partial class WizardPage : Page
             var n = new TextBlock { Text = note, FontSize = 12, Foreground = noteBrush, VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Right };
             Grid.SetColumn(n, 2);
             g.Children.Add(n);
-            var sw = new ToggleButton { Style = (Style)Application.Current.Resources["Switch"], IsChecked = on };
+            var sw = new ToggleButton { Style = (Style)Application.Current.Resources["Switch"], IsChecked = on, IsEnabled = Available(s.Key) };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, "Incluir etapa " + s.Name);
             sw.Click += (_, _) => { _on[s.Key] = sw.IsChecked == true; Build(); };
             Grid.SetColumn(sw, 3);
             g.Children.Add(sw);
             StepsPanel.Children.Add(g);
         }
-        StepsNote.Text = $"{active} de {Steps.Length} etapas · {(NoReboot.IsOn ? "sem reinício automático" : "reinicia 1 vez")}";
+        StepsNote.Text = $"{active} de {Steps.Length} etapas · {(NoReboot.IsOn || !_on["drv"] ? "sem reinício" : "reinicia 1 vez no fim")}";
+        EstimateText.Text = Estimate();
+    }
+
+    /// <summary>Estimativa grosseira: ~80 MB/s de cópia e uns 5 s por driver.</summary>
+    string Estimate()
+    {
+        double seconds = 0;
+        if (_on["drv"] && _drivers is { } d) seconds += 30 + d.M.Drivers.Count * 5;
+        foreach (var part in new[] { _on["cfg"] ? _creators : null, _on["files"] ? _files : null })
+        {
+            if (part is not { } p) continue;
+            var keys = p.Folders.Select(f => f.Key).ToHashSet();
+            seconds += p.M.Files.Where(f => keys.Contains(f.Folder)).Sum(f => f.Size) / (80.0 * 1024 * 1024) + p.M.Files.Count * 0.002;
+        }
+        if (seconds == 0) return "—";
+        if (seconds < 60) return "menos de 1 min";
+        var t = TimeSpan.FromSeconds(seconds);
+        return t.TotalHours >= 1 ? $"~{(int)t.TotalHours} h {t.Minutes:00} min" : $"~{Math.Ceiling(t.TotalMinutes)} min";
     }
 
     void OnChange(object sender, RoutedEventArgs e) => App.Shell.Navigate("restore");
     void OnCancel(object sender, RoutedEventArgs e) => App.Shell.Navigate("home");
-    async void OnSoon(object sender, RoutedEventArgs e) => await Dialogs.SoonAsync(XamlRoot, "Pós-formatação");
+    async void OnStart(object sender, RoutedEventArgs e)
+    {
+        var sources = new List<RestoreSource>();
+        if (_on["drv"] && _drivers is { } d) sources.Add(new RestoreSource(d.Path, d.M, [], null, true));
+        // Configs de programas substituem as padrão criadas na reinstalação; arquivos pessoais nunca são sobrescritos
+        if (_on["cfg"] && _creators is { } c) sources.Add(new RestoreSource(c.Path, c.M, c.Folders.Select(f => f.Key).ToHashSet(), null, false, ConflictMode.Overwrite));
+        if (_on["files"] && _files is { } f) sources.Add(new RestoreSource(f.Path, f.M, f.Folders.Select(x => x.Key).ToHashSet(), null, false, ConflictMode.Skip));
+        if (sources.Count == 0)
+        {
+            await Dialogs.InfoAsync(XamlRoot, "Nada para restaurar", "Nenhuma etapa disponível está ligada. Confira o destino dos backups no menu lateral.");
+            return;
+        }
+        if (!Silent.IsOn)
+        {
+            var parts = new List<string>();
+            if (sources.Any(x => x.Drivers)) parts.Add("drivers");
+            if (_on["cfg"] && _creators != null) parts.Add("configurações de apps (substituindo as padrão)");
+            if (_on["files"] && _files != null) parts.Add("arquivos pessoais (sem sobrescrever)");
+            var ok = await Dialogs.ConfirmAsync(XamlRoot, "Iniciar a restauração completa?",
+                $"Vai restaurar {string.Join(", ", parts)} para os locais originais." +
+                (sources.Any(x => x.Drivers) && !NoReboot.IsOn ? " No fim, o app pede para reiniciar." : ""),
+                "Iniciar", "Agora não");
+            if (!ok) return;
+        }
+        App.Shell.Run(new JobSpec
+        {
+            Kind = JobKind.Restore, Title = "Pós-formatação", RestoreSources = sources,
+            Target = RestoreTarget.Original, Conflict = ConflictMode.Skip, NoReboot = NoReboot.IsOn,
+            Unavailable = ["Programas (winget)", "Configurações do Windows", "Navegadores"],
+        });
+    }
 }

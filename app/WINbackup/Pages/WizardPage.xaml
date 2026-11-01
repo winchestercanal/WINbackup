@@ -11,7 +11,6 @@
                 <TextBlock Text="Modo pós-formatação" Style="{StaticResource H1}"/>
                 <TextBlock Text="Deixa o PC como estava, numa ordem pensada para não dar conflito. Você pode sair e voltar depois." Style="{StaticResource Sub}"/>
             </StackPanel>
-            <c:PreviewNotice Text="Prévia: a restauração completa entra numa próxima versão. Hoje dá para reinstalar os drivers pela tela Drivers, aba Restaurar."/>
 
             <Border Style="{StaticResource Card}" Padding="18,14">
                 <Grid ColumnSpacing="14">
@@ -39,7 +38,7 @@
                     <Border Style="{StaticResource Card}" Padding="18,16" Background="{StaticResource SurfaceStrong}" BorderBrush="{StaticResource LineStrong}">
                         <StackPanel Spacing="6">
                             <TextBlock Text="Tempo estimado" Style="{StaticResource Small}"/>
-                            <TextBlock Text="[HH:MM]" FontSize="22" FontWeight="Bold" FontFamily="{StaticResource Mono}"/>
+                            <TextBlock x:Name="EstimateText" FontSize="22" FontWeight="Bold" FontFamily="{StaticResource Mono}"/>
                             <TextBlock x:Name="StepsNote" Style="{StaticResource Small}"/>
                         </StackPanel>
                     </Border>
@@ -54,7 +53,7 @@
 
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
                 <Button Style="{StaticResource SecondaryButton}" Content="Agora não" Click="OnCancel"/>
-                <Button Style="{StaticResource PrimaryButton}" Content="Iniciar restauração completa" Click="OnSoon"/>
+                <Button Style="{StaticResource PrimaryButton}" Content="Iniciar restauração completa" Click="OnStart"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

@@ -27,7 +27,20 @@ public sealed partial class ReportPage : Page
             return;
         }
         Fill(_r);
-        Loaded += async (_, _) => await MaybeRemindDonationAsync(_r);
+        Loaded += async (_, _) =>
+        {
+            await MaybeAskRebootAsync(_r);
+            await MaybeRemindDonationAsync(_r);
+        };
+    }
+
+    /// <summary>Restauração com drivers: reiniciar é o padrão, a menos que o usuário tenha marcado "Não reiniciar".</summary>
+    async Task MaybeAskRebootAsync(BackupRunner r)
+    {
+        if (!r.RebootRequired || r.Spec.NoReboot || r.RebootAsked || r.State != RunState.Completed) return;
+        r.RebootAsked = true;
+        await Task.Delay(400);
+        OnReboot(this, new RoutedEventArgs());
     }
 
     async Task MaybeRemindDonationAsync(BackupRunner r)
@@ -41,7 +54,7 @@ public sealed partial class ReportPage : Page
 
     void Fill(BackupRunner r)
     {
-        var restore = r.Spec.Kind == JobKind.RestoreDrivers;
+        var restore = r.Spec.IsRestore;
         var what = restore ? "Restauração" : "Backup";
         var issues = r.WarningCount + r.ErrorCount;
         (TitleText.Text, var color, var bg, var icon) = r.State switch
@@ -56,14 +69,23 @@ public sealed partial class ReportPage : Page
         StatusIcon.Foreground = color;
         StatusIcon.Data = icon;
 
-        var where = restore ? r.Spec.DriverSource : r.VersionPath;
+        var where = r.Spec.Kind switch
+        {
+            JobKind.RestoreDrivers => r.Spec.DriverSource,
+            JobKind.Restore => string.Join(", ", r.Spec.RestoreSources.Select(s => Path.GetFileName(s.VersionPath))),
+            _ => r.VersionPath,
+        };
         SubText.Text = $"{r.Spec.Title} · {where}" + (issues == 0 ? "" : issues == 1 ? " · com 1 aviso" : $" · com {issues} avisos");
 
-        Stat(0, restore ? "Pacotes de driver" : "Itens salvos", r.ItemsSaved.ToString("N0"), UI.Text);
-        Stat(1, restore ? "Reinício" : "Tamanho final", restore ? (r.RebootRequired ? "Necessário" : "Não precisa") : Sys.Bytes(r.StoredBytes),
-            restore && r.RebootRequired ? UI.Warn : UI.Text);
+        var onlyDrivers = r.Spec.Kind == JobKind.RestoreDrivers;
+        Stat(0, onlyDrivers ? "Pacotes de driver" : restore ? "Itens restaurados" : "Itens salvos", r.ItemsSaved.ToString("N0"), UI.Text);
+        if (restore && r.RebootRequired)
+            Stat(1, "Reinício", "Necessário", UI.Warn);
+        else
+            Stat(1, onlyDrivers ? "Reinício" : restore ? "Restaurado" : "Tamanho final", onlyDrivers ? "Não precisa" : Sys.Bytes(r.StoredBytes), UI.Text);
         Stat(2, "Duração", Sys.Duration(r.Elapsed), UI.Text);
-        Stat(3, "Integridade", restore ? "—" : r.Integrity, !r.Spec.VerifyHash || restore ? UI.Muted : r.IntegrityOk ? UI.Ok : UI.ErrSoft);
+        var hashed = r.Spec.Kind == JobKind.Restore || (!restore && r.Spec.VerifyHash);
+        Stat(3, "Integridade", hashed ? r.Integrity : "—", !hashed ? UI.Muted : r.IntegrityOk ? UI.Ok : UI.ErrSoft);
 
         foreach (var m in r.Modules)
         {

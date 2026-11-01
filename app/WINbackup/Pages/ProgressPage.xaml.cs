@@ -83,7 +83,7 @@ public sealed partial class ProgressPage : Page
         }
         else
         {
-            NowText.Inlines.Add(new Run { Text = r.Activity == "integridade" ? "Conferindo " : r.Spec.Kind == JobKind.RestoreDrivers ? "Instalando " : "Copiando " });
+            NowText.Inlines.Add(new Run { Text = r.Activity == "integridade" ? "Conferindo " : r.Spec.IsRestore ? "Restaurando " : "Copiando " });
             NowText.Inlines.Add(new Run { Text = r.Activity, FontWeight = FontWeights.Bold });
             if (!string.IsNullOrEmpty(r.CurrentFile))
             {
