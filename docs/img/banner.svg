@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-label="WINbackup: seus dados, a salvo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b15"/>
+      <stop offset="1" stop-color="#0e1830"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.35" r="0.55">
+      <stop offset="0" stop-color="#2f7bff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#2f7bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.12" cy="1" r="0.5">
+      <stop offset="0" stop-color="#19e3ff" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#19e3ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#19e3ff"/>
+      <stop offset="1" stop-color="#2f7bff"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#1c2a48" stroke-width="1" opacity="0.55"/>
+    </pattern>
+    <clipPath id="card"><rect width="1200" height="380" rx="24"/></clipPath>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="1200" height="380" fill="url(#bg)"/>
+    <rect width="1200" height="380" fill="url(#grid)"/>
+    <rect width="1200" height="380" fill="url(#glow)"/>
+    <rect width="1200" height="380" fill="url(#glow2)"/>
+
+    <!-- Logo -->
+    <g transform="translate(72 92)">
+      <rect x="0" y="0" width="38" height="38" rx="9" fill="url(#tile)"/>
+      <rect x="46" y="0" width="38" height="38" rx="9" fill="#2f7bff"/>
+      <rect x="0" y="46" width="38" height="38" rx="9" fill="#2f7bff"/>
+      <rect x="46" y="46" width="38" height="38" rx="9" fill="url(#tile)"/>
+    </g>
+    <text x="180" y="150" font-family="Segoe UI Variable Display, Segoe UI, Inter, system-ui, sans-serif" font-size="64" font-weight="700" fill="#e8f0ff">WIN<tspan fill="#19e3ff">backup</tspan></text>
+    <text x="72" y="236" font-family="Segoe UI Variable Display, Segoe UI, Inter, system-ui, sans-serif" font-size="34" font-weight="600" fill="#e8f0ff">Seus dados, a salvo.</text>
+    <text x="72" y="274" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="20" fill="#8ea3c7">Backup antes de formatar o Windows e restauração completa depois,</text>
+    <text x="72" y="302" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="20" fill="#8ea3c7">grátis e sem anúncios. Um app do Canal WINchester.</text>
+
+    <!-- Selos -->
+    <g font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="14" font-weight="600">
+      <rect x="72" y="326" width="96" height="28" rx="7" fill="#04121a" stroke="#19e3ff"/>
+      <text x="120" y="345" text-anchor="middle" fill="#7befff">v0.1 beta</text>
+      <rect x="178" y="326" width="140" height="28" rx="7" fill="#0f1b33" stroke="#2a3b63"/>
+      <text x="248" y="345" text-anchor="middle" fill="#c9d6ee">Windows 10 e 11</text>
+      <rect x="328" y="326" width="156" height="28" rx="7" fill="#0f1b33" stroke="#2a3b63"/>
+      <text x="406" y="345" text-anchor="middle" fill="#c9d6ee">Feito com IA (Claude)</text>
+    </g>
+
+    <!-- Ilustração: PC → disco → PC -->
+    <g transform="translate(760 70)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="0" y="40" width="150" height="100" rx="12" fill="#0e1526" stroke="#22407a" stroke-width="2"/>
+      <rect x="12" y="52" width="126" height="76" rx="6" fill="#0b1a33"/>
+      <path d="M55 165h40M75 140v25" stroke="#22407a" stroke-width="2"/>
+      <g transform="translate(51 66) scale(2)" stroke="#6fa4ff" stroke-width="1.6">
+        <path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>
+      </g>
+
+      <path d="M165 90h70" stroke="#19e3ff" stroke-width="2.5" stroke-dasharray="2 9"/>
+      <path d="M228 83l9 7-9 7" stroke="#19e3ff" stroke-width="2.5"/>
+
+      <rect x="250" y="30" width="130" height="120" rx="18" fill="#0f1b33" stroke="#19e3ff" stroke-width="2"/>
+      <g transform="translate(279 54) scale(3)" stroke="#19e3ff" stroke-width="1.4">
+        <path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/>
+        <path d="m8.5 12 2.5 2.5 4.5-5"/>
+      </g>
+
+      <path d="M315 165v38" stroke="#19e3ff" stroke-width="2.5" stroke-dasharray="2 9"/>
+      <path d="M308 196l7 9 7-9" stroke="#19e3ff" stroke-width="2.5"/>
+      <text x="300" y="190" text-anchor="end" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="14" fill="#8ea3c7" stroke="none">depois de formatar</text>
+
+      <rect x="240" y="215" width="150" height="40" rx="10" fill="#04121a" stroke="#3ddc97" stroke-width="2"/>
+      <path d="m258 235 6 6 12-12" stroke="#3ddc97" stroke-width="2.5"/>
+      <text x="288" y="241" font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="16" font-weight="600" fill="#e8f0ff" stroke="none">PC como antes</text>
+    </g>
+  </g>
+</svg>
