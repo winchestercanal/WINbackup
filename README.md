@@ -4,6 +4,25 @@ App gratuito para Windows do **[Canal WINchester](https://www.youtube.com/WINche
 
 > **Status: 0.1 beta (testes).** Todos os módulos funcionam: backup, restauração, pós-formatação, agendamentos e linha de comando. Falta só a criptografia dos backups.
 
+> 🤖 **Feito com inteligência artificial.** O código deste aplicativo foi escrito pelo **Claude** (IA da Anthropic) a partir do protótipo e das decisões do Canal WINchester, que orientou, revisou e testou cada etapa. Por ser uma versão de testes, **faça um backup extra dos seus arquivos importantes antes de confiar só nele** e relate qualquer problema.
+
+## Baixar e testar
+
+1. Vá em **[Releases](https://github.com/winchestercanal/WINbackup/releases)** e baixe o `.zip` da versão mais recente.
+2. Extraia o `.zip` numa pasta (por exemplo `C:\WINbackup` ou um pendrive). Não precisa instalar nada: o .NET e o Windows App SDK já vêm dentro.
+3. Abra o `WINbackup.exe` e aceite o aviso de administrador.
+4. O Windows pode mostrar **"O Windows protegeu o computador"** porque o app ainda não tem assinatura digital. Clique em **Mais informações → Executar assim mesmo**.
+
+Para um primeiro teste seguro: escolha um destino vazio (pendrive ou pasta de teste), faça backup de uma pasta pequena e restaure em **Restaurar → Outra pasta**.
+
+## Feedback
+
+Encontrou um erro ou tem uma sugestão? Abra uma **[issue](https://github.com/winchestercanal/WINbackup/issues/new)** contando:
+
+- o que você fez e o que esperava acontecer;
+- a versão do Windows;
+- se possível, o log da execução (`backup_audit_….log` dentro da pasta `WINbackup_<data>` do backup, ou `%APPDATA%\WINbackup\logs`) e o arquivo `%APPDATA%\WINbackup\erros.log`.
+
 ## O que ele faz
 
 | Módulo | Situação |
