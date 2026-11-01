@@ -67,7 +67,7 @@ public static class Dialogs
     }
 
     public static Task SoonAsync(XamlRoot root, string module) => InfoAsync(root, "Em breve",
-        $"O módulo {module} ainda não executa nesta versão. A tela já mostra como ele vai funcionar; já funcionam de verdade: Arquivos pessoais, Criadores, Programas, Drivers e a restauração.");
+        $"O módulo {module} ainda não executa nesta versão. A tela já mostra como ele vai funcionar; já funcionam de verdade: Arquivos pessoais, Criadores, Programas, Navegadores, Drivers e a restauração.");
 
     /// <summary>Lembrete ocasional de doação, com "não mostrar de novo".</summary>
     public static async Task<bool> DonationReminderAsync(XamlRoot root)

@@ -26,12 +26,12 @@ public sealed partial class WizardPage : Page
     ];
 
     /// <summary>Etapas que ainda não existem nesta versão.</summary>
-    static readonly HashSet<string> Soon = ["win", "nav"];
+    static readonly HashSet<string> Soon = ["win"];
 
     readonly Dictionary<string, bool> _on = Steps.ToDictionary(s => s.Key, s => !Soon.Contains(s.Key));
 
     // O mais recente de cada parte: versão e pastas
-    (string Path, Manifest M, List<ManifestFolder> Folders)? _files, _creators;
+    (string Path, Manifest M, List<ManifestFolder> Folders)? _files, _creators, _browsers;
     (string Path, Manifest M)? _drivers, _programs;
 
     public WizardPage()
@@ -43,7 +43,7 @@ public sealed partial class WizardPage : Page
         var found = _files != null || _creators != null || _drivers != null;
         FoundText.Inlines.Add(new Run { Text = found ? "Backups encontrados em " : "Nenhum backup encontrado em " });
         FoundText.Inlines.Add(new Run { Text = dest, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontWeight = FontWeights.SemiBold });
-        foreach (var key in new[] { "drv", "apps", "cfg", "files" }) _on[key] = Available(key);
+        foreach (var key in new[] { "drv", "apps", "cfg", "files", "nav" }) _on[key] = Available(key);
 
         NotifyEnd.IsOn = true;
         NoReboot.Toggled += async (row, on) =>
@@ -66,6 +66,8 @@ public sealed partial class WizardPage : Page
             var creators = groups.Where(x => x.G.StartsWith("Criadores")).Select(x => x.F).ToList();
             if (_files == null && files.Count > 0) _files = (path, m, files);
             if (_creators == null && creators.Count > 0) _creators = (path, m, creators);
+            var browsers = groups.Where(x => x.G.StartsWith("Navegadores")).Select(x => x.F).ToList();
+            if (_browsers == null && browsers.Count > 0) _browsers = (path, m, browsers);
             if (_programs == null && m.Programs.Any(p => p.Source is "winget" or "msstore")) _programs = (path, m);
             if (_drivers == null && (Directory.Exists(Path.Combine(path, "Drivers")) || File.Exists(Path.Combine(path, "Drivers_Backup.zip")))) _drivers = (path, m);
         }
@@ -85,6 +87,7 @@ public sealed partial class WizardPage : Page
         "apps" => _programs != null,
         "cfg" => _creators != null,
         "files" => _files != null,
+        "nav" => _browsers != null,
         _ => false,
     };
 
@@ -105,6 +108,7 @@ public sealed partial class WizardPage : Page
                           NoReboot.IsOn ? UI.Brush("#ff8fa1") : UI.Warn),
                 "apps" => ($"{_programs!.Value.M.Programs.Count(p => p.Source is "winget" or "msstore")} programas · {When(_programs.Value.Path)}\npela internet, via winget", UI.Muted),
                 "cfg" => ($"{Size(_creators!.Value.M, _creators.Value.Folders)} · {When(_creators.Value.Path)}\nsubstitui as configs padrão", UI.Muted),
+                "nav" => ($"{_browsers!.Value.Folders.Count(f => f.Name != "Lista de perfis" && f.Name != "Senhas exportadas")} perfis · {When(_browsers.Value.Path)}\nfeche os navegadores antes", UI.Warn),
                 "files" => ($"{Size(_files!.Value.M, _files.Value.Folders)} · {When(_files.Value.Path)}\npula o que já existir", UI.Muted),
                 _ => ("", UI.Muted),
             };
@@ -146,7 +150,7 @@ public sealed partial class WizardPage : Page
         double seconds = 0;
         if (_on["drv"] && _drivers is { } d) seconds += 30 + d.M.Drivers.Count * 5;
         if (_on["apps"] && _programs is { } pr) seconds += pr.M.Programs.Count(p => p.Source is "winget" or "msstore") * 45;
-        foreach (var part in new[] { _on["cfg"] ? _creators : null, _on["files"] ? _files : null })
+        foreach (var part in new[] { _on["cfg"] ? _creators : null, _on["files"] ? _files : null, _on["nav"] ? _browsers : null })
         {
             if (part is not { } p) continue;
             var keys = p.Folders.Select(f => f.Key).ToHashSet();
@@ -168,6 +172,8 @@ public sealed partial class WizardPage : Page
         // Configs de programas substituem as padrão criadas na reinstalação; arquivos pessoais nunca são sobrescritos
         if (_on["cfg"] && _creators is { } c) sources.Add(new RestoreSource(c.Path, c.M, c.Folders.Select(f => f.Key).ToHashSet(), null, false, ConflictMode.Overwrite));
         if (_on["files"] && _files is { } f) sources.Add(new RestoreSource(f.Path, f.M, f.Folders.Select(x => x.Key).ToHashSet(), null, false, ConflictMode.Skip));
+        // Favoritos e configurações substituem os do navegador recém-instalado
+        if (_on["nav"] && _browsers is { } b) sources.Add(new RestoreSource(b.Path, b.M, b.Folders.Select(x => x.Key).ToHashSet(), null, false, ConflictMode.Overwrite));
         if (sources.Count == 0)
         {
             await Dialogs.InfoAsync(XamlRoot, "Nada para restaurar", "Nenhuma etapa disponível está ligada. Confira o destino dos backups no menu lateral.");
@@ -180,6 +186,7 @@ public sealed partial class WizardPage : Page
             if (sources.Any(x => x.Programs)) parts.Add("programas (pela internet)");
             if (_on["cfg"] && _creators != null) parts.Add("configurações de apps (substituindo as padrão)");
             if (_on["files"] && _files != null) parts.Add("arquivos pessoais (sem sobrescrever)");
+            if (_on["nav"] && _browsers != null) parts.Add("navegadores (feche-os antes)");
             var ok = await Dialogs.ConfirmAsync(XamlRoot, "Iniciar a restauração completa?",
                 $"Vai restaurar {string.Join(", ", parts)} para os locais originais." +
                 (sources.Any(x => x.Drivers) && !NoReboot.IsOn ? " No fim, o app pede para reiniciar." : ""),
@@ -190,7 +197,7 @@ public sealed partial class WizardPage : Page
         {
             Kind = JobKind.Restore, Title = "Pós-formatação", RestoreSources = sources,
             Target = RestoreTarget.Original, Conflict = ConflictMode.Skip, NoReboot = NoReboot.IsOn,
-            Unavailable = ["Configurações do Windows", "Navegadores"],
+            Unavailable = ["Configurações do Windows"],
         });
     }
 }

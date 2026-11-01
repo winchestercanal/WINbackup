@@ -5,7 +5,8 @@ namespace WINbackup.Backup;
 public enum JobKind { Backup, RestoreDrivers, Restore }
 
 /// <summary>Group = pasta do backup onde ela fica ("Arquivos", "Criadores\Photoshop"…).</summary>
-public record FolderSpec(string Key, string Name, string Path, bool Sensitive, bool Custom, string Group = "Arquivos");
+/// <summary>Include = só estes itens da raiz da pasta (perfis de navegador); null = a pasta toda.</summary>
+public record FolderSpec(string Key, string Name, string Path, bool Sensitive, bool Custom, string Group = "Arquivos", string[]? Include = null);
 
 /// <summary>O que uma execução vai fazer. Montado pelas telas a partir das escolhas do usuário.</summary>
 public class JobSpec
@@ -19,6 +20,8 @@ public class JobSpec
     public string FilesLabel { get; init; } = "Arquivos pessoais";
     public bool Drivers { get; init; }
     public bool Programs { get; init; }
+    /// <summary>As pastas incluem perfis de navegador: gera a lista de extensões e o aviso das senhas.</summary>
+    public bool Browsers { get; init; }
     /// <summary>IDs do winget que ficam de fora (desmarcados na tela Programas).</summary>
     public HashSet<string> ProgramsOff { get; init; } = new(Settings.Data.ProgramsOff, StringComparer.OrdinalIgnoreCase);
     /// <summary>"Importar lista e instalar": pacotes de um Programas.json avulso.</summary>
@@ -105,8 +108,9 @@ public static class Presets
         {
             0 => new JobSpec
             {
-                Title = p.Name, Folders = PersonalFolders.Selected(), Drivers = true, Programs = true,
-                Unavailable = ["Configurações", "Saves de jogos", "Navegadores"],
+                Title = p.Name, FilesLabel = "Arquivos e navegadores", Folders = [.. PersonalFolders.Selected(), .. BrowsersModule.SelectedFolders()],
+                Drivers = true, Programs = true, Browsers = true,
+                Unavailable = ["Configurações", "Saves de jogos"],
             },
             1 => new JobSpec { Title = p.Name, Folders = PersonalFolders.ByKeys("doc", "img", "dsk") },
             2 => new JobSpec

@@ -20,6 +20,10 @@ public class SettingsData
     // Programas: IDs do winget que o usuário desmarcou
     public List<string> ProgramsOff { get; set; } = new();
 
+    // Navegadores: "chrome" (navegador inteiro) ou "chrome:Profile 1" desmarcados; .csv de senhas exportados
+    public List<string> BrowsersOff { get; set; } = new();
+    public List<string> PasswordCsvs { get; set; } = new();
+
     // Criadores
     public Dictionary<string, bool> CreatorSelection { get; set; } = new();
     public List<string> CreatorCustomFolders { get; set; } = new();

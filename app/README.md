@@ -12,6 +12,7 @@ WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar 
 | Criadores | Detecta Adobe (Premiere, After Effects, Photoshop, Illustrator, Lightroom, Media Encoder, .mogrt, painéis CEP), DaVinci Resolve, OBS, Stream Deck, Elgato, Streamer.bot, Voicemeeter, NVIDIA Broadcast, Reaper, Blender, Cinema 4D e outros; copia presets, workspaces, scripts, macros e, se ligado, as pastas de plugins (AE, MediaCore, OFX, Photoshop, OBS, VST). Catálogo em `Backup/CreatorApps.cs` |
 | Apoie o projeto | Pix com QR Code e "copia e cola" (BR Code gerado no app) e LivePix; lembrete a cada 5 backups bem-sucedidos, com "não mostrar de novo" |
 | Programas | Lista real do `winget list` (winget, Microsoft Store, sem pacote); salva `Programas\Programas.json` (formato do `winget import`, só os marcados) e `Instalar_manualmente.html` com os sem pacote; reinstala um por um com `winget install` (os já instalados são pulados); "Exportar lista" e "Importar lista e instalar" avulsos |
+| Navegadores | Perfis reais de Edge, Chrome, Brave, Vivaldi, Opera (via `Local State`) e Firefox (via `profiles.ini`); copia favoritos, configurações e notas (Chromium) ou favoritos, preferências e extensões (Firefox), mais a lista de perfis; gera `Navegadores\Extensoes.html` com link da loja de cada extensão; senhas só por exportação guiada (abre a página do navegador como usuário comum, via Explorer) e o .csv que o usuário adicionar |
 | Drivers | Lista real (WMI), exporta com `pnputil /export-driver` para a pasta `Drivers` (sem compactar); restaura da pasta, de outra pasta com .inf ou de `.zip` com `pnputil /add-driver /install` |
 | Em andamento | Progresso, velocidade, tempo restante, etapas, log ao vivo, pausar/continuar, cancelar |
 | Relatório | Resumo, por módulo, avisos, exportar HTML, abrir pasta, "Reiniciar agora" quando os drivers pedem |
@@ -22,7 +23,7 @@ WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar 
 | Restaurar backup | Versões reais do destino, conteúdo por grupo e pasta, busca de arquivos soltos; restaura para os locais originais (Documentos, Imagens etc. vão para onde essas pastas estão hoje, inclusive OneDrive), para outro usuário ou para outra pasta; Pular / Substituir / Manter os dois; confere SHA-256; drivers primeiro |
 | Pós-formatação | Pega a versão mais recente de drivers, Criadores e arquivos e restaura nessa ordem. Configs de programas substituem as padrão; arquivos pessoais nunca são sobrescritos. Pede para reiniciar no fim se os drivers precisarem (a menos que "Não reiniciar" esteja ligado) |
 
-**Prévia (layout fiel ao protótipo, dados de exemplo, botões avisam "Em breve")**: Configurações do Windows, Saves de jogos, Navegadores, Agendamentos, criptografia, modo portátil, linha de comando.
+**Prévia (layout fiel ao protótipo, dados de exemplo, botões avisam "Em breve")**: Configurações do Windows, Saves de jogos, Agendamentos, criptografia, modo portátil, linha de comando.
 
 Nos presets, as etapas que ainda não existem aparecem como "Em breve nesta versão" no progresso e no relatório. O preset Gamer ainda não tem nada executável, por isso o app avisa em vez de começar.
 

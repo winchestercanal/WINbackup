@@ -63,7 +63,9 @@ public sealed partial class HomePage : Page
         summary.Children.Add(Row("Preset", preset.Name, mono: false));
         summary.Children.Add(Row("Destino", string.IsNullOrEmpty(spec.Destination) ? "Não escolhido" : spec.Destination, mono: true));
         var runs = new List<string>();
-        if (spec.Folders.Count > 0) runs.Add($"Arquivos pessoais ({spec.Folders.Count} pastas)");
+        var personal = spec.Folders.Count(f => f.Group == "Arquivos");
+        if (personal > 0) runs.Add($"Arquivos pessoais ({personal} pastas)");
+        if (spec.Browsers) runs.Add("Navegadores");
         if (spec.Programs) runs.Add("Programas");
         if (spec.Drivers) runs.Add("Drivers");
         summary.Children.Add(Row("Nesta versão", runs.Count > 0 ? string.Join(", ", runs) : "Nada ainda", mono: false));

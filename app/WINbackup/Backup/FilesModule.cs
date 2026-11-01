@@ -16,7 +16,10 @@ public static class FilesModule
     // Arquivos do OneDrive que só existem na nuvem (FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS / RECALL_ON_OPEN)
     const FileAttributes CloudOnly = (FileAttributes)0x400000 | (FileAttributes)0x40000 | FileAttributes.Offline;
 
-    record Work(ManifestFile Entry, string Source, string Target, FileAttributes Attributes, DateTime Created);
+    record Work(ManifestFile Entry, string Source, string Target, FileAttributes Attributes, DateTime Created, string Group);
+
+    /// <summary>Nome do grupo no relatório: "Arquivos" → "Arquivos pessoais", "Criadores\\Photoshop" → "Criadores".</summary>
+    public static string GroupTitle(string group) => group.Split('\\')[0] switch { "Arquivos" => "Arquivos pessoais", var g => g };
 
     public static async Task RunAsync(BackupRunner r, StepItem step, StepItem? vssStep, StepItem? verifyStep, Manifest m, CancellationToken token)
     {
@@ -47,6 +50,7 @@ public static class FilesModule
         // 1. Varredura
         var work = new List<Work>();
         int reused = 0, skippedCloud = 0, denied = 0;
+        var reusedBy = new Dictionary<string, int>();
         long total = 0;
         var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var folder in spec.Folders)
@@ -69,7 +73,9 @@ public static class FilesModule
                 m.EmptyFolders.Add(new ManifestDir { Folder = folder.Key, Path = rel });
             }
 
-            foreach (var (file, rel) in Walk(folder.Path, spec.Exclusions, () => denied++, OnEmpty))
+            var groupTitle = GroupTitle(folder.Group);
+            reusedBy.TryAdd(groupTitle, 0);
+            foreach (var (file, rel) in Walk(folder.Path, spec.Exclusions, () => denied++, OnEmpty, folder.Include))
             {
                 r.Checkpoint(token);
                 if ((file.Attributes & CloudOnly) != 0 && !spec.DownloadCloudFiles)
@@ -85,10 +91,11 @@ public static class FilesModule
                     entry.Sha256 = old.Sha256;
                     m.Files.Add(entry);
                     reused++;
+                    reusedBy[groupTitle]++;
                     continue;
                 }
                 entry.Stored = Path.Combine(versionName, storedRoot, rel);
-                work.Add(new Work(entry, file.FullName, Path.Combine(r.VersionPath, storedRoot, rel), file.Attributes, file.CreationTimeUtc));
+                work.Add(new Work(entry, file.FullName, Path.Combine(r.VersionPath, storedRoot, rel), file.Attributes, file.CreationTimeUtc, groupTitle));
                 total += entry.Size;
                 if (work.Count % 500 == 0) r.Step(step, StepState.Running, $"Calculando… {work.Count + reused:N0} arquivos");
             }
@@ -104,6 +111,8 @@ public static class FilesModule
         // 2. Cópia
         long done = 0;
         int copied = 0, failed = 0, viaShadow = 0;
+        var copiedBy = new Dictionary<string, int>();
+        var failedBy = new Dictionary<string, int>();
         r.SetPhase(0, total);
         r.Step(step, StepState.Running, "Copiando…");
         using (var shadows = spec.UseShadowCopy ? new ShadowCopies(r) : null)
@@ -139,11 +148,13 @@ public static class FilesModule
                     m.Files.Add(w.Entry);
                     r.StoredBytes += w.Entry.Size;
                     copied++;
+                    copiedBy[w.Group] = copiedBy.GetValueOrDefault(w.Group) + 1;
                 }
                 catch (OperationCanceledException) { throw; }
                 catch (Exception ex)
                 {
                     failed++;
+                    failedBy[w.Group] = failedBy.GetValueOrDefault(w.Group) + 1;
                     done += w.Entry.Size - fileDone;
                     r.Error(ex switch
                     {
@@ -167,8 +178,15 @@ public static class FilesModule
         var summary = N(copied, "copiado", "copiados") + (reused > 0 ? $" · {reused:N0} sem mudança" : "") + (failed > 0 ? $" · {failed} com erro" : "");
         r.Step(step, failed > 0 ? StepState.Warning : StepState.Done, summary);
         r.Ok($"{spec.FilesLabel}: {summary}");
-        var detail = N(copied + reused, "arquivo", "arquivos") + (viaShadow > 0 ? $" · {viaShadow} via Shadow Copy" : "") + (failed > 0 ? $" · {failed} com erro" : "");
-        r.Modules.Add(new ModuleResult(spec.FilesLabel, detail, failed > 0 ? StepState.Warning : StepState.Done));
+        // Uma linha por grupo no relatório (Arquivos pessoais, Criadores, Navegadores)
+        foreach (var group in reusedBy.Keys)
+        {
+            var c = copiedBy.GetValueOrDefault(group) + reusedBy[group];
+            var f = failedBy.GetValueOrDefault(group);
+            var detail = N(c, "arquivo", "arquivos") + (f > 0 ? $" · {f} com erro" : "");
+            r.Modules.Add(new ModuleResult(group, detail, f > 0 ? StepState.Warning : StepState.Done));
+        }
+        if (viaShadow > 0) r.Info($"{viaShadow} arquivos em uso foram copiados via Shadow Copy");
 
         // 3. Verificação
         if (verifyStep == null) return;
@@ -208,12 +226,12 @@ public static class FilesModule
     }
 
     /// <summary>Quantos arquivos e bytes a pasta tem, já aplicando as exclusões (estimativa da tela).</summary>
-    public static (int Files, long Bytes) Measure(string root, List<string> exclusions, CancellationToken token)
+    public static (int Files, long Bytes) Measure(string root, List<string> exclusions, CancellationToken token, string[]? include = null)
     {
         int files = 0;
         long bytes = 0;
         if (!Directory.Exists(root)) return (0, 0);
-        foreach (var (file, _) in Walk(root, exclusions, () => { }))
+        foreach (var (file, _) in Walk(root, exclusions, () => { }, null, include))
         {
             token.ThrowIfCancellationRequested();
             files++;
@@ -223,7 +241,7 @@ public static class FilesModule
     }
 
     /// <summary>Percorre a pasta sem seguir junções/atalhos de pasta (evita laços como "Meus Documentos\Minhas Músicas").</summary>
-    static IEnumerable<(FileInfo File, string Rel)> Walk(string root, List<string> exclusions, Action onDenied, Action<string>? onEmptyDir = null)
+    static IEnumerable<(FileInfo File, string Rel)> Walk(string root, List<string> exclusions, Action onDenied, Action<string>? onEmptyDir = null, string[]? include = null)
     {
         var patterns = exclusions.Select(Environment.ExpandEnvironmentVariables).ToList();
         var stack = new Stack<DirectoryInfo>();
@@ -236,6 +254,9 @@ public static class FilesModule
             catch (Exception ex) when (ex is UnauthorizedAccessException or IOException) { onDenied(); continue; }
 
             var kept = entries.Where(e => !Excluded(e, patterns) && e.LinkTarget == null).ToList();
+            // Na raiz, com lista de inclusão, só os itens pedidos (ex.: Bookmarks e Preferences de um perfil)
+            var atRoot = dir.FullName.Length <= root.TrimEnd('\\').Length;
+            if (atRoot && include != null) kept = kept.Where(e => include.Contains(e.Name, StringComparer.OrdinalIgnoreCase)).ToList();
             if (kept.Count == 0 && dir.FullName.Length > root.TrimEnd('\\').Length)
                 onEmptyDir?.Invoke(Path.GetRelativePath(root, dir.FullName));
 

@@ -10,7 +10,15 @@
                 <TextBlock Text="Navegadores" Style="{StaticResource H1}"/>
                 <TextBlock Text="Favoritos, lista de extensões e configurações de cada perfil detectado." Style="{StaticResource Sub}"/>
             </StackPanel>
-            <c:PreviewNotice/>
+
+            <Border x:Name="RunningWarn" Style="{StaticResource WarnCard}" Visibility="Collapsed">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <c:Icon Width="20" Height="20" Data="M12 3 2 20h20zM12 10v4M12 17h.01" Foreground="{StaticResource Warn}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="RunningText" Grid.Column="1" Foreground="{StaticResource WarnText}" TextWrapping="Wrap" LineHeight="20" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Style="{StaticResource LinkButton}" Content="Verificar de novo" Foreground="{StaticResource WarnText}" Click="OnRecheck"/>
+                </Grid>
+            </Border>
 
             <Grid x:Name="Cards" ColumnSpacing="14" RowSpacing="14">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
@@ -24,17 +32,24 @@
                         <c:Icon Width="20" Height="20" Foreground="{StaticResource Neon}" Data="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" VerticalAlignment="Top"/>
                         <StackPanel Grid.Column="1" Spacing="2">
                             <TextBlock Text="Senhas: exportação guiada" FontWeight="SemiBold"/>
-                            <TextBlock Style="{StaticResource Small}" Text="Por segurança o WINbackup não lê suas senhas. Ele abre a página certa de cada navegador e guarda o .csv que você exportar. Dica: ative a criptografia em Opções para proteger esse arquivo."/>
+                            <TextBlock Style="{StaticResource Small}" Text="Por segurança o WINbackup não lê suas senhas. Abra a página de senhas do navegador, use Exportar senhas e depois adicione aqui o .csv: ele entra no próximo backup."/>
                         </StackPanel>
                     </Grid>
                     <c:WrapPanel x:Name="PwButtons"/>
+                    <Grid ColumnSpacing="10">
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel x:Name="CsvList" Spacing="6" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="Adicionar .csv exportado" VerticalAlignment="Top" Click="OnAddCsv"/>
+                    </Grid>
+                    <TextBlock x:Name="CsvWarn" Style="{StaticResource Small}" Foreground="{StaticResource WarnText}" Visibility="Collapsed"
+                               Text="O .csv guarda as senhas em texto puro e o backup ainda não é criptografado. Guarde o HD de backup em local seguro e apague o .csv do PC depois."/>
                 </StackPanel>
             </Border>
 
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <c:SaveTargetBar Suffix="Navegadores"/>
-                <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="Salvar navegadores" Click="OnSoon"/>
+                <Button x:Name="SaveButton" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="Salvar navegadores" Click="OnSave"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

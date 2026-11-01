@@ -238,7 +238,6 @@ public sealed class BackupRunner
         if (files) _files = Add(Spec.FilesLabel, Spec.FilesLabel, 70);
         if (Spec.Unavailable.Contains("Saves de jogos")) Unavailable(Add("Saves de jogos", "Saves de jogos", 0));
         if (Spec.Drivers) _drivers = Add("Drivers", "Drivers", 20);
-        if (Spec.Unavailable.Contains("Navegadores")) Unavailable(Add("Navegadores", "Navegadores", 0));
         if (files && Spec.VerifyHash) _verify = Add("Verificar integridade (SHA-256)", Spec.FilesLabel, 25);
     }
 
@@ -312,6 +311,13 @@ public sealed class BackupRunner
         {
             manifest.Modules.Add("Programas");
             await ProgramsModule.BackupAsync(this, _programs, manifest, token);
+        }
+        if (Spec.Browsers)
+        {
+            var browsers = BrowsersModule.Detect();
+            BrowsersModule.WriteExtensionList(VersionPath, browsers);
+            if (Settings.Data.PasswordCsvs.Count == 0 && browsers.Any(b => b.Installed))
+                Warn("Senhas dos navegadores não foram exportadas. Faça a exportação guiada em Navegadores antes de formatar.");
         }
         if (_drivers != null)
         {

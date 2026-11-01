@@ -116,7 +116,7 @@ public sealed partial class RestorePage : Page
 
     // ---------- Conteúdo ----------
 
-    static string GroupTitle(string top) => top switch { "Arquivos" => "Arquivos pessoais", _ => top };
+    static string GroupTitle(string top) => FilesModule.GroupTitle(top);
 
     void BuildTree()
     {
@@ -133,7 +133,7 @@ public sealed partial class RestorePage : Page
             {
                 var ff = m.Files.Where(x => x.Folder == f.Key).ToList();
                 var app = group.Contains('\\') ? group[(group.IndexOf('\\') + 1)..] : null;
-                var child = Item(app ?? f.Name, Sys.Pretty(f.Source), $"{ff.Count:N0} · {Sys.Bytes(ff.Sum(x => x.Size))}", Icons.Folder, 1);
+                var child = Item(app != null ? $"{app} · {f.Name}" : f.Name, Sys.Pretty(f.Source), $"{ff.Count:N0} · {Sys.Bytes(ff.Sum(x => x.Size))}", Icons.Folder, 1);
                 _nodes.Add(new Node(child, top.Key, f, false));
             }
         }
@@ -324,6 +324,9 @@ public sealed partial class RestorePage : Page
         };
         var drivers = source.Drivers ? " Os drivers são instalados primeiro" + (NoReboot.IsOn ? ", sem reiniciar no fim." : " e o app pede para reiniciar no fim.") : "";
         if (!_manifest.Completed) rule += " Atenção: esta versão está incompleta (o backup foi cancelado).";
+        if (source.Folders?.Any(k => _manifest.Folders.FirstOrDefault(f => f.Key == k) is { } mf && RestoreModule.GroupOf(_manifest, mf).StartsWith("Navegadores")) == true
+            && BrowsersModule.Running(BrowsersModule.Detect()) is { Count: > 0 } open)
+            rule += $" Feche {string.Join(", ", open)} antes: o navegador aberto sobrescreve os favoritos ao fechar.";
         var ok = await Dialogs.ConfirmAsync(XamlRoot, "Restaurar agora?",
             $"{RestoreButton.Content} da versão de {HomePage.VersionDate(_version):dd/MM/yyyy HH:mm}, {where}. {rule}{drivers}",
             "Restaurar", "Cancelar", danger: Conflict == ConflictMode.Overwrite);
