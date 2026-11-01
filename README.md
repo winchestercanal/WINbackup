@@ -19,6 +19,18 @@
 
 **WINbackup** é um app gratuito para Windows, do **[Canal WINchester](https://www.youtube.com/WINchesterCanal)**, que faz backup de tudo o que importa antes de formatar e deixa o PC como estava depois: arquivos, programas, configurações, saves de jogos, drivers, navegadores e os presets dos seus apps de criação.
 
+<p align="center"><b>Abra, faça o backup e depois restaure. Simples, rápido e eficiente.</b></p>
+
+### 💡 Por que o WINbackup existe
+
+> Durante anos testei inúmeras ferramentas de backup. Todas precisavam de muitos ajustes e nenhuma entregava tudo o que eu precisava, o que me obrigava a usar várias ferramentas para um único propósito.
+>
+> O WINbackup nasceu para transformar a tarefa cansativa de fazer e restaurar backups de arquivos, programas e drivers em algo **simples, rápido e eficiente**. Você abre, executa o backup e depois restaura.
+>
+> **Sem configurações complicadas, sem escolhas entre termos difíceis e sem a chance de esquecer alguma coisa e só lembrar quando já é tarde demais.**
+>
+> — *Canal WINchester*
+
 > [!IMPORTANT]
 > 🤖 **Este aplicativo foi criado com inteligência artificial.** O código foi escrito pelo **Claude**, a IA da Anthropic, a partir do protótipo e das decisões do Canal WINchester, que orientou, revisou e testou cada etapa.
 
