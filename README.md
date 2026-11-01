@@ -38,7 +38,7 @@
 > **Versão 0.1 beta, de testes.** Todos os módulos funcionam, mas ainda estamos validando em PCs diferentes. Enquanto testa, **mantenha uma cópia extra dos seus arquivos importantes** e conte pra gente o que encontrar.
 
 <p align="center">
-  <img src="docs/img/home.png" alt="Tela inicial do WINbackup" width="90%">
+  <img src="docs/img/presets.gif" alt="Tela inicial do WINbackup alternando entre os presets" width="90%">
 </p>
 
 ## ✨ Por que o WINbackup
