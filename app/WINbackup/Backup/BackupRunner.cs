@@ -198,7 +198,7 @@ public sealed class BackupRunner
 
     // ---------- Execução ----------
 
-    StepItem? _vss, _files, _drivers, _verify, _prep, _install;
+    StepItem? _vss, _files, _drivers, _verify, _prep, _install, _programs;
 
     void BuildSteps()
     {
@@ -223,6 +223,8 @@ public sealed class BackupRunner
                 _prep = Add("Preparar drivers", "Drivers", 3);
                 _install = Add("Instalar drivers (PnPUtil)", "Drivers", 17);
             }
+            if (Spec.InstallPackages != null || Spec.RestoreSources.Any(s => s.Programs))
+                _programs = Add("Programas (winget)", "Programas", 40);
             foreach (var name in Spec.Unavailable) Unavailable(Add(name, name, 0));
             if (Spec.RestoreSources.Any(s => s.Folders == null || s.Folders.Count > 0 || s.Files?.Count > 0))
                 _files = Add("Arquivos e configurações", "Arquivos", 80);
@@ -231,8 +233,8 @@ public sealed class BackupRunner
 
         var files = Spec.Folders.Count > 0;
         if (files && Spec.UseShadowCopy) _vss = Add("Shadow Copy (VSS)", Spec.FilesLabel, 0);
-        foreach (var name in new[] { "Programas (winget)", "Configurações" })
-            if (Spec.Unavailable.Contains(name)) Unavailable(Add(name, name, 0));
+        if (Spec.Programs) _programs = Add("Programas (winget)", "Programas", 10);
+        if (Spec.Unavailable.Contains("Configurações")) Unavailable(Add("Configurações", "Configurações", 0));
         if (files) _files = Add(Spec.FilesLabel, Spec.FilesLabel, 70);
         if (Spec.Unavailable.Contains("Saves de jogos")) Unavailable(Add("Saves de jogos", "Saves de jogos", 0));
         if (Spec.Drivers) _drivers = Add("Drivers", "Drivers", 20);
@@ -306,6 +308,11 @@ public sealed class BackupRunner
             manifest.Modules.Add(Spec.FilesLabel);
             await FilesModule.RunAsync(this, _files, _vss, _verify, manifest, token);
         }
+        if (_programs != null)
+        {
+            manifest.Modules.Add("Programas");
+            await ProgramsModule.BackupAsync(this, _programs, manifest, token);
+        }
         if (_drivers != null)
         {
             manifest.Modules.Add("Drivers");
@@ -332,7 +339,7 @@ public sealed class BackupRunner
             _ => "Destino: locais originais",
         } + $" · se já existir: {Spec.Conflict switch { ConflictMode.Overwrite => "substituir", ConflictMode.KeepBoth => "manter os dois", _ => "pular" }}");
         if (!Sys.IsAdmin) Warn("O app não está rodando como administrador: drivers e pastas protegidas podem falhar.");
-        await RestoreModule.RunAsync(this, _files, _prep, _install, token);
+        await RestoreModule.RunAsync(this, _files, _prep, _install, _programs, token);
         foreach (var name in Spec.Unavailable)
             Modules.Add(new ModuleResult(name, "Ainda não disponível nesta versão", StepState.Unavailable));
         Percent = 100;

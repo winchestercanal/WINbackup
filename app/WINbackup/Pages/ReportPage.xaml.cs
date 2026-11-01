@@ -72,7 +72,8 @@ public sealed partial class ReportPage : Page
         var where = r.Spec.Kind switch
         {
             JobKind.RestoreDrivers => r.Spec.DriverSource,
-            JobKind.Restore => string.Join(", ", r.Spec.RestoreSources.Select(s => Path.GetFileName(s.VersionPath))),
+            JobKind.Restore when r.Spec.InstallPackages != null => "lista importada",
+            JobKind.Restore => string.Join(", ", r.Spec.RestoreSources.Select(s => Path.GetFileName(s.VersionPath)).Distinct()),
             _ => r.VersionPath,
         };
         SubText.Text = $"{r.Spec.Title} · {where}" + (issues == 0 ? "" : issues == 1 ? " · com 1 aviso" : $" · com {issues} avisos");

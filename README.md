@@ -2,7 +2,7 @@
 
 App gratuito para Windows do **[Canal WINchester](https://www.youtube.com/WINchesterCanal)** para fazer backup antes de formatar e deixar o PC como estava depois.
 
-> **Status: 0.1 beta (testes).** Já funcionam de verdade: backup de Arquivos pessoais, Criadores e Drivers, e a restauração. As outras telas mostram como os módulos vão funcionar e entram nas próximas versões.
+> **Status: 0.1 beta (testes).** Já funcionam de verdade: backup de Arquivos pessoais, Criadores, Programas e Drivers, e a restauração. As outras telas mostram como os módulos vão funcionar e entram nas próximas versões.
 
 ## O que ele faz
 
@@ -10,9 +10,10 @@ App gratuito para Windows do **[Canal WINchester](https://www.youtube.com/WINche
 |---|---|
 | **Arquivos pessoais** | Documentos, Imagens, Área de Trabalho, Downloads e pastas que você escolher. Detecta pastas no OneDrive, copia só o que mudou (incremental), usa Shadow Copy para arquivos em uso e confere tudo com SHA-256 |
 | **Criadores** | Presets, workspaces, scripts e plugins de Premiere, After Effects, Photoshop, Illustrator, Lightroom, DaVinci Resolve, OBS, Stream Deck, Voicemeeter, Blender e outros |
+| **Programas** | Lista o que está instalado via winget, salva a lista para reinstalar tudo sozinho depois de formatar e gera uma lista dos que precisam ser instalados à mão |
 | **Drivers** | Exporta os drivers de terceiros com PnPUtil e reinstala depois |
 | **Restaurar** | Escolhe a versão e o que trazer de volta (pastas ou arquivos soltos), para o lugar original, outro usuário ou outra pasta. O modo Pós-formatação restaura drivers, configurações e arquivos na ordem certa |
-| Programas (winget), Configurações do Windows, Navegadores, Saves de jogos, Agendamentos | Em desenvolvimento |
+| Configurações do Windows, Navegadores, Saves de jogos, Agendamentos | Em desenvolvimento |
 
 O backup fica em pastas comuns no destino que você escolher (HD externo, outro disco ou rede), com um `manifest.json` e um log por execução. Nada é enviado para a internet.
 

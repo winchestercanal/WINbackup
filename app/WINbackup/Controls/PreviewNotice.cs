@@ -11,7 +11,7 @@ public sealed partial class PreviewNotice : UserControl
 
     public PreviewNotice()
     {
-        Text = "Prévia: esta tela ainda mostra dados de exemplo. O módulo entra numa próxima versão; já funcionam: Arquivos pessoais, Criadores, Drivers e a restauração.";
+        Text = "Prévia: esta tela ainda mostra dados de exemplo. O módulo entra numa próxima versão; já funcionam: Arquivos pessoais, Criadores, Programas, Drivers e a restauração.";
         var grid = new Grid { ColumnSpacing = 10 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition());

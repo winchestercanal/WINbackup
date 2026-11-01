@@ -17,6 +17,9 @@ public class SettingsData
     public bool Incremental { get; set; } = true;
     public bool KeepAcl { get; set; }
 
+    // Programas: IDs do winget que o usuário desmarcou
+    public List<string> ProgramsOff { get; set; } = new();
+
     // Criadores
     public Dictionary<string, bool> CreatorSelection { get; set; } = new();
     public List<string> CreatorCustomFolders { get; set; } = new();

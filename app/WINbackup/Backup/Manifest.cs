@@ -27,6 +27,7 @@ public class Manifest
     public List<ManifestFile> Files { get; set; } = new();
     public List<ManifestDir> EmptyFolders { get; set; } = new();
     public List<ManifestDriver> Drivers { get; set; } = new();
+    public List<ManifestProgram> Programs { get; set; } = new();
     public long BytesStored { get; set; }
     public bool HashChecked { get; set; }
     public int HashMismatches { get; set; }
@@ -74,6 +75,15 @@ public class ManifestDir
 {
     public string Folder { get; set; } = "";
     public string Path { get; set; } = "";
+}
+
+public class ManifestProgram
+{
+    public string Name { get; set; } = "";
+    public string Id { get; set; } = "";
+    public string Version { get; set; } = "";
+    /// <summary>"winget", "msstore" ou vazio (sem pacote: instalar à mão).</summary>
+    public string Source { get; set; } = "";
 }
 
 public class ManifestDriver

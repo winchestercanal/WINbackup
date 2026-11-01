@@ -9,7 +9,8 @@ public enum RestoreTarget { Original, OtherUser, Folder }
 public enum ConflictMode { Skip, Overwrite, KeepBoth }
 
 /// <summary>Uma versão e o que restaurar dela. Folders null = todas as pastas.</summary>
-public record RestoreSource(string VersionPath, Manifest Manifest, HashSet<string>? Folders, HashSet<string>? Files, bool Drivers, ConflictMode? Conflict = null);
+public record RestoreSource(string VersionPath, Manifest Manifest, HashSet<string>? Folders, HashSet<string>? Files, bool Drivers,
+    ConflictMode? Conflict = null, bool Programs = false);
 
 /// <summary>
 /// Restauração: copia de volta os arquivos de uma ou mais versões (seguindo os arquivos que
@@ -74,7 +75,7 @@ public static class RestoreModule
             : path;
     }
 
-    public static async Task RunAsync(BackupRunner r, StepItem? filesStep, StepItem? prep, StepItem? install, CancellationToken token)
+    public static async Task RunAsync(BackupRunner r, StepItem? filesStep, StepItem? prep, StepItem? install, StepItem? programsStep, CancellationToken token)
     {
         await Task.Yield();
         var spec = r.Spec;
@@ -88,6 +89,16 @@ public static class RestoreModule
             if (path == null || prep == null || install == null) continue;
             await DriversModule.RestoreAsync(r, prep, install, path, token);
             break;
+        }
+        // Depois os programas: as configurações dos apps precisam deles instalados
+        if (programsStep != null)
+        {
+            if (spec.InstallPackages != null)
+                await ProgramsModule.InstallAsync(r, programsStep, spec.InstallPackages, null, token);
+            else if (spec.RestoreSources.FirstOrDefault(s => s.Programs) is { } ps)
+                await ProgramsModule.InstallAsync(r, programsStep,
+                    ps.Manifest.Programs.Where(p => p.Source is "winget" or "msstore").Select(p => (p.Id, p.Name, p.Source)).ToList(),
+                    ProgramsModule.ManualListPath(ps.VersionPath), token);
         }
         if (filesStep == null) return;
 

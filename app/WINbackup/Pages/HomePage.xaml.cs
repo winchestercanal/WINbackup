@@ -64,8 +64,9 @@ public sealed partial class HomePage : Page
         summary.Children.Add(Row("Destino", string.IsNullOrEmpty(spec.Destination) ? "Não escolhido" : spec.Destination, mono: true));
         var runs = new List<string>();
         if (spec.Folders.Count > 0) runs.Add($"Arquivos pessoais ({spec.Folders.Count} pastas)");
+        if (spec.Programs) runs.Add("Programas");
         if (spec.Drivers) runs.Add("Drivers");
-        summary.Children.Add(Row("Nesta versão", runs.Count > 0 ? string.Join(" e ", runs) : "Nada ainda", mono: false));
+        summary.Children.Add(Row("Nesta versão", runs.Count > 0 ? string.Join(", ", runs) : "Nada ainda", mono: false));
 
         var body = new StackPanel { Spacing = 18 };
         body.Children.Add(summary);

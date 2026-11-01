@@ -13,14 +13,13 @@
                     <TextBlock Text="Programas" Style="{StaticResource H1}"/>
                     <TextBlock Text="Salva a lista dos seus programas e reinstala tudo depois, sozinho, via winget." Style="{StaticResource Sub}"/>
                 </StackPanel>
-                <Button Grid.Column="1" Style="{StaticResource SmallButton}" VerticalAlignment="Bottom" Click="OnSoon">
+                <Button x:Name="ScanButton" Grid.Column="1" Style="{StaticResource SmallButton}" VerticalAlignment="Bottom" Click="OnScan">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="14" Height="14" StrokeThickness="2" Data="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/>
                         <TextBlock Text="Escanear novamente"/>
                     </StackPanel>
                 </Button>
             </Grid>
-            <c:PreviewNotice/>
 
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
@@ -55,6 +54,10 @@
                         <TextBlock Grid.Column="2" Text="Versão" Style="{StaticResource Small}"/>
                         <TextBlock Grid.Column="3" Text="Origem" Style="{StaticResource Small}"/>
                     </Grid>
+                    <StackPanel x:Name="Loading" Orientation="Horizontal" Spacing="12" Padding="18,22">
+                        <ProgressRing IsActive="True" Width="20" Height="20" Foreground="{StaticResource Neon}"/>
+                        <TextBlock x:Name="LoadingText" Text="Perguntando ao winget o que está instalado…" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    </StackPanel>
                     <ItemsRepeater x:Name="Rows">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="m:CheckItem">
@@ -87,20 +90,20 @@
 
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <Button Style="{StaticResource AccentButton}" Click="OnSoon">
+                <Button Style="{StaticResource AccentButton}" Click="OnImport">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M12 15V4M7 9l5-5 5 5M5 20h14"/>
                         <TextBlock Text="Importar lista e instalar"/>
                     </StackPanel>
                 </Button>
                 <TextBlock Grid.Column="1" Text="Só instala os programas de um arquivo .json, sem restaurar o resto" Style="{StaticResource Small}" VerticalAlignment="Center"/>
-                <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Click="OnSoon">
+                <Button x:Name="ExportButton" Grid.Column="2" Style="{StaticResource SecondaryButton}" Click="OnExport">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M12 4v11M7 10l5 5 5-5M5 20h14"/>
                         <TextBlock Text="Exportar lista (.json)"/>
                     </StackPanel>
                 </Button>
-                <Button x:Name="SaveButton" Grid.Column="3" Style="{StaticResource PrimaryButton}" Click="OnSoon"/>
+                <Button x:Name="SaveButton" Grid.Column="3" Style="{StaticResource PrimaryButton}" Content="Salvar programas" IsEnabled="False" Click="OnSave"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

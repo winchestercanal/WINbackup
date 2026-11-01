@@ -7,9 +7,9 @@ namespace WINbackup.Services;
 public static class Proc
 {
     /// <summary>Roda um comando do sistema e devolve o código de saída, repassando cada linha da saída.</summary>
-    public static async Task<int> RunAsync(string exe, string args, Action<string>? onLine, CancellationToken token)
+    public static async Task<int> RunAsync(string exe, string args, Action<string>? onLine, CancellationToken token, Encoding? encoding = null)
     {
-        var oem = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+        var oem = encoding ?? Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
         var psi = new ProcessStartInfo(exe, args)
         {
             UseShellExecute = false,
@@ -38,4 +38,17 @@ public static class Proc
     }
 
     public static string SystemExe(string name) => Path.Combine(Environment.SystemDirectory, name);
+
+    /// <summary>winget.exe (alias do Instalador de Aplicativo), ou null se não estiver instalado.</summary>
+    public static string? Winget()
+    {
+        var alias = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "WindowsApps", "winget.exe");
+        if (File.Exists(alias)) return alias;
+        foreach (var dir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var candidate = Path.Combine(dir.Trim(), "winget.exe");
+            if (File.Exists(candidate)) return candidate;
+        }
+        return null;
+    }
 }

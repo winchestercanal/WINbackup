@@ -18,6 +18,11 @@ public class JobSpec
     /// <summary>Nome da etapa de cópia de pastas no progresso e no relatório.</summary>
     public string FilesLabel { get; init; } = "Arquivos pessoais";
     public bool Drivers { get; init; }
+    public bool Programs { get; init; }
+    /// <summary>IDs do winget que ficam de fora (desmarcados na tela Programas).</summary>
+    public HashSet<string> ProgramsOff { get; init; } = new(Settings.Data.ProgramsOff, StringComparer.OrdinalIgnoreCase);
+    /// <summary>"Importar lista e instalar": pacotes de um Programas.json avulso.</summary>
+    public List<(string Id, string Name, string Source)>? InstallPackages { get; init; }
     /// <summary>Pacotes oemNN.inf escolhidos; null = todos os de terceiros.</summary>
     public List<string>? DriverInfs { get; init; }
     /// <summary>Módulos do preset que ainda não existem nesta versão (aparecem como "Em breve").</summary>
@@ -42,7 +47,7 @@ public class JobSpec
     public bool DownloadCloudFiles { get; init; } = Settings.Data.DownloadCloudFiles;
     public List<string> Exclusions { get; init; } = new(Settings.Data.Exclusions);
 
-    public bool HasWork => Folders.Count > 0 || Drivers;
+    public bool HasWork => Folders.Count > 0 || Drivers || Programs;
 }
 
 /// <summary>Pastas pessoais padrão + pastas adicionadas pelo usuário.</summary>
@@ -100,17 +105,19 @@ public static class Presets
         {
             0 => new JobSpec
             {
-                Title = p.Name, Folders = PersonalFolders.Selected(), Drivers = true,
-                Unavailable = ["Programas (winget)", "Configurações", "Saves de jogos", "Navegadores"],
+                Title = p.Name, Folders = PersonalFolders.Selected(), Drivers = true, Programs = true,
+                Unavailable = ["Configurações", "Saves de jogos", "Navegadores"],
             },
             1 => new JobSpec { Title = p.Name, Folders = PersonalFolders.ByKeys("doc", "img", "dsk") },
             2 => new JobSpec
             {
                 Title = p.Name, Folders = PersonalFolders.ByKeys("ssh").Where(f => Directory.Exists(f.Path)).ToList(),
-                Unavailable = ["Programas (winget)", "Configurações"],
+                Programs = true,
+                Unavailable = ["Configurações"],
             },
             3 => new JobSpec { Title = p.Name, Unavailable = ["Saves de jogos", "Configurações"] },
             _ => Creators(),
         };
     }
 }
+
