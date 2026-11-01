@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Navegação</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<nav aria-label="Seções" style="width: 248px; height: 758px; box-sizing: border-box; padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; background: #070b15; border-right: 1px solid #141f38; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif">
+<a href="Main.dc.html" class="nav-i" aria-current="{{home.current}}" style="height: 38px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 6px; background: {{home.bg}}; color: {{home.fg}}; font-size: 14px; font-weight: {{home.weight}}; text-decoration: none; position: relative">
+<span style="position: absolute; left: 0; top: 10px; width: 3px; height: 18px; border-radius: 3px; background: {{home.pill}}"></span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>
+<span>Início</span>
+</a>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+<button onClick="{{g.toggle}}" class="nav-g" aria-expanded="{{g.open}}" style="height: 38px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: {{g.fg}}; font-family: inherit; font-size: 14px; font-weight: {{g.weight}}; text-align: left; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{g.d}}"></path></svg>
+<span style="flex-grow: 1">{{g.label}}</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8ea3c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: rotate({{g.rot}}); transition: transform 0.15s"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+<sc-if value="{{g.open}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 2px; margin: 0 0 4px 21px; padding-left: 8px; border-left: 1px solid #1a2847">
+<sc-for list="{{g.items}}" as="item" hint-placeholder-count="3">
+<a href="{{item.href}}" class="nav-i" aria-current="{{item.current}}" style="height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 6px; background: {{item.bg}}; color: {{item.fg}}; font-size: 13.5px; font-weight: {{item.weight}}; text-decoration: none; position: relative">
+<span style="position: absolute; left: -9px; top: 8px; width: 3px; height: 18px; border-radius: 3px; background: {{item.pill}}"></span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{item.d}}"></path></svg>
+<span>{{item.label}}</span>
+</a>
+</sc-for>
+</div>
+</sc-if>
+</sc-for>
+<div style="flex-grow: 1"></div>
+<sc-if value="{{pickerOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Escolher destino dos backups" style="display: flex; flex-direction: column; gap: 2px; padding: 6px; margin-bottom: 6px; border-radius: 10px; background: #0e1526; border: 1px solid #2f4a80; box-shadow: 0 12px 30px rgba(0,0,0,0.5)">
+<span style="padding: 6px 8px 4px; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #7f93b8">SALVAR BACKUPS EM</span>
+<sc-for list="{{dests}}" as="d" hint-placeholder-count="3">
+<button onClick="{{d.pick}}" role="option" aria-selected="{{d.on}}" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 0; border-radius: 7px; background: {{d.bg}}; color: #e8f0ff; font-family: inherit; text-align: left; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{d.iconColor}}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{d.icon}}"></path></svg>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+<span style="font-size: 12.5px; font-weight: 600">{{d.label}}</span>
+<span style="font-size: 11px; color: #8ea3c7; font-family: 'Cascadia Mono', Consolas, monospace">{{d.path}}</span>
+</span>
+<sc-if value="{{d.on}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#19e3ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</button>
+</sc-for>
+<button onClick="{{closePicker}}" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 0; border-top: 1px solid #1a2847; border-radius: 0 0 7px 7px; background: transparent; color: #9fc3ff; font-family: inherit; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM12 11v5M9.5 13.5h5"></path></svg>
+Procurar outra pasta…
+</button>
+</div>
+</sc-if>
+<button onClick="{{togglePicker}}" aria-expanded="{{pickerOpen}}" aria-label="Destino dos backups: {{cur.path}}. Clique para alterar" style="display: flex; flex-direction: column; gap: 7px; padding: 12px; border-radius: 10px; background: #0c1426; border: 1px solid {{cardBorder}}; color: #e8f0ff; font-family: inherit; text-align: left; cursor: pointer">
+<span style="display: flex; align-items: center; justify-content: space-between; width: 100%">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #7f93b8">DESTINO DOS BACKUPS</span>
+<span style="font-size: 11.5px; font-weight: 600; color: #19e3ff">Alterar</span>
+</span>
+<span style="display: flex; align-items: center; gap: 8px; width: 100%">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#19e3ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{cur.icon}}"></path></svg>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0">
+<span style="font-size: 13px; font-weight: 600">{{cur.label}}</span>
+<span style="font-size: 11.5px; color: #a9badb; font-family: 'Cascadia Mono', Consolas, monospace">{{cur.path}}</span>
+</span>
+<span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: #3ddc97"></span>
+</span>
+<span style="height: 6px; width: 100%; border-radius: 6px; background: #1a2847; overflow: hidden; display: block"><span style="display: block; width: {{cur.used}}; height: 6px; background: #2f7bff"></span></span>
+<span style="font-size: 11.5px; color: #8ea3c7">[LIVRE] livres de [TOTAL]</span>
+</button>
+<a href="Options.dc.html" class="nav-i" aria-current="{{optCurrent}}" style="height: 36px; display: flex; align-items: center; gap: 12px; padding: 0 12px; margin-top: 6px; border-radius: 6px; background: {{optBg}}; color: {{optFg}}; font-size: 14px; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"></path></svg>
+Opções
+</a>
+<a href="https://www.youtube.com/WINchesterCanal" class="yt" style="height: 36px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 6px; color: #ff5c6c; font-size: 14px; font-weight: 600; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 5h11A4 4 0 0 1 21.5 9v6a4 4 0 0 1-4 4h-11a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zM10 9l5 3-5 3z"></path></svg>
+Tutorial no YouTube
+</a>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","default":"home","options":["home","files","apps","configs","games","drivers","browsers","restore","wizard","activity","schedule","history","options"]},"$preview":{"width":248,"height":760}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { open: {}, picker: false, dest: 0 }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var active = this.props.active ?? 'home';
+    var D = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+      files: 'M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z',
+      apps: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',
+      configs: 'M4 6h9M17 6h3M15 4v4M4 12h3M11 12h9M9 10v4M4 18h11M19 18h1M17 16v4',
+      games: 'M6 9h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.4 1.8L15 14H9l-1.6 1.8A3 3 0 0 1 2 14v-1a4 4 0 0 1 4-4zM7 11v3M5.5 12.5h3M16 12h.01M18 13.5h.01',
+      drivers: 'M8 6h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4',
+      browsers: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18',
+      restore: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5',
+      wizard: 'M5 19 15 9M14 4v3M12.5 5.5h3M19 9v3M17.5 10.5h3M9 3v2M8 4h2',
+      activity: 'M3 12h4l3-8 4 16 3-8h4',
+      schedule: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7v5l3 2',
+      history: 'M6 3h9l4 4v14H6zM9 12h7M9 16h7M9 8h3'
+    };
+    var def = [
+      ['backup', 'Backup', 'M12 4v11M7 10l5 5 5-5M5 20h14', [
+        ['files', 'Arquivos pessoais', 'Files.dc.html'], ['apps', 'Programas', 'Apps.dc.html'],
+        ['configs', 'Configurações', 'Configs.dc.html'], ['games', 'Saves de jogos', 'Games.dc.html'],
+        ['drivers', 'Drivers', 'Drivers.dc.html'], ['browsers', 'Navegadores', 'Browsers.dc.html']]],
+      ['restaurar', 'Restaurar', 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5', [
+        ['restore', 'Restaurar backup', 'Restore.dc.html'], ['wizard', 'Pós-formatação', 'Wizard.dc.html']]],
+      ['auto', 'Painel', 'M4 18a8 8 0 1 1 16 0M12 18l4-5M4 18h2M18 18h2', [
+        ['activity', 'Atividade', 'Activity.dc.html'], ['schedule', 'Agendamentos', 'Schedule.dc.html'],
+        ['history', 'Histórico e versões', 'History.dc.html']]]
+    ];
+    var groups = def.map(function (g) {
+      var hasActive = g[3].some(function (n) { return n[0] === active; });
+      var open = s.open[g[0]] === undefined ? hasActive : s.open[g[0]];
+      return { label: g[1], d: g[2], open: open, rot: open ? '90deg' : '0deg',
+        fg: hasActive ? '#ffffff' : '#c9d6ee', weight: hasActive ? 600 : 500,
+        toggle: function () { var o = Object.assign({}, s.open); o[g[0]] = !open; self.setState({ open: o }); },
+        items: g[3].map(function (n) {
+          var on = active === n[0];
+          return { label: n[1], href: n[2], d: D[n[0]], current: on ? 'page' : 'false',
+            bg: on ? '#12203d' : 'transparent', fg: on ? '#ffffff' : '#a9badb', weight: on ? 600 : 400,
+            pill: on ? '#19e3ff' : 'transparent' };
+        }) };
+    });
+    var h = active === 'home';
+    var home = { current: h ? 'page' : 'false', bg: h ? '#12203d' : 'transparent', fg: h ? '#ffffff' : '#c9d6ee',
+      weight: h ? 600 : 500, pill: h ? '#19e3ff' : 'transparent' };
+    var DRIVE = 'M3 13h18v7H3zM5 13 7.5 5h9L19 13M17 16.5h.01';
+    var NET = 'M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01';
+    var dDef = [
+      ['HD Externo (E:)', 'E:\\Backup', DRIVE, '58%'],
+      ['Dados (D:)', 'D:\\Backup', DRIVE, '72%'],
+      ['NAS na rede', '\\\\NAS\\backups', NET, '35%']
+    ];
+    var dests = dDef.map(function (d, i) {
+      var on = s.dest === i;
+      return { label: d[0], path: d[1], icon: d[2], on: on, bg: on ? '#12203d' : 'transparent', iconColor: on ? '#19e3ff' : '#6fa4ff',
+        pick: function () { self.setState({ dest: i, picker: false }); } };
+    });
+    var c = dDef[s.dest];
+    var cur = { label: c[0], path: c[1], icon: c[2], used: c[3] };
+    var opt = active === 'options';
+    return { dests: dests, cur: cur, pickerOpen: s.picker, cardBorder: s.picker ? '#19e3ff' : '#22407a',
+      togglePicker: function () { self.setState({ picker: !s.picker }); },
+      closePicker: function () { self.setState({ picker: false }); },
+      home: home, groups: groups, optCurrent: opt ? 'page' : 'false', optBg: opt ? '#12203d' : 'transparent', optFg: opt ? '#ffffff' : '#a9badb' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<Page
+    x:Class="WINbackup.Pages.BrowsersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:WINbackup.Controls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" Padding="36,28,36,36">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Navegadores" Style="{StaticResource H1}"/>
+                <TextBlock Text="Favoritos, lista de extensões e configurações de cada perfil detectado." Style="{StaticResource Sub}"/>
+            </StackPanel>
+            <c:PreviewNotice/>
+
+            <Grid x:Name="Cards" ColumnSpacing="14" RowSpacing="14">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            </Grid>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <c:Icon Width="20" Height="20" Foreground="{StaticResource Neon}" Data="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" VerticalAlignment="Top"/>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Senhas: exportação guiada" FontWeight="SemiBold"/>
+                            <TextBlock Style="{StaticResource Small}" Text="Por segurança o WINbackup não lê suas senhas. Ele abre a página certa de cada navegador e guarda o .csv que você exportar. Dica: ative a criptografia em Opções para proteger esse arquivo."/>
+                        </StackPanel>
+                    </Grid>
+                    <c:WrapPanel x:Name="PwButtons"/>
+                </StackPanel>
+            </Border>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <c:SaveTargetBar Suffix="Navegadores"/>
+                <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="Salvar navegadores" Click="OnSoon"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

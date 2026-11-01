@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Relatório final</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="home" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; align-items: center; gap: 16px">
+<div style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; background: #0b2a1f; border: 1.5px solid #3ddc97; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(61,220,151,0.35)">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3ddc97" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Backup concluído</h1>
+<p style="margin: 0; color: #8ea3c7">Backup completo · E:\Backup\WINbackup_[DATA] · com 2 avisos</p>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{stats}}" as="st" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; color: #8ea3c7">{{st.label}}</span>
+<span style="font-size: 22px; font-weight: 700; color: {{st.color}}">{{st.value}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start">
+<div style="border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<span style="display: block; padding: 12px 18px; font-size: 14px; font-weight: 600; border-bottom: 1px solid #16223d">Por módulo</span>
+<sc-for list="{{mods}}" as="m" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 12px; padding: 11px 18px; border-bottom: 1px solid #16223d">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{m.color}}"></span>
+<span style="flex-grow: 1">{{m.name}}</span>
+<span style="font-size: 12px; color: #a9badb">{{m.detail}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 14px; font-weight: 600">Atenção</span>
+<div style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #1d1608; border: 1px solid #5c4413">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffb547" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"></path></svg>
+<span style="color: #ffd89a; font-size: 13px; line-height: 19px">[N] programas não têm pacote no winget. A lista com links de download foi salva em <span style="font-family: 'Cascadia Mono', Consolas, monospace">Instalar_manualmente.html</span>.</span>
+</div>
+<div style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #1d1608; border: 1px solid #5c4413">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffb547" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"></path></svg>
+<span style="color: #ffd89a; font-size: 13px; line-height: 19px">Senhas dos navegadores não foram exportadas. Faça a exportação guiada antes de formatar.</span>
+</div>
+<a href="Browsers.dc.html" style="font-size: 13px; text-decoration: none">Exportar senhas agora</a>
+</div>
+</div>
+
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<button style="height: 44px; padding: 0 18px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 14px; font-weight: 600; cursor: pointer">Exportar relatório (HTML)</button>
+<button style="height: 44px; padding: 0 18px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 14px; font-weight: 600; cursor: pointer">Abrir pasta do backup</button>
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Concluir</a>
+</div>
+
+</main>
+</div>
+
+<sc-if value="{{showToast}}" hint-placeholder-val="{{true}}">
+<div role="status" style="position: absolute; right: 20px; bottom: 20px; width: 360px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; background: #1b2235; border: 1px solid #2f3a55; box-shadow: 0 16px 40px rgba(0,0,0,0.55)">
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="width: 14px; height: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5px">
+<div style="background: #19e3ff; border-radius: 1.5px"></div><div style="background: #2f7bff; border-radius: 1.5px"></div><div style="background: #2f7bff; border-radius: 1.5px"></div><div style="background: #19e3ff; border-radius: 1.5px"></div>
+</div>
+<span style="flex-grow: 1; font-size: 12px; color: #c9d6ee">WINbackup</span>
+<button onClick="{{closeToast}}" aria-label="Fechar notificação" style="width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: #c9d6ee; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0l10 10M10 0 0 10" stroke="currentColor"></path></svg></button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 600">Backup concluído com 2 avisos</span>
+<span style="font-size: 13px; color: #a9badb">[TAMANHO] salvos em E:\Backup · integridade conferida</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button style="height: 32px; border: 0; border-radius: 6px; background: #2a3450; color: #e8f0ff; font-size: 12.5px; cursor: pointer">Ver relatório</button>
+<button onClick="{{closeToast}}" style="height: 32px; border: 0; border-radius: 6px; background: #2a3450; color: #e8f0ff; font-size: 12.5px; cursor: pointer">Dispensar</button>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { toast: true }; }
+  renderVals() {
+    var self = this;
+    var stats = [
+      { label: 'Itens salvos', value: '[N]', color: '#e8f0ff' }, { label: 'Tamanho final', value: '[TAMANHO]', color: '#e8f0ff' },
+      { label: 'Duração', value: '[MM:SS]', color: '#e8f0ff' }, { label: 'Integridade', value: 'SHA-256 OK', color: '#3ddc97' }
+    ];
+    var mods = [
+      ['Arquivos pessoais', '[N] arquivos · 3 via Shadow Copy', '#3ddc97'], ['Programas', '[N] no winget · [N] manuais', '#ffb547'],
+      ['Configurações', 'Windows + [N] apps', '#3ddc97'], ['Saves de jogos', '[N] jogos', '#3ddc97'],
+      ['Drivers', '[N] drivers de terceiros', '#3ddc97'], ['Navegadores', '4 navegadores · senhas pendentes', '#ffb547']
+    ].map(function (m) { return { name: m[0], detail: m[1], color: m[2] }; });
+    return { stats: stats, mods: mods, showToast: this.state.toast, closeToast: function () { self.setState({ toast: false }); } };
+  }
+}
+</script>
+</body>
+</html>

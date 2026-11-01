@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Opções</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="options" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Opções</h1>
+<p style="margin: 0; color: #8ea3c7">Segurança, notificações, automação e modo portátil.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: #7f93b8">SEGURANÇA</span>
+<sc-for list="{{sec}}" as="t" hint-placeholder-count="2">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.on}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{t.track}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{t.knob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">{{t.label}}</span><span style="font-size: 12px; color: #8ea3c7">{{t.desc}}</span></span>
+</button>
+</sc-for>
+<sc-if value="{{encOn}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding-left: 52px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="pw1" style="font-size: 12px; color: #a9badb">Senha</label>
+<input id="pw1" type="password" value="senhasecreta" style="height: 34px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 13px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="pw2" style="font-size: 12px; color: #a9badb">Confirmar</label>
+<input id="pw2" type="password" value="senhasecreta" style="height: 34px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 13px">
+</div>
+<span style="grid-column: 1 / -1; font-size: 12px; color: #ffd89a">Sem a senha não dá para restaurar. Guarde-a em um gerenciador de senhas.</span>
+</div>
+</sc-if>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: #7f93b8">NOTIFICAÇÕES</span>
+<sc-for list="{{notif}}" as="t" hint-placeholder-count="3">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.on}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{t.track}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{t.knob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">{{t.label}}</span><span style="font-size: 12px; color: #8ea3c7">{{t.desc}}</span></span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: #7f93b8">VERSÕES</span>
+<span style="font-size: 13px; color: #a9badb; line-height: 20px">Manter as últimas <b style="color: #e8f0ff">5</b> versões. O último backup completo nunca é apagado.</span>
+<a href="History.dc.html" style="font-size: 13px; text-decoration: none">Ajustar retenção</a>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: #7f93b8">LINHA DE COMANDO</span>
+<button style="height: 28px; padding: 0 10px; border: 1px solid #2a3b63; border-radius: 7px; background: #101b33; color: #e8f0ff; font-size: 12px; cursor: pointer">Copiar exemplos</button>
+</div>
+<span style="font-size: 13px; color: #a9badb; line-height: 20px">Tudo o que a interface faz também roda por comando, para scripts, agendamentos e o autounattend.</span>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 10px; background: #070b15; border: 1px solid #16223d; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; line-height: 20px">
+<span style="color: #7f93b8"># backup com um preset</span>
+<span style="color: #7befff">WINbackup.exe --preset completo --dest E:\Backup</span>
+<span style="color: #7f93b8"># só programas e configurações</span>
+<span style="color: #7befff">WINbackup.exe --only apps,configs --dest E:\Backup</span>
+<span style="color: #7f93b8"># pós-formatação sem perguntas</span>
+<span style="color: #7befff">WINbackup.exe --restore E:\Backup --postformat --silent</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 10px; background: #0b1a33; border: 1px solid #22407a">
+<span style="font-size: 12px; font-weight: 600">No autounattend.xml</span>
+<span style="font-size: 12px; color: #a9badb">Adicione o comando de pós-formatação em <span style="font-family: 'Cascadia Mono', Consolas, monospace">FirstLogonCommands</span> para restaurar tudo logo no primeiro login.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: #7f93b8">MODO PORTÁTIL E GERAL</span>
+<sc-for list="{{gen}}" as="t" hint-placeholder-count="2">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.on}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{t.track}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{t.knob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">{{t.label}}</span><span style="font-size: 12px; color: #8ea3c7">{{t.desc}}</span></span>
+</button>
+</sc-for>
+<button style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border: 1px solid #2f7bff; border-radius: 8px; background: #12203d; color: #ffffff; font-size: 13px; font-weight: 600; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2h6v6H9zM7 8h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"></path></svg>
+Criar versão portátil no pendrive
+</button>
+</div>
+</div>
+
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { enc: false, hash: true, nDone: true, nErr: true, nRemind: true, portable: false, tray: true }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var mk = function (o) {
+      var on = !!s[o[0]];
+      return { label: o[1], desc: o[2], on: on, track: on ? '#2f7bff' : '#2a3350', knob: on ? '21px' : '3px',
+        toggle: function () { var u = {}; u[o[0]] = !on; self.setState(u); } };
+    };
+    return {
+      sec: [['enc', 'Criptografar backups (7z AES-256)', 'Desativado por padrão · recomendado se tiver .ssh, Wi-Fi ou senhas'],
+        ['hash', 'Verificar integridade (SHA-256)', 'Confere cada arquivo depois da cópia e gera relatório']].map(mk),
+      notif: [['nDone', 'Ao terminar um backup', 'Notificação do Windows com o resumo'],
+        ['nErr', 'Quando houver erros', 'Mesmo em backups agendados'],
+        ['nRemind', 'Lembrete de backup', 'Avisa se passar 30 dias sem backup']].map(mk),
+      gen: [['portable', 'Modo portátil', 'Salva as configurações ao lado do .exe, sem instalar nada'],
+        ['tray', 'Ficar na bandeja do sistema', 'Necessário para gatilhos de HD externo']].map(mk),
+      encOn: s.enc
+    };
+  }
+}
+</script>
+</body>
+</html>

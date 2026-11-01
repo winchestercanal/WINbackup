@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Backup em andamento</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="home" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: {{stateColor}}; font-weight: 700; letter-spacing: 1.2px">{{stateLabel}}</span>
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Backup completo</h1>
+<p style="margin: 0; color: #8ea3c7">Pode continuar usando o PC. Você recebe uma notificação quando terminar.</p>
+</div>
+<span style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #0b1f24; border: 1px solid #17616a; color: #7befff; font-size: 12px">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg>
+Verificação SHA-256 ativa
+</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 22px 24px; border-radius: 12px; background: #0e1830; border: 1px solid #22407a; box-shadow: 0 0 32px rgba(47,123,255,0.18)">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-size: 15px">Copiando <b>Vídeos</b> · <span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; color: #a9badb">[arquivo atual].mp4</span></span>
+<span style="font-size: 40px; font-weight: 800; color: #ffffff; font-family: 'Cascadia Mono', Consolas, monospace; text-shadow: 0 0 14px rgba(25,227,255,0.7)">47%</span>
+</div>
+<div style="height: 10px; border-radius: 10px; background: #13213f; overflow: hidden"><div style="width: 47%; height: 10px; border-radius: 10px; background: {{barColor}}; box-shadow: 0 0 12px rgba(25,227,255,0.8)"></div></div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #a9badb; font-family: 'Cascadia Mono', Consolas, monospace">
+<span>[COPIADO] de [TOTAL] · [VELOCIDADE] MB/s</span><span>Tempo restante: [MM:SS]</span>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="9">
+<div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #16223d; border-right: 1px solid #16223d">
+<span style="width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid {{s.ring}}; background: {{s.fill}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{s.done}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="font-size: 13px; font-weight: {{s.weight}}">{{s.name}}</span>
+<span style="font-size: 12px; color: {{s.statusColor}}">{{s.status}}</span>
+</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 16px; border-radius: 12px; background: #070b15; border: 1px solid #1c2a48; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; line-height: 19px">
+<span><span style="color: #7f93b8">[HH:MM:SS]</span> <span style="color: #7fb2ff">[INFO]</span> Shadow Copy criada para C:</span>
+<span><span style="color: #7f93b8">[HH:MM:SS]</span> <span style="color: #ffb547">[AVISO]</span> Arquivo em uso copiado via VSS: [ARQUIVO]</span>
+<span><span style="color: #7f93b8">[HH:MM:SS]</span> <span style="color: #3ddc97">[OK]</span> Imagens: [N] arquivos novos ou alterados</span>
+</div>
+
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<a href="Report.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 16px; border-radius: 8px; color: #8ea3c7; font-size: 13px; text-decoration: none">Prévia: ver relatório final</a>
+<button onClick="{{togglePause}}" style="height: 44px; padding: 0 18px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 14px; font-weight: 600; cursor: pointer">{{pauseLabel}}</button>
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid #6a2333; background: #2a0d15; color: #ff8fa1; font-size: 14px; font-weight: 600; text-decoration: none">Cancelar</a>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { paused: false }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var run = s.paused ? '#ffb547' : '#19e3ff';
+    var steps = [
+      ['Shadow Copy (VSS)', 'done', 'Concluído'], ['Programas (winget)', 'done', '[N] programas'],
+      ['Configurações', 'done', 'Windows e [N] apps'], ['Arquivos pessoais', 'run', s.paused ? 'Pausado' : 'Copiando…'],
+      ['Saves de jogos', 'wait', 'Na fila'], ['Drivers', 'wait', 'Na fila'],
+      ['Navegadores', 'wait', 'Na fila'], ['Compactar (ZIP)', 'wait', 'Na fila'],
+      ['Verificar integridade (SHA-256)', 'wait', 'Na fila']
+    ].map(function (st) {
+      var done = st[1] === 'done', r = st[1] === 'run';
+      return { name: st[0], status: st[2], done: done, weight: r ? 700 : 500,
+        ring: done ? '#3ddc97' : r ? run : '#3a4b70', fill: done ? '#3ddc97' : 'transparent',
+        statusColor: done ? '#3ddc97' : r ? run : '#8ea3c7' };
+    });
+    return { steps: steps, barColor: run,
+      stateLabel: s.paused ? 'PAUSADO' : 'EM ANDAMENTO', stateColor: run,
+      pauseLabel: s.paused ? 'Continuar' : 'Pausar', togglePause: function () { self.setState({ paused: !s.paused }); } };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Arquivos pessoais</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="files" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Arquivos pessoais</h1>
+<p style="margin: 0; color: #8ea3c7">Suas pastas do usuário e as pastas que você escolher.</p>
+</div>
+<div style="width: 320px; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 10px; background: #0e1526; border: 1px solid #1c2a48">
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #8ea3c7">Estimativa do backup</span><span style="font-weight: 600">[TAMANHO] de [LIVRE] livres</span></div>
+<div style="height: 8px; border-radius: 8px; background: #1a2847; overflow: hidden; display: flex"><div style="width: 34%; height: 8px; background: #19e3ff"></div><div style="width: 24%; height: 8px; background: #2f7bff"></div></div>
+<span style="font-size: 12px; color: #3ddc97">Cabe no destino com folga</span>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; background: #0b1a33; border: 1px solid #22407a">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6fa4ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h11a4 4 0 0 0 .5-8 6 6 0 0 0-11.5-1.5A4.5 4.5 0 0 0 7 18z"></path></svg>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Documentos, Imagens e Área de Trabalho estão no OneDrive</span>
+<span style="font-size: 12px; color: #a9badb">Vamos copiar das pastas reais em <span style="font-family: 'Cascadia Mono', Consolas, monospace">%OneDrive%\…</span> em vez das pastas padrão, que estão vazias.</span>
+</div>
+<button onClick="{{toggleCloud}}" aria-pressed="{{cloudOn}}" style="display: flex; align-items: center; gap: 10px; border: 0; background: transparent; color: #e8f0ff; padding: 0; cursor: pointer">
+<span style="font-size: 12px; text-align: right; color: #a9badb">Baixar arquivos<br>só na nuvem</span>
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{cloudTrack}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{cloudKnob}}"></span></span>
+</button>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0e1526; border: 1px solid #1c2a48">
+<button onClick="{{setModeC}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{modeCbg}}; color: {{modeCfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Completo</button>
+<button onClick="{{setModeS}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{modeSbg}}; color: {{modeSfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Seletivo</button>
+</div>
+<span style="font-size: 12px; color: #8ea3c7">{{selCount}} pastas selecionadas</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{folders}}" as="f" hint-placeholder-count="8">
+<button onClick="{{f.toggle}}" aria-pressed="{{f.on}}" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid {{f.border}}; background: {{f.bg}}; color: #e8f0ff; text-align: left; cursor: pointer; min-width: 0">
+<span style="width: 20px; height: 20px; flex-shrink: 0; border-radius: 5px; border: 1.5px solid {{f.boxBorder}}; background: {{f.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{f.on}}" hint-placeholder-val="{{true}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600">{{f.name}}
+<sc-if value="{{f.cloud}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6fa4ff" stroke-width="2" aria-label="No OneDrive" role="img"><path d="M7 18h11a4 4 0 0 0 .5-8 6 6 0 0 0-11.5-1.5A4.5 4.5 0 0 0 7 18z"></path></svg></sc-if>
+</span>
+<span style="font-size: 11.5px; color: #8ea3c7; font-family: 'Cascadia Mono', Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.path}}</span>
+</span>
+<span style="font-size: 12px; color: {{f.tagColor}}; flex-shrink: 0">{{f.tag}}</span>
+</button>
+</sc-for>
+<button style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px dashed #2f4a80; background: transparent; color: #9fc3ff; font-size: 13px; font-weight: 600; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+Adicionar pasta
+</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 600">Exclusões</span>
+<span style="font-size: 12px; color: #8ea3c7">Pastas e padrões que nunca entram no backup</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{excl}}" as="x" hint-placeholder-count="6">
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 10px; border-radius: 999px; background: #12203d; border: 1px solid #22407a; font-size: 12px; font-family: 'Cascadia Mono', Consolas, monospace">{{x.label}}
+<button onClick="{{x.remove}}" aria-label="Remover {{x.label}}" style="width: 20px; height: 20px; border: 0; border-radius: 50%; background: transparent; color: #9fc3ff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1l8 8M9 1 1 9" stroke="currentColor" stroke-width="1.5"></path></svg></button>
+</span>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px">
+<label for="add-excl" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Nova exclusão</label>
+<input id="add-excl" type="text" placeholder="Ex.: *.iso ou C:\Users\…\AppData" style="flex-grow: 1; height: 36px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 12.5px; font-family: 'Cascadia Mono', Consolas, monospace">
+<button style="height: 36px; padding: 0 14px; border: 1px solid #2a3b63; border-radius: 8px; background: #101b33; color: #e8f0ff; font-size: 13px; cursor: pointer">Adicionar</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 14px; font-weight: 600">Opções de cópia</span>
+<sc-for list="{{opts}}" as="t" hint-placeholder-count="3">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.on}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{t.track}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{t.knob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">{{t.label}}</span><span style="font-size: 12px; color: #8ea3c7">{{t.desc}}</span></span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; align-items: flex-end; gap: 12px">
+<div style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 8px; background: #0b1a33; border: 1px solid #22407a">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#19e3ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h18v7H3zM5 13 7.5 5h9L19 13"></path></svg>
+<span style="font-size: 12px; color: #a9badb; flex-shrink: 0">Salvando em</span>
+<span style="font-size: 12.5px; font-family: 'Cascadia Mono', Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">E:\Backup\WINbackup_[DATA]\Arquivos</span>
+<span style="margin-left: auto; font-size: 11.5px; color: #8ea3c7; flex-shrink: 0">Altere em Destino dos backups</span>
+</div>
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid #2a3b63; color: #e8f0ff; font-size: 14px; font-weight: 600; text-decoration: none">Cancelar</a>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Iniciar backup</a>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mode: 'C', sel: {}, cloud: true, vss: true, incr: true, keepAcl: false,
+      excl: ['node_modules', '*.tmp', 'Cache', 'Thumbs.db', '$RECYCLE.BIN', '*.iso'] };
+  }
+  renderVals() {
+    var self = this, s = this.state;
+    var sw = function (on) { return { track: on ? '#2f7bff' : '#2a3350', knob: on ? '21px' : '3px' }; };
+    var seg = function (on) { return { bg: on ? '#1a2b52' : 'transparent', fg: on ? '#ffffff' : '#a9badb' }; };
+    var def = [
+      ['doc', 'Documentos', '%OneDrive%\\Documentos', true, false], ['img', 'Imagens', '%OneDrive%\\Imagens', true, false],
+      ['mus', 'Músicas', '%USERPROFILE%\\Music', false, false], ['vid', 'Vídeos', '%USERPROFILE%\\Videos', false, false],
+      ['dwn', 'Downloads', '%USERPROFILE%\\Downloads', false, false], ['dsk', 'Área de Trabalho', '%OneDrive%\\Área de Trabalho', true, false],
+      ['ssh', '.ssh', '%USERPROFILE%\\.ssh', false, true], ['proj', 'Projetos', 'D:\\Projetos', false, false]
+    ];
+    var count = 0;
+    var folders = def.map(function (f) {
+      var on = s.mode === 'C' ? !f[4] : (s.sel[f[0]] ?? !f[4]);
+      if (on) count++;
+      return { name: f[1], path: f[2], cloud: f[3], on: on,
+        tag: f[4] ? 'Sensível' : f[0] === 'proj' ? 'Personalizada' : '[TAM]', tagColor: f[4] ? '#ffb547' : '#8ea3c7',
+        border: on ? '#22407a' : '#1c2a48', bg: on ? '#0f1b33' : '#0e1526',
+        boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { var sel = Object.assign({}, s.mode === 'C' ? {} : s.sel); sel[f[0]] = !on; self.setState({ mode: 'S', sel: sel }); } };
+    });
+    var excl = s.excl.map(function (x) {
+      return { label: x, remove: function () { self.setState({ excl: s.excl.filter(function (y) { return y !== x; }) }); } };
+    });
+    var opts = [
+      ['vss', 'Copiar arquivos em uso (Shadow Copy)', 'Usa o VSS do Windows para não pular arquivos travados'],
+      ['incr', 'Incremental: copiar só o que mudou', 'Mantém versões anteriores no destino'],
+      ['keepAcl', 'Preservar permissões e datas', 'Copia ACLs e atributos (robocopy /COPYALL)']
+    ].map(function (o) {
+      var on = !!s[o[0]], t = sw(on);
+      return { label: o[1], desc: o[2], on: on, track: t.track, knob: t.knob,
+        toggle: function () { var u = {}; u[o[0]] = !on; self.setState(u); } };
+    });
+    var mC = seg(s.mode === 'C'), mS = seg(s.mode === 'S'), c = sw(s.cloud);
+    return { folders: folders, selCount: count, excl: excl, opts: opts,
+      modeCbg: mC.bg, modeCfg: mC.fg, modeSbg: mS.bg, modeSfg: mS.fg,
+      setModeC: function () { self.setState({ mode: 'C' }); }, setModeS: function () { self.setState({ mode: 'S' }); },
+      cloudOn: s.cloud, cloudTrack: c.track, cloudKnob: c.knob, toggleCloud: function () { self.setState({ cloud: !s.cloud }); } };
+  }
+}
+</script>
+</body>
+</html>

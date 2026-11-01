@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Histórico e versões</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="history" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Histórico e versões</h1>
+<p style="margin: 0; color: #8ea3c7">Cada backup vira uma versão. Volte para qualquer uma delas.</p>
+</div>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0e1526; border: 1px solid #1c2a48">
+<button onClick="{{tabV}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{tVbg}}; color: {{tVfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Versões</button>
+<button onClick="{{tabL}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{tLbg}}; color: {{tLfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Logs</button>
+</div>
+</div>
+
+<sc-if value="{{isV}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Retenção</span>
+<span style="font-size: 12px; color: #8ea3c7">As versões mais antigas são apagadas automaticamente. O último backup completo nunca é apagado.</span>
+</span>
+<span style="font-size: 13px; color: #a9badb">Manter as últimas</span>
+<div style="display: flex; align-items: center; border: 1px solid #2a3b63; border-radius: 8px; overflow: hidden">
+<button onClick="{{dec}}" aria-label="Menos" style="width: 36px; height: 34px; border: 0; background: #101b33; color: #e8f0ff; font-size: 16px; cursor: pointer">−</button>
+<span style="width: 44px; text-align: center; font-weight: 700; font-family: 'Cascadia Mono', Consolas, monospace">{{keep}}</span>
+<button onClick="{{inc}}" aria-label="Mais" style="width: 36px; height: 34px; border: 0; background: #101b33; color: #e8f0ff; font-size: 16px; cursor: pointer">+</button>
+</div>
+<span style="font-size: 13px; color: #a9badb">versões</span>
+</div>
+
+<div style="border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: grid; grid-template-columns: 1.5fr 1fr 0.9fr 1.2fr 1fr 1.6fr; gap: 12px; padding: 10px 18px; font-size: 12px; color: #8ea3c7; border-bottom: 1px solid #16223d">
+<span>Data</span><span>Tipo</span><span>Tamanho</span><span>Integridade</span><span>Proteção</span><span></span>
+</div>
+<sc-for list="{{versions}}" as="v" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 1.5fr 1fr 0.9fr 1.2fr 1fr 1.6fr; gap: 12px; align-items: center; padding: 12px 18px; border-bottom: 1px solid #16223d; opacity: {{v.opacity}}">
+<span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12.5px">{{v.date}}</span>
+<span>{{v.kind}}</span>
+<span style="color: #a9badb">[TAM]</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{v.hashColor}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{v.hashColor}}"></span>{{v.hash}}</span>
+<span style="font-size: 12px; color: {{v.encColor}}">{{v.enc}}</span>
+<span style="display: flex; gap: 6px; justify-content: flex-end">
+<a href="Restore.dc.html" style="display: inline-flex; align-items: center; height: 30px; padding: 0 10px; border-radius: 7px; border: 1px solid #2a3b63; color: #e8f0ff; font-size: 12px; text-decoration: none">Restaurar</a>
+<button style="height: 30px; padding: 0 10px; border: 1px solid #2a3b63; border-radius: 7px; background: transparent; color: #e8f0ff; font-size: 12px; cursor: pointer">Verificar</button>
+</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isL}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 8px">
+<sc-for list="{{filters}}" as="fl" hint-placeholder-count="4">
+<button onClick="{{fl.pick}}" aria-pressed="{{fl.on}}" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid {{fl.border}}; background: {{fl.bg}}; color: {{fl.fg}}; font-size: 12px; font-weight: 600; cursor: pointer">{{fl.label}}</button>
+</sc-for>
+<div style="flex-grow: 1"></div>
+<button style="height: 32px; padding: 0 12px; border: 1px solid #2a3b63; border-radius: 8px; background: #101b33; color: #e8f0ff; font-size: 12px; cursor: pointer">Abrir pasta de logs</button>
+</div>
+<div style="border-radius: 12px; background: #070b15; border: 1px solid #1c2a48; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; line-height: 20px">
+<sc-for list="{{logs}}" as="l" hint-placeholder-count="10">
+<div style="display: flex; gap: 14px">
+<span style="color: #7f93b8; flex-shrink: 0">{{l.time}}</span>
+<span style="color: {{l.color}}; width: 64px; flex-shrink: 0">[{{l.level}}]</span>
+<span style="color: #d5e1f7">{{l.msg}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'v', keep: 5, filter: 'all' }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var seg = function (on) { return { bg: on ? '#1a2b52' : 'transparent', fg: on ? '#ffffff' : '#a9badb' }; };
+    var vDef = [
+      ['Incremental', 'ok', false], ['Incremental', 'ok', false], ['Completo', 'ok', false],
+      ['Incremental', 'warn', false], ['Incremental', 'ok', false], ['Completo', 'ok', true], ['Incremental', 'ok', false]
+    ];
+    var versions = vDef.map(function (v, i) {
+      var expiring = i >= s.keep && v[0] !== 'Completo';
+      return { date: '[AAAA-MM-DD HH:MM]', kind: v[0],
+        hash: v[1] === 'ok' ? 'SHA-256 conferido' : '2 arquivos divergentes', hashColor: v[1] === 'ok' ? '#3ddc97' : '#ffb547',
+        enc: v[2] ? 'AES-256' : 'Sem criptografia', encColor: v[2] ? '#7befff' : '#8ea3c7',
+        opacity: expiring ? 0.45 : 1 };
+    });
+    var lvColor = { INFO: '#7fb2ff', OK: '#3ddc97', AVISO: '#ffb547', ERRO: '#ff6b81' };
+    var all = [
+      ['INFO', 'Gatilho: HD Externo (E:) conectado'], ['INFO', 'Criando Shadow Copy (VSS) de C:'],
+      ['OK', 'Documentos: [N] arquivos novos ou alterados'], ['AVISO', 'Arquivo em uso copiado via VSS: [ARQUIVO]'],
+      ['OK', 'winget export: [N] programas'], ['OK', 'Configurações: Wi-Fi, Terminal, VS Code, Komorebi'],
+      ['AVISO', 'Opera não instalado, etapa ignorada'], ['INFO', 'Compactando (ZIP)'],
+      ['ERRO', 'Hash divergente: [ARQUIVO], copiado de novo'], ['OK', 'Verificação SHA-256 concluída'],
+      ['INFO', 'Retenção: 1 versão antiga removida']
+    ];
+    var fMap = { all: null, info: ['INFO', 'OK'], warn: ['AVISO'], err: ['ERRO'] };
+    var logs = all.filter(function (l) { var f = fMap[s.filter]; return !f || f.indexOf(l[0]) >= 0; })
+      .map(function (l) { return { time: '[HH:MM:SS]', level: l[0], msg: l[1], color: lvColor[l[0]] }; });
+    var filters = [['all', 'Tudo'], ['info', 'Info'], ['warn', 'Avisos'], ['err', 'Erros']].map(function (f) {
+      var on = s.filter === f[0];
+      return { label: f[1], on: on, bg: on ? '#12203d' : 'transparent', fg: on ? '#ffffff' : '#a9badb', border: on ? '#2f7bff' : '#2a3b63',
+        pick: function () { self.setState({ filter: f[0] }); } };
+    });
+    var tV = seg(s.tab === 'v'), tL = seg(s.tab === 'l');
+    return { versions: versions, logs: logs, filters: filters, keep: s.keep, isV: s.tab === 'v', isL: s.tab === 'l',
+      tVbg: tV.bg, tVfg: tV.fg, tLbg: tL.bg, tLfg: tL.fg,
+      tabV: function () { self.setState({ tab: 'v' }); }, tabL: function () { self.setState({ tab: 'l' }); },
+      dec: function () { self.setState({ keep: Math.max(1, s.keep - 1) }); }, inc: function () { self.setState({ keep: Math.min(30, s.keep + 1) }); } };
+  }
+}
+</script>
+</body>
+</html>

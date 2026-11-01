@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Programas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="apps" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Programas</h1>
+<p style="margin: 0; color: #8ea3c7">Salva a lista dos seus programas e reinstala tudo depois, sozinho, via winget.</p>
+</div>
+<button style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid #2a3b63; border-radius: 8px; background: #101b33; color: #e8f0ff; font-size: 13px; cursor: pointer">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"></path></svg>
+Escanear novamente
+</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; color: #8ea3c7">Programas encontrados</span>
+<span style="font-size: 24px; font-weight: 700">[N]</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 12px; background: #0b1f24; border: 1px solid #17616a">
+<span style="font-size: 12px; color: #7befff">Reinstalação automática</span>
+<span style="font-size: 24px; font-weight: 700">[N]</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 12px; background: #1d1608; border: 1px solid #5c4413">
+<span style="font-size: 12px; color: #ffd89a">Sem pacote: instalar à mão</span>
+<span style="font-size: 24px; font-weight: 700">[N]</span>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 8px">
+<sc-for list="{{filters}}" as="fl" hint-placeholder-count="4">
+<button onClick="{{fl.pick}}" aria-pressed="{{fl.on}}" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid {{fl.border}}; background: {{fl.bg}}; color: {{fl.fg}}; font-size: 12px; font-weight: 600; cursor: pointer">{{fl.label}}</button>
+</sc-for>
+<div style="flex-grow: 1"></div>
+<label for="search-apps" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar programa</label>
+<input id="search-apps" type="text" placeholder="Buscar programa…" style="width: 240px; height: 34px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 13px">
+</div>
+
+<div style="border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: grid; grid-template-columns: 36px 2fr 2.2fr 0.8fr 1.3fr; gap: 12px; padding: 10px 18px; font-size: 12px; color: #8ea3c7; border-bottom: 1px solid #16223d">
+<span></span><span>Programa</span><span>ID do pacote</span><span>Versão</span><span>Origem</span>
+</div>
+<sc-for list="{{apps}}" as="a" hint-placeholder-count="8">
+<button onClick="{{a.toggle}}" aria-pressed="{{a.on}}" style="width: 100%; display: grid; grid-template-columns: 36px 2fr 2.2fr 0.8fr 1.3fr; gap: 12px; align-items: center; padding: 11px 18px; border: 0; border-bottom: 1px solid #16223d; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer; font-size: 14px">
+<span style="width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid {{a.boxBorder}}; background: {{a.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{a.on}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="font-weight: 600">{{a.name}}</span>
+<span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; color: #a9badb">{{a.id}}</span>
+<span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; color: #a9badb">{{a.ver}}</span>
+<span><span style="display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; background: {{a.srcBg}}; border: 1px solid {{a.srcBorder}}; color: {{a.srcFg}}">{{a.src}}</span></span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; background: #070b15; border: 1px solid #1c2a48">
+<span style="font-size: 12px; color: #8ea3c7">Na restauração:</span>
+<code style="flex-grow: 1; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; color: #7befff">winget import -i Programas.json --accept-package-agreements</code>
+<span style="font-size: 12px; color: #8ea3c7">+ lista dos sem pacote, com link de download</span>
+</div>
+
+<div style="display: flex; align-items: center; gap: 10px">
+<button style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid #2f7bff; border-radius: 8px; background: #12203d; color: #ffffff; font-size: 14px; font-weight: 600; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"></path></svg>
+Importar lista e instalar
+</button>
+<span style="font-size: 12px; color: #8ea3c7">Só instala os programas de um arquivo.json, sem restaurar o resto</span>
+<div style="flex-grow: 1"></div>
+<button style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 14px; font-weight: 600; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+Exportar lista (.json)
+</button>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Salvar {{selCount}} programas</a>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { filter: 'all', off: {} }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var SRC = {
+      winget: { label: 'winget', bg: '#0b2a2e', border: '#17616a', fg: '#7befff' },
+      msstore: { label: 'Microsoft Store', bg: '#12203d', border: '#2f4a80', fg: '#9fc3ff' },
+      none: { label: 'Sem pacote', bg: '#2a1f0b', border: '#5c4413', fg: '#ffd89a' }
+    };
+    var all = [
+      ['7-Zip', '7zip.7zip', 'winget'], ['Visual Studio Code', 'Microsoft.VisualStudioCode', 'winget'],
+      ['OBS Studio', 'OBSProject.OBSStudio', 'winget'], ['Discord', 'Discord.Discord', 'winget'],
+      ['Steam', 'Valve.Steam', 'winget'], ['VLC', 'VideoLAN.VLC', 'winget'],
+      ['WhatsApp', '9NKSQGP7F2NH', 'msstore'], ['[Utilitário do fabricante]', '—', 'none']
+    ];
+    var map = { all: null, winget: 'winget', msstore: 'msstore', none: 'none' };
+    var count = 0;
+    var apps = all.filter(function (a) { return !map[s.filter] || a[2] === map[s.filter]; }).map(function (a) {
+      var on = !s.off[a[1]] && a[2] !== 'none';
+      var src = SRC[a[2]];
+      return { name: a[0], id: a[1], ver: '[x.x]', on: on, src: src.label, srcBg: src.bg, srcBorder: src.border, srcFg: src.fg,
+        boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { var off = Object.assign({}, s.off); off[a[1]] = on; self.setState({ off: off }); } };
+    });
+    all.forEach(function (a) { if (!s.off[a[1]] && a[2] !== 'none') count++; });
+    var filters = [['all', 'Todos'], ['winget', 'winget'], ['msstore', 'Microsoft Store'], ['none', 'Sem pacote']].map(function (f) {
+      var on = s.filter === f[0];
+      return { label: f[1], on: on, bg: on ? '#12203d' : 'transparent', fg: on ? '#ffffff' : '#a9badb',
+        border: on ? '#2f7bff' : '#2a3b63', pick: function () { self.setState({ filter: f[0] }); } };
+    });
+    return { apps: apps, filters: filters, selCount: count };
+  }
+}
+</script>
+</body>
+</html>

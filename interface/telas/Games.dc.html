@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Saves de jogos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="games" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Saves de jogos</h1>
+<p style="margin: 0; color: #8ea3c7">Encontra o progresso dos seus jogos nas pastas mais comuns, para não começar do zero.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{sources}}" as="src" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 12px; color: #8ea3c7; font-family: 'Cascadia Mono', Consolas, monospace">{{src.path}}</span>
+<span style="font-size: 18px; font-weight: 700">{{src.count}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 10px 18px; border-bottom: 1px solid #16223d">
+<span style="font-size: 13px; font-weight: 600">{{selCount}} de 6 selecionados</span>
+<div style="display: flex; align-items: center; gap: 6px">
+<span style="font-size: 11.5px; color: #7f93b8; margin-right: 2px">Marcar:</span>
+<sc-for list="{{quick}}" as="q" hint-placeholder-count="3">
+<button onClick="{{q.pick}}" aria-pressed="{{q.on}}" style="height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid {{q.border}}; background: {{q.bg}}; color: {{q.fg}}; font-size: 11.5px; font-weight: 600; cursor: pointer">{{q.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 36px 1.6fr 2.4fr 0.8fr 1.3fr; gap: 12px; padding: 10px 18px; font-size: 12px; color: #8ea3c7; border-bottom: 1px solid #16223d">
+<span></span><span>Jogo</span><span>Local do save</span><span>Tamanho</span><span>Nuvem</span>
+</div>
+<sc-for list="{{games}}" as="g" hint-placeholder-count="6">
+<button onClick="{{g.toggle}}" aria-pressed="{{g.on}}" style="width: 100%; display: grid; grid-template-columns: 36px 1.6fr 2.4fr 0.8fr 1.3fr; gap: 12px; align-items: center; padding: 12px 18px; border: 0; border-bottom: 1px solid #16223d; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer; font-size: 14px">
+<span style="width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid {{g.boxBorder}}; background: {{g.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{g.on}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="font-weight: 600">{{g.name}}</span>
+<span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; color: #a9badb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.path}}</span>
+<span style="font-size: 12px; color: #a9badb">[TAM]</span>
+<span style="font-size: 12px; color: {{g.cloudColor}}">{{g.cloud}}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 14px; font-weight: 600">Bibliotecas da Steam</span>
+<span style="font-size: 12px; color: #8ea3c7">Salvamos só os caminhos, para a Steam reconhecer os jogos já instalados em outro disco.</span>
+<div style="display: flex; flex-direction: column; gap: 6px; font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; color: #d5e1f7">
+<span>C:\Program Files (x86)\Steam</span>
+<span>D:\SteamLibrary</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 14px; font-weight: 600">Opções</span>
+<button onClick="{{toggleSkip}}" aria-pressed="{{skip}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{skipTrack}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{skipKnob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">Pular jogos com save na nuvem</span><span style="font-size: 12px; color: #8ea3c7">Steam Cloud, Xbox e similares já guardam o progresso</span></span>
+</button>
+</div>
+</div>
+
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<button style="height: 44px; padding: 0 18px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 14px; font-weight: 600; cursor: pointer">Adicionar jogo manualmente</button>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Salvar {{selCount}} saves</a>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { off: {}, skip: true }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var sources = [
+      { path: 'Documentos\\My Games', count: '[N] jogos' },
+      { path: '%USERPROFILE%\\Saved Games', count: '[N] jogos' },
+      { path: '%APPDATA% / %LOCALAPPDATA%', count: '[N] jogos' }
+    ];
+    var def = [
+      ['g1', '[Jogo detectado 1]', 'Documentos\\My Games\\[Jogo]', false],
+      ['g2', '[Jogo detectado 2]', '%USERPROFILE%\\Saved Games\\[Jogo]', false],
+      ['g3', '[Jogo detectado 3]', '%LOCALAPPDATA%\\[Estúdio]\\[Jogo]\\Saved', true],
+      ['g4', '[Jogo detectado 4]', '%APPDATA%\\[Jogo]\\saves', false],
+      ['g5', '[Jogo detectado 5]', 'Steam\\userdata\\[ID]\\[AppID]', true],
+      ['g6', '[Jogo detectado 6]', 'Documentos\\[Estúdio]\\[Jogo]', false]
+    ];
+    var isOn = function (g) { return s.off[g[0]] === undefined ? !(s.skip && g[3]) : !s.off[g[0]]; };
+    var groupToggle = function (test) {
+      var grp = def.filter(test), all = grp.every(isOn), off = Object.assign({}, s.off);
+      grp.forEach(function (g) { off[g[0]] = all; });
+      self.setState({ off: off });
+    };
+    var quick = [
+      ['Só locais', function (g) { return !g[3]; }],
+      ['Só na nuvem', function (g) { return g[3]; }],
+      ['Todos', function () { return true; }]
+    ].map(function (q) {
+      var on = def.filter(q[1]).every(isOn);
+      return { label: q[0], on: on, bg: on ? '#12203d' : 'transparent', fg: on ? '#ffffff' : '#a9badb', border: on ? '#2f7bff' : '#2a3b63',
+        pick: function () { groupToggle(q[1]); } };
+    });
+    var count = 0;
+    var games = def.map(function (g) {
+      var on = isOn(g);
+      if (on) count++;
+      return { name: g[1], path: g[2], on: on, cloud: g[3] ? 'Já na nuvem' : 'Só local', cloudColor: g[3] ? '#7befff' : '#ffb547',
+        boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { var off = Object.assign({}, s.off); off[g[0]] = on; self.setState({ off: off }); } };
+    });
+    var t = { track: s.skip ? '#2f7bff' : '#2a3350', knob: s.skip ? '21px' : '3px' };
+    return { sources: sources, games: games, quick: quick, selCount: count, skip: s.skip, skipTrack: t.track, skipKnob: t.knob,
+      toggleSkip: function () { self.setState({ skip: !s.skip, off: {} }); } };
+  }
+}
+</script>
+</body>
+</html>

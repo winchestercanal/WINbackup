@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Barra de título</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 40px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding-left: 14px; background: #070b15; border-bottom: 1px solid #141f38; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif">
+<div style="width: 18px; height: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px">
+<div style="background: #19e3ff; border-radius: 2px"></div><div style="background: #2f7bff; border-radius: 2px"></div><div style="background: #2f7bff; border-radius: 2px"></div><div style="background: #19e3ff; border-radius: 2px"></div>
+</div>
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.2px">WINbackup</span>
+<span style="font-size: 12px; color: #8ea3c7">v2.0 · Canal WINchester</span>
+<div style="flex-grow: 1"></div>
+<div style="display: flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: #0f1d36; border: 1px solid #1f3560; font-size: 11px; color: #9fc3ff">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"></path></svg>
+Administrador
+</div>
+<div style="display: flex; height: 40px; margin-left: 8px">
+<button aria-label="Minimizar" style="width: 46px; height: 40px; border: 0; background: transparent; color: #c9d6ee; cursor: pointer"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 5h10" stroke="currentColor"></path></svg></button>
+<button aria-label="Maximizar" style="width: 46px; height: 40px; border: 0; background: transparent; color: #c9d6ee; cursor: pointer"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><rect x="0.5" y="0.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor"></rect></svg></button>
+<button aria-label="Fechar" style="width: 46px; height: 40px; border: 0; background: transparent; color: #c9d6ee; cursor: pointer"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0l10 10M10 0 0 10" stroke="currentColor"></path></svg></button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":40}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

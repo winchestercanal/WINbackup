@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>WINbackup</RootNamespace>
+    <AssemblyName>WINbackup</AssemblyName>
+    <Version>0.1.0</Version>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- Sem isto o publish não copia o WINbackup.pri nem os .xbf e o app fecha ao abrir -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SatelliteResourceLanguages>pt-BR;pt;en</SatelliteResourceLanguages>
+    <ApplicationIcon>Assets/WINbackup.ico</ApplicationIcon>
+    <Configurations>Debug;Release;Teste</Configurations>
+    <!-- Requer administrador. "dotnet build -c Teste" gera uma versão sem UAC, em bin\Teste, só para testar a interface -->
+    <ApplicationManifest Condition="'$(Configuration)' != 'Teste'">app.manifest</ApplicationManifest>
+    <ApplicationManifest Condition="'$(Configuration)' == 'Teste'">app.asinvoker.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <!-- Só os componentes usados (o pacote completo traz IA/ML: +40 MB de onnxruntime e DirectML) -->
+    <PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="2.0.4" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.12" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.DWrite" Version="2.1.0" />
+    <PackageReference Include="QRCoder" Version="1.8.1" />
+    <PackageReference Include="System.Management" Version="10.0.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\WINbackup.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

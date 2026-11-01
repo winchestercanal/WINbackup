@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Configurações</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="configs" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Configurações</h1>
+<p style="margin: 0; color: #8ea3c7">O que deixa o Windows e os seus apps com a sua cara.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start">
+<div style="display: flex; flex-direction: column; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #16223d">
+<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8.5v8.5H3zM12.5 3H21v8.5h-8.5zM3 12.5h8.5V21H3zM12.5 12.5H21V21h-8.5z" fill="#2f7bff"></path></svg>
+<span style="font-size: 15px; font-weight: 600; flex-grow: 1">Windows</span>
+<span style="font-size: 12px; color: #8ea3c7">{{winCount}} de 6</span>
+</div>
+<sc-for list="{{win}}" as="c" hint-placeholder-count="6">
+<button onClick="{{c.toggle}}" aria-pressed="{{c.on}}" style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; border: 0; border-bottom: 1px solid #16223d; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer">
+<span style="width: 18px; height: 18px; flex-shrink: 0; border-radius: 5px; border: 1.5px solid {{c.boxBorder}}; background: {{c.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 600">{{c.name}}</span>
+<span style="font-size: 12px; color: #8ea3c7">{{c.desc}}</span>
+</span>
+<span style="font-size: 12px; color: {{c.metaColor}}">{{c.meta}}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #16223d">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#19e3ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM8 10l2 2-2 2M12 14h4"></path></svg>
+<span style="font-size: 15px; font-weight: 600; flex-grow: 1">Configurações de apps</span>
+<span style="font-size: 12px; color: #8ea3c7">{{appCount}} detectados</span>
+</div>
+<sc-for list="{{apps}}" as="c" hint-placeholder-count="8">
+<button onClick="{{c.toggle}}" aria-pressed="{{c.on}}" style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; border: 0; border-bottom: 1px solid #16223d; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer">
+<span style="width: 18px; height: 18px; flex-shrink: 0; border-radius: 5px; border: 1.5px solid {{c.boxBorder}}; background: {{c.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="font-size: 14px; font-weight: 600">{{c.name}}</span>
+<span style="font-size: 11.5px; color: #8ea3c7; font-family: 'Cascadia Mono', Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.desc}}</span>
+</span>
+<span style="font-size: 12px; color: {{c.metaColor}}; flex-shrink: 0">{{c.meta}}</span>
+</button>
+</sc-for>
+<button style="display: flex; align-items: center; gap: 10px; padding: 12px 18px; border: 0; background: transparent; color: #9fc3ff; font-size: 13px; font-weight: 600; cursor: pointer">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+Adicionar pasta de configuração
+</button>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; background: #1d1608; border: 1px solid #5c4413">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb547" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"></path></svg>
+<span style="flex-grow: 1; color: #ffd89a; line-height: 20px">As senhas de Wi-Fi são exportadas em texto. Recomendamos ativar a criptografia do backup.</span>
+<a href="Options.dc.html" style="font-size: 13px; font-weight: 600; color: #ffd89a">Ativar criptografia</a>
+</div>
+
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid #2a3b63; color: #e8f0ff; font-size: 14px; font-weight: 600; text-decoration: none">Cancelar</a>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Salvar configurações</a>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { off: { hosts: true, yasb: true } }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var mk = function (c) {
+      var on = !s.off[c[0]] && c[4] !== false;
+      return { name: c[1], desc: c[2], meta: c[3], metaColor: c[4] === false ? '#7f93b8' : '#8ea3c7', on: on,
+        boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { if (c[4] === false) return; var off = Object.assign({}, s.off); off[c[0]] = on; self.setState({ off: off }); } };
+    };
+    var winDef = [
+      ['wifi', 'Redes Wi-Fi', 'Perfis salvos, com senha', '[N] redes'],
+      ['theme', 'Papel de parede e tema', 'Fundo, cor de destaque, modo escuro', ''],
+      ['print', 'Impressoras', 'Filas e drivers de impressão', '[N]'],
+      ['fonts', 'Fontes instaladas', 'Só as que não vêm com o Windows', '[N] fontes'],
+      ['env', 'Variáveis de ambiente', 'Usuário e PATH personalizado', ''],
+      ['hosts', 'Arquivo hosts', 'C:\\Windows\\System32\\drivers\\etc\\hosts', '']
+    ];
+    var appDef = [
+      ['term', 'Windows Terminal', 'settings.json', 'Detectado'],
+      ['pwsh', 'Perfil do PowerShell', '$PROFILE', 'Detectado'],
+      ['vscode', 'VS Code', 'settings, atalhos, snippets e extensões', 'Detectado'],
+      ['git', 'Git', '%USERPROFILE%\\.gitconfig', 'Detectado'],
+      ['obs', 'OBS Studio', '%APPDATA%\\obs-studio', 'Detectado'],
+      ['sbot', 'Streamer.bot', 'pasta data do Streamer.bot', 'Detectado'],
+      ['komorebi', 'Komorebi', 'komorebi.json, applications.yaml', 'Detectado'],
+      ['yasb', 'YASB', '%USERPROFILE%\\.config\\yasb', 'Detectado']
+    ];
+    var win = winDef.map(mk), apps = appDef.map(mk);
+    return { win: win, apps: apps,
+      winCount: win.filter(function (c) { return c.on; }).length, appCount: apps.length };
+  }
+}
+</script>
+</body>
+</html>

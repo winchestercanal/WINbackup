@@ -1,0 +1,78 @@
+<Page
+    x:Class="WINbackup.Pages.ConfigsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:WINbackup.Controls"
+    xmlns:m="using:WINbackup.Models">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ConfigRow" x:DataType="m:CheckItem">
+            <ToggleButton Style="{StaticResource CheckRow}" Padding="18,12" IsChecked="{x:Bind IsChecked, Mode=TwoWay}" IsEnabled="{x:Bind Enabled}" AutomationProperties.Name="{x:Bind Title}">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{x:Bind Title}" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="{x:Bind Subtitle}" FontSize="12" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{x:Bind Meta}" FontSize="12" Foreground="{x:Bind MetaBrush}" VerticalAlignment="Center"/>
+                </Grid>
+            </ToggleButton>
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" Padding="36,28,36,36">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Configurações" Style="{StaticResource H1}"/>
+                <TextBlock Text="O que deixa o Windows e os seus apps com a sua cara." Style="{StaticResource Sub}"/>
+            </StackPanel>
+            <c:PreviewNotice/>
+
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Border Style="{StaticResource TableCard}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <Grid Padding="18,14" ColumnSpacing="10" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <c:Icon Width="18" Height="18" StrokeThickness="0" Fill="{StaticResource Blue}" Data="M3 3h8.5v8.5H3zM12.5 3H21v8.5h-8.5zM3 12.5h8.5V21H3zM12.5 12.5H21V21h-8.5z"/>
+                            <TextBlock Grid.Column="1" Text="Windows" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="WinCount" Grid.Column="2" Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ItemsRepeater x:Name="WinRows" ItemTemplate="{StaticResource ConfigRow}"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource TableCard}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <Grid Padding="18,14" ColumnSpacing="10" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <c:Icon Width="18" Height="18" Foreground="{StaticResource Neon}" Data="M4 5h16v14H4zM8 10l2 2-2 2M12 14h4"/>
+                            <TextBlock Grid.Column="1" Text="Configurações de apps" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="AppCount" Grid.Column="2" Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ItemsRepeater x:Name="AppRows" ItemTemplate="{StaticResource ConfigRow}"/>
+                        <Button Style="{StaticResource RowButton}" Padding="18,12" CornerRadius="0" Foreground="{StaticResource BlueLink}" Click="OnSoon">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <c:Icon Width="14" Height="14" StrokeThickness="2" Data="M12 5v14M5 12h14"/>
+                                <TextBlock Text="Adicionar pasta de configuração" FontSize="13" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource WarnCard}">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <c:Icon Width="20" Height="20" Foreground="{StaticResource Warn}" Data="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="As senhas de Wi-Fi são exportadas em texto. Recomendamos ativar a criptografia do backup." Foreground="{StaticResource WarnText}" TextWrapping="Wrap" LineHeight="20" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Style="{StaticResource LinkButton}" Content="Ativar criptografia" Foreground="{StaticResource WarnText}" FontWeight="SemiBold" Click="OnOptions"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                <Button Style="{StaticResource SecondaryButton}" Content="Cancelar" Click="OnCancel"/>
+                <Button Style="{StaticResource PrimaryButton}" Content="Salvar configurações" Click="OnSoon"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

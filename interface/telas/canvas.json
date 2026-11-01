@@ -1,0 +1,19 @@
+{"v":3,"createdOnFiles":{"v":1,"at":"2026-10-22T15:00:00Z"},"title":"WINbackup — Interface","launch":{"view":"focused","file":"Main.dc.html"},"pages":[],"boards":{
+"Main.dc.html":{"x":0,"y":0,"w":1280,"h":800,"title":"01 · Início","is_interactive":true,"radius":8},
+"Files.dc.html":{"x":1360,"y":0,"w":1280,"h":800,"title":"02 · Arquivos pessoais","is_interactive":true,"radius":8},
+"Apps.dc.html":{"x":2720,"y":0,"w":1280,"h":800,"title":"03 · Programas (winget)","is_interactive":true,"radius":8},
+"Configs.dc.html":{"x":4080,"y":0,"w":1280,"h":800,"title":"04 · Configurações do Windows e apps","is_interactive":true,"radius":8},
+"Games.dc.html":{"x":0,"y":920,"w":1280,"h":800,"title":"05 · Saves de jogos","is_interactive":true,"radius":8},
+"Drivers.dc.html":{"x":1360,"y":920,"w":1280,"h":800,"title":"06 · Drivers","is_interactive":true,"radius":8},
+"Browsers.dc.html":{"x":2720,"y":920,"w":1280,"h":800,"title":"07 · Navegadores","is_interactive":true,"radius":8},
+"Restore.dc.html":{"x":4080,"y":920,"w":1280,"h":800,"title":"08 · Restaurar backup","is_interactive":true,"radius":8},
+"Wizard.dc.html":{"x":0,"y":1840,"w":1280,"h":800,"title":"09 · Assistente pós-formatação","is_interactive":true,"radius":8},
+"Schedule.dc.html":{"x":1360,"y":1840,"w":1280,"h":800,"title":"10 · Agendamentos e gatilhos","is_interactive":true,"radius":8},
+"History.dc.html":{"x":2720,"y":1840,"w":1280,"h":800,"title":"11 · Histórico, versões e logs","is_interactive":true,"radius":8},
+"Options.dc.html":{"x":4080,"y":1840,"w":1280,"h":800,"title":"12 · Opções","is_interactive":true,"radius":8},
+"Progress.dc.html":{"x":0,"y":2760,"w":1280,"h":800,"title":"13 · Backup em andamento","is_interactive":true,"radius":8},
+"Report.dc.html":{"x":1360,"y":2760,"w":1280,"h":800,"title":"14 · Relatório final + notificação","is_interactive":true,"radius":8},
+"Activity.dc.html":{"x":4080,"y":2760,"w":1280,"h":800,"title":"15 · Atividade (automação + recentes)","is_interactive":true,"radius":8},
+"TitleBar.dc.html":{"x":2720,"y":2760,"w":1280,"h":40,"title":"Componente · Barra de título"},
+"Sidebar.dc.html":{"x":2720,"y":2920,"w":248,"h":760,"title":"Componente · Navegação","is_interactive":true}
+},"order":["Main.dc.html","Activity.dc.html","Files.dc.html","Apps.dc.html","Configs.dc.html","Games.dc.html","Drivers.dc.html","Browsers.dc.html","Restore.dc.html","Wizard.dc.html","Schedule.dc.html","History.dc.html","Options.dc.html","Progress.dc.html","Report.dc.html","TitleBar.dc.html","Sidebar.dc.html"],"notes":{},"designSystems":[]}

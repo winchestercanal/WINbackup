@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Drivers</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="drivers" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Drivers</h1>
+<p style="margin: 0; color: #8ea3c7">Exporta os drivers com DISM e reinstala depois com PnPUtil.</p>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0e1526; border: 1px solid #1c2a48">
+<button onClick="{{tabB}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{tBbg}}; color: {{tBfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Fazer backup</button>
+<button onClick="{{tabR}}" style="height: 34px; padding: 0 18px; border: 0; border-radius: 7px; background: {{tRbg}}; color: {{tRfg}}; font-size: 13px; font-weight: 600; cursor: pointer">Restaurar</button>
+</div>
+<sc-if value="{{isB}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0e1526; border: 1px solid #1c2a48">
+<button onClick="{{fThird}}" style="height: 30px; padding: 0 14px; border: 0; border-radius: 7px; background: {{f3bg}}; color: {{f3fg}}; font-size: 12px; font-weight: 600; cursor: pointer">Só de terceiros</button>
+<button onClick="{{fAll}}" style="height: 30px; padding: 0 14px; border: 0; border-radius: 7px; background: {{fAbg}}; color: {{fAfg}}; font-size: 12px; font-weight: 600; cursor: pointer">Todos</button>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{isB}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 10px 18px; border-bottom: 1px solid #16223d">
+<span style="font-size: 13px; font-weight: 600">{{selCount}} selecionados</span>
+<div style="display: flex; align-items: center; gap: 6px">
+<span style="font-size: 11.5px; color: #7f93b8; margin-right: 2px">Marcar:</span>
+<sc-for list="{{quick}}" as="q" hint-placeholder-count="3">
+<button onClick="{{q.pick}}" aria-pressed="{{q.on}}" style="height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid {{q.border}}; background: {{q.bg}}; color: {{q.fg}}; font-size: 11.5px; font-weight: 600; cursor: pointer">{{q.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 36px 2fr 1.2fr 0.9fr 0.8fr 1.4fr; gap: 12px; padding: 10px 18px; font-size: 12px; color: #8ea3c7; border-bottom: 1px solid #16223d">
+<span></span><span>Dispositivo</span><span>Fabricante</span><span>Classe</span><span>Versão</span><span>Windows Update</span>
+</div>
+<sc-for list="{{drivers}}" as="d" hint-placeholder-count="6">
+<button onClick="{{d.toggle}}" aria-pressed="{{d.on}}" style="width: 100%; display: grid; grid-template-columns: 36px 2fr 1.2fr 0.9fr 0.8fr 1.4fr; gap: 12px; align-items: center; padding: 11px 18px; border: 0; border-bottom: 1px solid #16223d; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer; font-size: 14px">
+<span style="width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid {{d.boxBorder}}; background: {{d.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{d.on}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="font-weight: 600">{{d.name}}</span>
+<span style="color: #a9badb">[Fabricante]</span>
+<span style="color: #a9badb">{{d.cls}}</span>
+<span style="font-family: 'Cascadia Mono', Consolas, monospace; font-size: 12px; color: #a9badb">[x.x.x]</span>
+<span style="font-size: 12px; color: {{d.wuColor}}">{{d.wu}}</span>
+</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 13px; font-weight: 600">Dica</span>
+<span style="font-size: 13px; color: #a9badb; line-height: 20px">Drivers marcados como "Não" no Windows Update são os mais importantes de guardar: depois de formatar, o Windows não acha sozinho.</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px">
+<div style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 44px; box-sizing: border-box; padding: 0 14px; border-radius: 8px; background: #0b1a33; border: 1px solid #22407a">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#19e3ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h18v7H3zM5 13 7.5 5h9L19 13"></path></svg>
+<span style="font-size: 12px; color: #a9badb; flex-shrink: 0">Salvando em</span>
+<span style="font-size: 12.5px; font-family: 'Cascadia Mono', Consolas, monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">E:\Backup\WINbackup_[DATA]\Drivers_Backup.zip</span>
+<span style="margin-left: auto; font-size: 11.5px; color: #8ea3c7; flex-shrink: 0">Altere em Destino dos backups</span>
+</div>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Exportar {{selCount}} drivers</a>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isR}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<label for="src-drv" style="font-size: 13px; font-weight: 600">Backup de drivers (.zip ou pasta com .inf)</label>
+<div style="display: flex; gap: 8px">
+<input id="src-drv" type="text" value="E:\Backup\Drivers_Backup.zip" style="flex-grow: 1; height: 38px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 13px; font-family: 'Cascadia Mono', Consolas, monospace">
+<button style="height: 38px; padding: 0 14px; border: 1px solid #2a3b63; border-radius: 8px; background: #101b33; color: #e8f0ff; font-size: 13px; cursor: pointer">Procurar…</button>
+</div>
+<span style="font-size: 12px; color: #8ea3c7">O ZIP é extraído para uma pasta temporária antes da instalação.</span>
+</div>
+<div style="display: flex; gap: 14px; padding: 16px 18px; border-radius: 12px; background: #1d1608; border: 1px solid #5c4413">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb547" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"></path></svg>
+<span style="color: #ffd89a; line-height: 20px">Todos os .inf encontrados serão instalados com PnPUtil. Melhor fazer logo depois de formatar. Pode ser preciso reiniciar no fim.</span>
+</div>
+<div style="display: flex; justify-content: flex-end">
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Instalar drivers</a>
+</div>
+</div>
+</sc-if>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'b', filter: 'third', off: {} }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var seg = function (on) { return { bg: on ? '#1a2b52' : 'transparent', fg: on ? '#ffffff' : '#a9badb' }; };
+    var def = [
+      ['d1', '[Placa de vídeo]', 'Display', true, false], ['d2', '[Adaptador Wi-Fi]', 'Net', true, false],
+      ['d3', '[Áudio]', 'Media', true, true], ['d4', '[Chipset]', 'System', true, true],
+      ['d5', '[Bluetooth]', 'Bluetooth', true, false], ['d6', '[Leitor de cartão]', 'SDHost', true, false],
+      ['d7', 'Teclado HID padrão', 'Keyboard', false, true], ['d8', 'Controlador USB genérico', 'USB', false, true]
+    ];
+    var rows = def.filter(function (d) { return s.filter === 'all' || d[3]; });
+    var isOn = function (d) { return s.off[d[0]] === undefined ? d[3] : !s.off[d[0]]; };
+    var quick = [
+      ['Fora do Windows Update', function (d) { return !d[4]; }],
+      ['No Windows Update', function (d) { return d[4]; }],
+      ['Todos', function () { return true; }]
+    ].map(function (q) {
+      var grp = rows.filter(q[1]), on = grp.length > 0 && grp.every(isOn);
+      return { label: q[0], on: on, bg: on ? '#12203d' : 'transparent', fg: on ? '#ffffff' : '#a9badb', border: on ? '#2f7bff' : '#2a3b63',
+        pick: function () { var off = Object.assign({}, s.off); grp.forEach(function (d) { off[d[0]] = on; }); self.setState({ off: off }); } };
+    });
+    var count = 0;
+    var drivers = rows.map(function (d) {
+      var on = isOn(d);
+      if (on) count++;
+      return { name: d[1], cls: d[2], on: on, wu: d[4] ? 'Sim, encontra sozinho' : 'Não: guarde este', wuColor: d[4] ? '#8ea3c7' : '#ffb547',
+        boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { var off = Object.assign({}, s.off); off[d[0]] = on; self.setState({ off: off }); } };
+    });
+    var tB = seg(s.tab === 'b'), tR = seg(s.tab === 'r'), f3 = seg(s.filter === 'third'), fA = seg(s.filter === 'all');
+    return { drivers: drivers, quick: quick, selCount: count, isB: s.tab === 'b', isR: s.tab === 'r',
+      tBbg: tB.bg, tBfg: tB.fg, tRbg: tR.bg, tRfg: tR.fg, f3bg: f3.bg, f3fg: f3.fg, fAbg: fA.bg, fAfg: fA.fg,
+      tabB: function () { self.setState({ tab: 'b' }); }, tabR: function () { self.setState({ tab: 'r' }); },
+      fThird: function () { self.setState({ filter: 'third' }); }, fAll: function () { self.setState({ filter: 'all' }); },
+      selectAll: function () { var off = {}; def.forEach(function (d) { off[d[0]] = false; }); self.setState({ off: off }); } };
+  }
+}
+</script>
+</body>
+</html>

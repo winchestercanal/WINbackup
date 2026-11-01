@@ -1,0 +1,48 @@
+<Page
+    x:Class="WINbackup.Pages.ReportPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:WINbackup.Controls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="18" Padding="36,28,36,36">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Border x:Name="StatusCircle" Width="52" Height="52" CornerRadius="26" BorderThickness="1.5" Background="{StaticResource OkBg}" BorderBrush="{StaticResource Ok}">
+                    <c:Icon x:Name="StatusIcon" Width="26" Height="26" StrokeThickness="2.5" Data="m5 12 5 5L20 7" Foreground="{StaticResource Ok}"/>
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText" Text="Backup concluído" Style="{StaticResource H1}"/>
+                    <TextBlock x:Name="SubText" Style="{StaticResource Sub}"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid x:Name="StatsGrid" ColumnSpacing="12">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+            </Grid>
+
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="1.2*"/><ColumnDefinition Width="1*"/></Grid.ColumnDefinitions>
+                <Border Style="{StaticResource TableCard}" VerticalAlignment="Top">
+                    <StackPanel x:Name="ModulesPanel">
+                        <Border Padding="18,12" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
+                            <TextBlock Text="Por módulo" Style="{StaticResource CardTitle}"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="10">
+                    <TextBlock x:Name="AttentionTitle" Text="Atenção" Style="{StaticResource CardTitle}"/>
+                    <StackPanel x:Name="WarningsPanel" Spacing="10"/>
+                    <Button x:Name="OpenLogLink" Style="{StaticResource LinkButton}" Content="Ver o log completo" HorizontalAlignment="Left" Click="OnOpenLog"/>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                <Button x:Name="RebootButton" Style="{StaticResource AccentButton}" Content="Reiniciar agora" Click="OnReboot" Visibility="Collapsed"/>
+                <Button x:Name="ExportButton" Style="{StaticResource SecondaryButton}" Content="Exportar relatório (HTML)" Click="OnExport"/>
+                <Button x:Name="FolderButton" Style="{StaticResource SecondaryButton}" Content="Abrir pasta do backup" Click="OnFolder"/>
+                <Button Style="{StaticResource PrimaryButton}" Content="Concluir" Click="OnDone"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

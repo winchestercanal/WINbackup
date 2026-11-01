@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>WINbackup — Restaurar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#04060c}
+a{color:#19e3ff}a:hover{color:#8ff1ff}
+button{font-family:inherit}
+.nav-i,.nav-g{transition:background .12s,color .12s}
+.nav-i:hover,.nav-g:hover{background:#101a30 !important;color:#ffffff !important}
+.yt:hover{background:#2a0d15 !important;color:#ff8fa1 !important}
+main button:not([disabled]):hover,main a:hover{filter:brightness(1.22)}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #19e3ff;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 1280px; height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #0a0f1c; color: #e8f0ff; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif; font-size: 14px; border: 1px solid #1c2a48; border-radius: 8px; overflow: hidden">
+<dc-import name="TitleBar" hint-size="1280px,40px"></dc-import>
+<div style="flex-grow: 1; display: flex; min-height: 0">
+<dc-import name="Sidebar" active="restore" hint-size="248px,758px"></dc-import>
+<main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 36px 36px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">Restaurar backup</h1>
+<p style="margin: 0; color: #8ea3c7">Escolha a versão, navegue pelo conteúdo e traga de volta só o que precisa.</p>
+</div>
+<a href="Wizard.dc.html" style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #2f7bff; background: #12203d; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 19 15 9M14 4v3M12.5 5.5h3M19 9v3M17.5 10.5h3"></path></svg>
+Restaurar tudo (pós-formatação)
+</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<label for="src-restore" style="font-size: 13px; font-weight: 600">Local do backup</label>
+<div style="display: flex; gap: 8px">
+<input id="src-restore" type="text" value="E:\Backup" style="flex-grow: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 12.5px; font-family: 'Cascadia Mono', Consolas, monospace">
+<button style="height: 36px; padding: 0 12px; border: 1px solid #2a3b63; border-radius: 8px; background: #101b33; color: #e8f0ff; font-size: 12px; cursor: pointer">Procurar…</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<span style="padding: 12px 16px; font-size: 13px; font-weight: 600; border-bottom: 1px solid #16223d">Versões</span>
+<sc-for list="{{versions}}" as="v" hint-placeholder-count="4">
+<button onClick="{{v.pick}}" aria-pressed="{{v.on}}" style="display: flex; align-items: center; gap: 10px; padding: 11px 16px; border: 0; border-bottom: 1px solid #16223d; background: {{v.bg}}; color: #e8f0ff; text-align: left; cursor: pointer">
+<span style="width: 14px; height: 14px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid {{v.ring}}; background: {{v.dot}}"></span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; font-weight: 600; font-family: 'Cascadia Mono', Consolas, monospace">{{v.date}}</span>
+<span style="font-size: 12px; color: #8ea3c7">{{v.kind}} · [TAMANHO]</span>
+</span>
+<sc-if value="{{v.locked}}" hint-placeholder-val="{{true}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7befff" stroke-width="2" role="img" aria-label="Criptografado"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"></path></svg></sc-if>
+</button>
+</sc-for>
+</div>
+<sc-if value="{{pwNeeded}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; background: #0b1f24; border: 1px solid #17616a">
+<label for="pw-restore" style="font-size: 13px; font-weight: 600">Senha do backup</label>
+<input id="pw-restore" type="password" value="senhasecreta" style="height: 36px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; border: 1px solid #17616a; background: #080d19; color: #e8f0ff; font-size: 13px">
+<span style="font-size: 12px; color: #7befff">Esta versão foi criptografada (AES-256)</span>
+</div>
+</sc-if>
+</div>
+
+<div style="display: flex; flex-direction: column; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #16223d">
+<span style="font-size: 13px; font-weight: 600; flex-grow: 1">Conteúdo do backup</span>
+<label for="search-restore" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar arquivo</label>
+<input id="search-restore" type="text" placeholder="Buscar arquivo…" style="width: 200px; height: 30px; box-sizing: border-box; padding: 0 10px; border-radius: 7px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 12px">
+</div>
+<sc-for list="{{tree}}" as="t" hint-placeholder-count="12">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.on}}" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px {{t.pad}}; border: 0; border-bottom: 1px solid #121c33; background: transparent; color: #e8f0ff; text-align: left; cursor: pointer; font-size: 13px">
+<span style="width: 16px; height: 16px; flex-shrink: 0; border-radius: 4px; border: 1.5px solid {{t.boxBorder}}; background: {{t.boxBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{t.on}}" hint-placeholder-val="{{true}}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.iconColor}}" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="{{t.icon}}"></path></svg>
+<span style="flex-grow: 1; font-weight: {{t.weight}}">{{t.name}}</span>
+<span style="font-size: 12px; color: #8ea3c7">{{t.meta}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 13px; font-weight: 600">Se o arquivo já existir</span>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0a1120; border: 1px solid #1c2a48">
+<sc-for list="{{conflict}}" as="c" hint-placeholder-count="3">
+<button onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="flex-grow: 1; height: 32px; border: 0; border-radius: 7px; background: {{c.bg}}; color: {{c.fg}}; font-size: 12.5px; font-weight: 600; cursor: pointer">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<span style="font-size: 13px; font-weight: 600">Restaurar para</span>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: #0a1120; border: 1px solid #1c2a48">
+<sc-for list="{{target}}" as="c" hint-placeholder-count="3">
+<button onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="flex-grow: 1; height: 32px; border: 0; border-radius: 7px; background: {{c.bg}}; color: {{c.fg}}; font-size: 12.5px; font-weight: 600; cursor: pointer">{{c.label}}</button>
+</sc-for>
+</div>
+<sc-if value="{{showTargetPath}}" hint-placeholder-val="{{false}}">
+<label for="target-path" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Destino da restauração</label>
+<input id="target-path" type="text" value="{{targetValue}}" style="height: 34px; box-sizing: border-box; padding: 0 10px; border-radius: 8px; border: 1px solid #2a3b63; background: #080d19; color: #e8f0ff; font-size: 12.5px; font-family: 'Cascadia Mono', Consolas, monospace">
+</sc-if>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; background: #0e1526; border: 1px solid #1c2a48">
+<button onClick="{{toggleNoReboot}}" aria-pressed="{{noReboot}}" style="display: flex; align-items: center; gap: 12px; border: 0; background: transparent; color: #e8f0ff; padding: 0; text-align: left; cursor: pointer; flex-grow: 1">
+<span style="width: 40px; height: 22px; flex-shrink: 0; border-radius: 22px; background: {{nrTrack}}; display: flex; align-items: center"><span style="width: 16px; height: 16px; border-radius: 50%; background: #ffffff; margin-left: {{nrKnob}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px">Não reiniciar o computador após instalar drivers</span><span style="font-size: 12px; color: #8ea3c7">Os drivers são instalados normalmente; só o reinício automático é pulado</span></span>
+</button>
+<span style="font-size: 12px; color: {{nrColor}}">{{nrStatus}}</span>
+</div>
+
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid #2a3b63; color: #e8f0ff; font-size: 14px; font-weight: 600; text-decoration: none">Cancelar</a>
+<a href="Progress.dc.html" style="display: inline-flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 8px; background: #19e3ff; color: #04121a; font-size: 14px; font-weight: 700; text-decoration: none">Restaurar {{selCount}} itens</a>
+</div>
+
+</main>
+</div>
+
+<sc-if value="{{modal}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; inset: 0; background: rgba(2,4,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 10">
+<div role="dialog" aria-modal="true" aria-labelledby="nr-title" style="width: 460px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 14px; background: #0e1526; border: 1px solid #5c4413; box-shadow: 0 24px 60px rgba(0,0,0,0.6)">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: #2a1f0b; border: 1px solid #5c4413; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb547" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"></path></svg>
+</span>
+<h2 id="nr-title" style="margin: 0; font-size: 18px; font-weight: 700">Reiniciar é recomendado</h2>
+</div>
+<p style="margin: 0; color: #c9d6ee; line-height: 21px">Depois de instalar drivers, o Windows precisa reiniciar para carregá-los corretamente. Sem reiniciar, alguns dispositivos podem não funcionar, ter conflitos ou causar erros até o próximo reinício.</p>
+<p style="margin: 0; color: #a9badb; font-size: 13px; line-height: 20px">Os drivers serão instalados normalmente. Só o reinício automático será pulado, e você reinicia quando quiser.</p>
+<button onClick="{{toggleAck}}" aria-pressed="{{ack}}" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid {{ackBorder}}; background: #0a1120; color: #e8f0ff; text-align: left; cursor: pointer">
+<span style="width: 18px; height: 18px; flex-shrink: 0; border-radius: 5px; border: 1.5px solid {{ackBox}}; background: {{ackBg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{ack}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04121a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></sc-if>
+</span>
+<span style="font-size: 13px">Entendo os riscos e quero continuar sem reiniciar, por minha conta.</span>
+</button>
+<div style="display: flex; justify-content: flex-end; gap: 10px">
+<button onClick="{{cancelModal}}" style="height: 40px; padding: 0 16px; border: 1px solid #2a3b63; border-radius: 8px; background: transparent; color: #e8f0ff; font-size: 13px; font-weight: 600; cursor: pointer">Manter reinício</button>
+<button onClick="{{confirmModal}}" disabled="{{ackMissing}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: {{confirmBg}}; color: {{confirmFg}}; font-size: 13px; font-weight: 700; cursor: {{confirmCursor}}">Continuar sem reiniciar</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { ver: 0, off: { n5: true, n6: true }, conflict: 'skip', target: 'me', noReboot: false, modal: false, ack: false }; }
+  renderVals() {
+    var self = this, s = this.state;
+    var seg = function (on) { return { bg: on ? '#1a2b52' : 'transparent', fg: on ? '#ffffff' : '#a9badb' }; };
+    var versions = [
+      ['[AAAA-MM-DD HH:MM]', 'Completo', false], ['[AAAA-MM-DD HH:MM]', 'Incremental', false],
+      ['[AAAA-MM-DD HH:MM]', 'Incremental', false], ['[AAAA-MM-DD HH:MM]', 'Completo', true]
+    ].map(function (v, i) {
+      var on = s.ver === i;
+      return { date: v[0], kind: v[1], locked: v[2], on: on, bg: on ? '#0f1b33' : 'transparent',
+        ring: on ? '#19e3ff' : '#3a4b70', dot: on ? '#19e3ff' : 'transparent', pick: function () { self.setState({ ver: i }); } };
+    });
+    var F = 'M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z';
+    var DOC = 'M6 3h9l4 4v14H6zM15 3v4h4';
+    var def = [
+      ['n1', 0, F, 'Arquivos pessoais', '[TAM]', true], ['n2', 1, F, 'Documentos', '[N] itens', true],
+      ['n3', 2, DOC, 'Contrato.pdf', '[TAM]', false], ['n4', 2, DOC, 'Planilha gastos.xlsx', '[TAM]', false],
+      ['n5', 1, F, 'Vídeos', '[N] itens', true], ['n6', 1, F, 'Downloads', '[N] itens', true],
+      ['n7', 0, F, 'Programas', 'Programas.json', true], ['n8', 0, F, 'Configurações', '[N] itens', true],
+      ['n9', 1, DOC, 'Redes Wi-Fi', '[N] perfis', false], ['n10', 1, DOC, 'Windows Terminal', 'settings.json', false],
+      ['n11', 0, F, 'Drivers', 'Drivers_Backup.zip', true], ['n12', 0, F, 'Navegadores', '[N] perfis', true]
+    ];
+    var count = 0;
+    var tree = def.map(function (n) {
+      var on = !s.off[n[0]];
+      if (on) count++;
+      return { name: n[3], meta: n[4], icon: n[2], iconColor: n[5] ? '#6fa4ff' : '#8ea3c7', weight: n[1] === 0 ? 600 : 400,
+        pad: (16 + n[1] * 24) + 'px', on: on, boxBorder: on ? '#19e3ff' : '#3a4b70', boxBg: on ? '#19e3ff' : 'transparent',
+        toggle: function () { var off = Object.assign({}, s.off); off[n[0]] = on; self.setState({ off: off }); } };
+    });
+    var opt = function (list, key) {
+      return list.map(function (c) {
+        var on = s[key] === c[0], g = seg(on);
+        return { label: c[1], on: on, bg: g.bg, fg: g.fg, pick: function () { var u = {}; u[key] = c[0]; self.setState(u); } };
+      });
+    };
+    var tv = { user: 'C:\\Users\\[outro usuário]', path: 'D:\\Restaurado' };
+    return { versions: versions, tree: tree, selCount: count, pwNeeded: s.ver === 3,
+      noReboot: s.noReboot, nrTrack: s.noReboot ? '#d9534f' : '#2a3350', nrKnob: s.noReboot ? '21px' : '3px',
+      nrStatus: s.noReboot ? 'Sem reinício · por sua conta' : 'Reinicia após os drivers', nrColor: s.noReboot ? '#ff8fa1' : '#8ea3c7',
+      toggleNoReboot: function () { if (s.noReboot) self.setState({ noReboot: false }); else self.setState({ modal: true, ack: false }); },
+      modal: s.modal, ack: s.ack, ackMissing: !s.ack,
+      ackBorder: s.ack ? '#ffb547' : '#2a3b63', ackBox: s.ack ? '#ffb547' : '#3a4b70', ackBg: s.ack ? '#ffb547' : 'transparent',
+      confirmBg: s.ack ? '#ffb547' : '#2a3350', confirmFg: s.ack ? '#1a1205' : '#7f93b8', confirmCursor: s.ack ? 'pointer' : 'not-allowed',
+      toggleAck: function () { self.setState({ ack: !s.ack }); },
+      cancelModal: function () { self.setState({ modal: false, ack: false }); },
+      confirmModal: function () { if (s.ack) self.setState({ modal: false, noReboot: true }); },
+      conflict: opt([['skip', 'Pular'], ['over', 'Substituir'], ['both', 'Manter os dois']], 'conflict'),
+      target: opt([['me', 'Usuário atual'], ['user', 'Outro usuário'], ['path', 'Outra pasta']], 'target'),
+      showTargetPath: s.target !== 'me', targetValue: tv[s.target] || '' };
+  }
+}
+</script>
+</body>
+</html>
