@@ -28,6 +28,9 @@ public class Manifest
     public List<ManifestDir> EmptyFolders { get; set; } = new();
     public List<ManifestDriver> Drivers { get; set; } = new();
     public List<ManifestProgram> Programs { get; set; } = new();
+    /// <summary>Configurações do Windows exportadas para Configuracoes\Windows ("wifi", "theme"…).</summary>
+    public List<string> WindowsSettings { get; set; } = new();
+    public List<string> SteamLibraries { get; set; } = new();
     public long BytesStored { get; set; }
     public bool HashChecked { get; set; }
     public int HashMismatches { get; set; }

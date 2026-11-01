@@ -26,7 +26,7 @@
                             <TextBlock Text="NOTIFICAÇÕES" Style="{StaticResource Overline}"/>
                             <c:ToggleRow x:Name="NotifyDone" Title="Ao terminar um backup" Description="Notificação do Windows com o resumo"/>
                             <c:ToggleRow x:Name="NotifyErr" Title="Quando houver erros" Description="Mesmo em backups agendados"/>
-                            <c:ToggleRow x:Name="Remind" Title="Lembrete de backup" Description="Em breve · avisa se passar 30 dias sem backup"/>
+                            <c:ToggleRow x:Name="Remind" Title="Lembrete de backup" Description="Avisa ao abrir o app e ao entrar no Windows se passar 30 dias sem backup"/>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}">
@@ -48,7 +48,7 @@
                                 <Button x:Name="CopyButton" Style="{StaticResource SmallButton}" Height="28" Padding="10,0" FontSize="12" Content="Copiar exemplos" HorizontalAlignment="Right" Click="OnCopy"/>
                             </Grid>
                             <TextBlock FontSize="13" Foreground="{StaticResource TextMuted2}" LineHeight="20" TextWrapping="Wrap"
-                                       Text="Tudo o que a interface faz também vai rodar por comando, para scripts, agendamentos e o autounattend (em breve)."/>
+                                       Text="Tudo o que a interface faz também roda por comando, para scripts, agendamentos e o autounattend."/>
                             <Border Padding="14" CornerRadius="10" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource Divider}" BorderThickness="1">
                                 <StackPanel x:Name="CliLines" Spacing="4"/>
                             </Border>
@@ -65,9 +65,9 @@
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="14">
                             <TextBlock Text="MODO PORTÁTIL E GERAL" Style="{StaticResource Overline}"/>
-                            <c:ToggleRow x:Name="Portable" Title="Modo portátil" Description="Em breve · salva as configurações ao lado do .exe, sem instalar nada"/>
-                            <c:ToggleRow x:Name="Tray" Title="Ficar na bandeja do sistema" Description="Em breve · necessário para gatilhos de HD externo"/>
-                            <Button Style="{StaticResource AccentButton}" Height="40" FontSize="13" HorizontalAlignment="Stretch" Click="OnSoon">
+                            <c:ToggleRow x:Name="Portable" Title="Modo portátil" Description="Salva as configurações ao lado do .exe, sem instalar nada"/>
+                            <TextBlock Style="{StaticResource Small}" Text="Não é preciso deixar o app aberto na bandeja: os agendamentos (inclusive ao conectar o HD externo) rodam pelo Agendador de Tarefas do Windows."/>
+                            <Button x:Name="PortableButton" Style="{StaticResource AccentButton}" Height="40" FontSize="13" HorizontalAlignment="Stretch" Click="OnMakePortable">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <c:Icon Width="16" Height="16" Data="M9 2h6v6H9zM7 8h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/>
                                     <TextBlock Text="Criar versão portátil no pendrive"/>

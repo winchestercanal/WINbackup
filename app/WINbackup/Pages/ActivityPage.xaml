@@ -10,7 +10,6 @@
                 <TextBlock Text="Atividade" Style="{StaticResource H1}"/>
                 <TextBlock Text="O que já rodou, o que vai rodar e o que está vigiando o seu HD externo." Style="{StaticResource Sub}"/>
             </StackPanel>
-            <c:PreviewNotice Text="Prévia: o último backup e o destino são reais. Agendamentos e automações entram numa próxima versão."/>
 
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
@@ -27,8 +26,8 @@
                 <Border Grid.Column="1" Style="{StaticResource Card}" Padding="18,16">
                     <StackPanel Spacing="4">
                         <TextBlock Text="Próximo agendado" Style="{StaticResource Small}"/>
-                        <TextBlock Text="[DIA, HH:MM]" FontSize="18" FontWeight="Bold"/>
-                        <TextBlock Text="Só documentos · incremental" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
+                        <TextBlock x:Name="NextText" FontSize="18" FontWeight="Bold"/>
+                        <TextBlock x:Name="NextWhat" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="2" Style="{StaticResource Card}" Padding="18,16">

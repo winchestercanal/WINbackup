@@ -11,18 +11,17 @@
                 <TextBlock Text="Saves de jogos" Style="{StaticResource H1}"/>
                 <TextBlock Text="Encontra o progresso dos seus jogos nas pastas mais comuns, para não começar do zero." Style="{StaticResource Sub}"/>
             </StackPanel>
-            <c:PreviewNotice/>
 
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <Border Style="{StaticResource Card}" Padding="16,14">
-                    <StackPanel Spacing="6"><TextBlock Text="Documentos\My Games" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock Text="[N] jogos" FontSize="18" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="6"><TextBlock Text="Documentos e Saved Games" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock x:Name="StatLocal" Text="…" FontSize="18" FontWeight="Bold"/></StackPanel>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16,14">
-                    <StackPanel Spacing="6"><TextBlock Text="%USERPROFILE%\Saved Games" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock Text="[N] jogos" FontSize="18" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="6"><TextBlock Text="Unreal e Unity (AppData)" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock x:Name="StatEngine" Text="…" FontSize="18" FontWeight="Bold"/></StackPanel>
                 </Border>
                 <Border Grid.Column="2" Style="{StaticResource Card}" Padding="16,14">
-                    <StackPanel Spacing="6"><TextBlock Text="%APPDATA% / %LOCALAPPDATA%" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock Text="[N] jogos" FontSize="18" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="6"><TextBlock Text="Steam Cloud e Ubisoft" Style="{StaticResource MonoText}" Foreground="{StaticResource TextMuted}"/><TextBlock x:Name="StatCloud" Text="…" FontSize="18" FontWeight="Bold"/></StackPanel>
                 </Border>
             </Grid>
 
@@ -44,15 +43,19 @@
                         <TextBlock Grid.Column="2" Text="Tamanho" Style="{StaticResource Small}"/>
                         <TextBlock Grid.Column="3" Text="Nuvem" Style="{StaticResource Small}"/>
                     </Grid>
+                    <StackPanel x:Name="Loading" Orientation="Horizontal" Spacing="12" Padding="18,22">
+                        <ProgressRing IsActive="True" Width="20" Height="20" Foreground="{StaticResource Neon}"/>
+                        <TextBlock Text="Procurando saves de jogos…" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                    </StackPanel>
                     <ItemsRepeater x:Name="Rows">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="m:CheckItem">
                                 <ToggleButton Style="{StaticResource CheckRow}" Padding="18,12" IsChecked="{x:Bind IsChecked, Mode=TwoWay}" AutomationProperties.Name="{x:Bind Title}">
                                     <Grid ColumnSpacing="12">
                                         <Grid.ColumnDefinitions><ColumnDefinition Width="1.6*"/><ColumnDefinition Width="2.4*"/><ColumnDefinition Width="0.8*"/><ColumnDefinition Width="1.3*"/></Grid.ColumnDefinitions>
-                                        <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <StackPanel Spacing="1" VerticalAlignment="Center"><TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/><TextBlock Text="{x:Bind Col2}" FontSize="11.5" Foreground="{StaticResource TextLabel}"/></StackPanel>
                                         <TextBlock Grid.Column="1" Text="{x:Bind Subtitle}" Style="{StaticResource MonoText}" VerticalAlignment="Center"/>
-                                        <TextBlock Grid.Column="2" Text="[TAM]" FontSize="12" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{x:Bind Col1, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
                                         <TextBlock Grid.Column="3" Text="{x:Bind Meta}" FontSize="12" Foreground="{x:Bind MetaBrush}" VerticalAlignment="Center"/>
                                     </Grid>
                                 </ToggleButton>
@@ -68,10 +71,7 @@
                     <StackPanel Spacing="10">
                         <TextBlock Text="Bibliotecas da Steam" Style="{StaticResource CardTitle}"/>
                         <TextBlock Text="Salvamos só os caminhos, para a Steam reconhecer os jogos já instalados em outro disco." Style="{StaticResource Small}"/>
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="C:\Program Files (x86)\Steam" FontFamily="{StaticResource Mono}" FontSize="12.5" Foreground="{StaticResource TextMono}"/>
-                            <TextBlock Text="D:\SteamLibrary" FontFamily="{StaticResource Mono}" FontSize="12.5" Foreground="{StaticResource TextMono}"/>
-                        </StackPanel>
+                        <StackPanel x:Name="LibrariesPanel" Spacing="6"/>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource Card}">
@@ -83,8 +83,8 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                <Button Style="{StaticResource SecondaryButton}" Content="Adicionar jogo manualmente" Click="OnSoon"/>
-                <Button x:Name="SaveButton" Style="{StaticResource PrimaryButton}" Click="OnSoon"/>
+                <Button Style="{StaticResource SecondaryButton}" Content="Adicionar jogo manualmente" Click="OnAddGame"/>
+                <Button x:Name="SaveButton" Style="{StaticResource PrimaryButton}" Content="Salvar saves" Click="OnSave"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

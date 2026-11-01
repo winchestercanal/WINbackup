@@ -1,54 +1,125 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using WINbackup.Backup;
 using WINbackup.Controls;
 using WINbackup.Models;
+using WINbackup.Services;
 
 namespace WINbackup.Pages;
 
-/// <summary>Prévia do módulo Configurações. Dados de exemplo do protótipo.</summary>
+/// <summary>Configurações do Windows e de apps detectados.</summary>
 public sealed partial class ConfigsPage : Page
 {
-    readonly List<CheckItem> _win, _apps;
+    readonly List<CheckItem> _win = new(), _apps = new();
+    readonly CancellationTokenSource _cts = new();
+
+    SettingsData S => Settings.Data;
 
     public ConfigsPage()
     {
         InitializeComponent();
-        _win = Items(
-            ("wifi", "Redes Wi-Fi", "Perfis salvos, com senha", "[N] redes", true),
-            ("theme", "Papel de parede e tema", "Fundo, cor de destaque, modo escuro", "", true),
-            ("print", "Impressoras", "Filas e drivers de impressão", "[N]", true),
-            ("fonts", "Fontes instaladas", "Só as que não vêm com o Windows", "[N] fontes", true),
-            ("env", "Variáveis de ambiente", "Usuário e PATH personalizado", "", true),
-            ("hosts", "Arquivo hosts", @"C:\Windows\System32\drivers\etc\hosts", "", false));
-        _apps = Items(
-            ("term", "Windows Terminal", "settings.json", "Detectado", true),
-            ("pwsh", "Perfil do PowerShell", "$PROFILE", "Detectado", true),
-            ("vscode", "VS Code", "settings, atalhos, snippets e extensões", "Detectado", true),
-            ("git", "Git", @"%USERPROFILE%\.gitconfig", "Detectado", true),
-            ("obs", "OBS Studio", @"%APPDATA%\obs-studio", "Detectado", true),
-            ("sbot", "Streamer.bot", "pasta data do Streamer.bot", "Detectado", true),
-            ("komorebi", "Komorebi", "komorebi.json, applications.yaml", "Detectado", true),
-            ("yasb", "YASB", @"%USERPROFILE%\.config\yasb", "Detectado", false));
+        Unloaded += (_, _) => _cts.Cancel();
+
+        foreach (var w in ConfigsModule.WindowsItems)
+            _win.Add(Item(w.Key, w.Name, w.Description, w.Key is "theme" or "env" or "hosts" ? "" : "…"));
         WinRows.ItemsSource = _win;
+
+        foreach (var app in ConfigsModule.Apps)
+        {
+            var paths = ConfigsModule.Resolve(app);
+            if (paths.Count == 0) continue;
+            _apps.Add(Item(app.Key, app.Name, app.Note, "Detectado"));
+        }
         AppRows.ItemsSource = _apps;
-        AppCount.Text = $"{_apps.Count} detectados";
+        AppCount.Text = _apps.Count == 1 ? "1 detectado" : $"{_apps.Count} detectados";
+        LoadCustom();
         Count();
+        _ = FillCountsAsync();
     }
 
-    List<CheckItem> Items(params (string Key, string Name, string Desc, string Meta, bool On)[] defs) => defs.Select(d =>
+    CheckItem Item(string key, string name, string desc, string meta)
     {
-        var i = new CheckItem { Key = d.Key, Title = d.Name, Subtitle = d.Desc, Meta = d.Meta, IsChecked = d.On };
-        i.Changed += _ => Count();
+        var i = new CheckItem { Key = key, Title = name, Subtitle = desc, Meta = meta, IsChecked = ConfigsModule.IsSelected(key) };
+        i.Changed += item =>
+        {
+            S.ConfigsOff.RemoveAll(k => string.Equals(k, item.Key, StringComparison.OrdinalIgnoreCase));
+            if (!item.IsChecked) S.ConfigsOff.Add(item.Key);
+            Settings.Save();
+            Count();
+        };
         return i;
-    }).ToList();
+    }
+
+    /// <summary>Quantas redes, impressoras e fontes existem (netsh e WMI demoram um pouco).</summary>
+    async Task FillCountsAsync()
+    {
+        try
+        {
+            var wifi = await ConfigsModule.WifiProfilesAsync(_cts.Token);
+            var printers = await Task.Run(ConfigsModule.Printers);
+            var fonts = ConfigsModule.UserFontCount();
+            Set("wifi", wifi.Count == 1 ? "1 rede" : $"{wifi.Count} redes");
+            Set("print", printers.Count == 1 ? "1 impressora" : $"{printers.Count} impressoras");
+            Set("fonts", fonts == 1 ? "1 fonte" : $"{fonts} fontes");
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    void Set(string key, string meta)
+    {
+        var item = _win.First(i => i.Key == key);
+        item.Meta = meta;
+        item.Refresh();
+    }
 
     void Count()
     {
-        if (_win == null) return;
         WinCount.Text = $"{_win.Count(i => i.IsChecked)} de {_win.Count}";
+        var any = _win.Any(i => i.IsChecked) || _apps.Any(i => i.IsChecked) || S.ConfigCustomFolders.Count > 0;
+        SaveButton.IsEnabled = any;
+    }
+
+    void LoadCustom()
+    {
+        CustomPanel.Children.Clear();
+        foreach (var path in S.ConfigCustomFolders.ToList())
+        {
+            var g = new Grid { ColumnSpacing = 8 };
+            g.ColumnDefinitions.Add(new ColumnDefinition());
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            g.Children.Add(new TextBlock { Text = path, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
+            var remove = new Button { Style = (Style)Application.Current.Resources["SmallButton"], Height = 28, FontSize = 12, Content = "Remover" };
+            remove.Click += (_, _) => { S.ConfigCustomFolders.Remove(path); Settings.Save(); LoadCustom(); Count(); };
+            Grid.SetColumn(remove, 1);
+            g.Children.Add(remove);
+            CustomPanel.Children.Add(g);
+        }
+    }
+
+    void OnAddFolder(object sender, RoutedEventArgs e)
+    {
+        var path = FileDialog.PickFolder("Pasta de configuração para incluir no backup");
+        if (path == null || S.ConfigCustomFolders.Contains(path, StringComparer.OrdinalIgnoreCase)) return;
+        S.ConfigCustomFolders.Add(path);
+        Settings.Save();
+        LoadCustom();
+        Count();
     }
 
     void OnCancel(object sender, RoutedEventArgs e) => App.Shell.Navigate("home");
-    void OnOptions(object sender, RoutedEventArgs e) => App.Shell.Navigate("options");
-    async void OnSoon(object sender, RoutedEventArgs e) => await Dialogs.SoonAsync(XamlRoot, "Configurações");
+
+    async void OnSave(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(S.Destination))
+        {
+            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            return;
+        }
+        App.Shell.Run(new JobSpec
+        {
+            Title = "Configurações", FilesLabel = "Configurações de apps",
+            Folders = ConfigsModule.SelectedAppFolders(), WindowsKeys = Presets.WindowsKeys(), Exclusions = ConfigsModule.Exclusions,
+        });
+    }
 }

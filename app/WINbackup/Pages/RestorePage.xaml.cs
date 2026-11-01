@@ -13,7 +13,7 @@ namespace WINbackup.Pages;
 /// <summary>Restauração seletiva: versão, conteúdo, conflitos e destino.</summary>
 public sealed partial class RestorePage : Page
 {
-    record Node(CheckItem Item, string? GroupKey, ManifestFolder? Folder, bool IsDrivers, bool IsPrograms = false);
+    record Node(CheckItem Item, string? GroupKey, ManifestFolder? Folder, bool IsDrivers, bool IsPrograms = false, bool IsWindows = false);
 
     readonly ObservableCollection<CheckItem> _view = new();
     readonly List<Node> _nodes = new();
@@ -144,6 +144,12 @@ public sealed partial class RestorePage : Page
             _nodes.Add(new Node(Item("Programas", "Reinstalados pelo winget, um por vez" + (manual > 0 ? $"; {manual} sem pacote ficam na lista manual" : ""),
                 $"{packaged} programas", Icons.Apps, 0), null, null, false, true));
         }
+        if (m.WindowsSettings.Count > 0)
+        {
+            var names = m.WindowsSettings.Select(k => ConfigsModule.WindowsItems.FirstOrDefault(w => w.Key == k)?.Name ?? k);
+            _nodes.Add(new Node(Item("Configurações do Windows", string.Join(", ", names), $"{m.WindowsSettings.Count} itens", Icons.Configs, 0),
+                null, null, false, false, true));
+        }
         if (_version != null && (Directory.Exists(Path.Combine(_version, "Drivers")) || File.Exists(Path.Combine(_version, "Drivers_Backup.zip"))))
         {
             var count = m.Drivers.Count;
@@ -222,6 +228,7 @@ public sealed partial class RestorePage : Page
     List<ManifestFolder> ChosenFolders() => _nodes.Where(n => n.Folder != null && n.Item.IsChecked).Select(n => n.Folder!).ToList();
     bool DriversChosen => !FileMode && _nodes.Any(n => n.IsDrivers && n.Item.IsChecked);
     bool ProgramsChosen => !FileMode && _nodes.Any(n => n.IsPrograms && n.Item.IsChecked);
+    bool WindowsChosen => !FileMode && _nodes.Any(n => n.IsWindows && n.Item.IsChecked);
 
     void UpdateSummary()
     {
@@ -243,6 +250,7 @@ public sealed partial class RestorePage : Page
         var parts = new List<string>();
         if (keys.Count > 0) parts.Add($"{files.Count:N0} arquivos ({Sys.Bytes(files.Sum(f => f.Size))})");
         if (ProgramsChosen) parts.Add("programas");
+        if (WindowsChosen) parts.Add("configurações do Windows");
         if (DriversChosen) parts.Add("drivers");
         RestoreButton.Content = parts.Count == 0 ? "Nada selecionado" : "Restaurar " + string.Join(" e ", parts);
         RestoreButton.IsEnabled = parts.Count > 0;
@@ -308,7 +316,7 @@ public sealed partial class RestorePage : Page
 
         var source = FileMode
             ? new RestoreSource(_version, _manifest, _pickedFiles.Select(k => k.Split('|')[0]).ToHashSet(), new HashSet<string>(_pickedFiles, StringComparer.OrdinalIgnoreCase), false)
-            : new RestoreSource(_version, _manifest, ChosenFolders().Select(f => f.Key).ToHashSet(), null, DriversChosen, Programs: ProgramsChosen);
+            : new RestoreSource(_version, _manifest, ChosenFolders().Select(f => f.Key).ToHashSet(), null, DriversChosen, Programs: ProgramsChosen, WindowsSettings: WindowsChosen);
 
         var where = target switch
         {

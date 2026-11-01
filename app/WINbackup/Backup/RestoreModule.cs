@@ -10,7 +10,7 @@ public enum ConflictMode { Skip, Overwrite, KeepBoth }
 
 /// <summary>Uma versão e o que restaurar dela. Folders null = todas as pastas.</summary>
 public record RestoreSource(string VersionPath, Manifest Manifest, HashSet<string>? Folders, HashSet<string>? Files, bool Drivers,
-    ConflictMode? Conflict = null, bool Programs = false);
+    ConflictMode? Conflict = null, bool Programs = false, bool WindowsSettings = false);
 
 /// <summary>
 /// Restauração: copia de volta os arquivos de uma ou mais versões (seguindo os arquivos que
@@ -75,7 +75,7 @@ public static class RestoreModule
             : path;
     }
 
-    public static async Task RunAsync(BackupRunner r, StepItem? filesStep, StepItem? prep, StepItem? install, StepItem? programsStep, CancellationToken token)
+    public static async Task RunAsync(BackupRunner r, StepItem? filesStep, StepItem? prep, StepItem? install, StepItem? programsStep, StepItem? windowsStep, CancellationToken token)
     {
         await Task.Yield();
         var spec = r.Spec;
@@ -100,6 +100,8 @@ public static class RestoreModule
                     ps.Manifest.Programs.Where(p => p.Source is "winget" or "msstore").Select(p => (p.Id, p.Name, p.Source)).ToList(),
                     ProgramsModule.ManualListPath(ps.VersionPath), token);
         }
+        if (windowsStep != null && spec.RestoreSources.FirstOrDefault(s => s.WindowsSettings) is { } ws)
+            await ConfigsModule.RestoreWindowsAsync(r, windowsStep, ws.VersionPath, ws.Manifest, token);
         if (filesStep == null) return;
 
         // 1. Plano
@@ -195,6 +197,15 @@ public static class RestoreModule
         r.Step(filesStep, state, summary);
         r.Ok($"Restauração: {summary}");
         r.Modules.Add(new ModuleResult("Arquivos", summary, state));
+
+        // Saves de jogos: a Steam precisa reconhecer as bibliotecas em outros discos
+        foreach (var src in spec.RestoreSources)
+        {
+            var games = src.Manifest.Folders.Any(f => (src.Folders == null || src.Folders.Contains(f.Key)) && GroupOf(src.Manifest, f).StartsWith("Saves de jogos"));
+            var extra = src.Manifest.SteamLibraries.Skip(1).ToList();
+            if (games && extra.Count > 0)
+                r.Warn($"Bibliotecas da Steam do PC antigo: {string.Join(", ", extra)}. Na Steam: Configurações → Armazenamento → Adicionar unidade.");
+        }
 
         void Advance(long n)
         {

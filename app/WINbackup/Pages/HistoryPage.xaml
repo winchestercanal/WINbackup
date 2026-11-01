@@ -27,7 +27,7 @@
                         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel Spacing="2">
                             <TextBlock Text="Retenção" FontWeight="SemiBold"/>
-                            <TextBlock Style="{StaticResource Small}" Text="As versões mais antigas serão apagadas automaticamente (em breve). O último backup completo nunca é apagado."/>
+                            <TextBlock Style="{StaticResource Small}" Text="Vale para cada tipo de backup. As mais antigas são apagadas ao fim de um backup sem erros; o último completo e as versões das quais as mantidas dependem nunca são apagadas."/>
                         </StackPanel>
                         <TextBlock Grid.Column="1" Text="Manter as últimas" FontSize="13" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
                         <Border Grid.Column="2" BorderBrush="{StaticResource LineButton}" BorderThickness="1" CornerRadius="8" VerticalAlignment="Center">

@@ -68,8 +68,30 @@ public sealed class BackupRunner
         _ui = DispatcherQueue.GetForCurrentThread();
     }
 
+    static FileStream? _lock;
+    static string LockPath => Path.Combine(Settings.Folder, "executando.lock");
+
+    /// <summary>Outra instância (app aberto, agendamento ou linha de comando) já está rodando uma tarefa.</summary>
+    public static bool IsAnotherRunning()
+    {
+        if (_lock != null) return false;
+        try
+        {
+            Directory.CreateDirectory(Settings.Folder);
+            using var probe = new FileStream(LockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+            return false;
+        }
+        catch (IOException) { return true; }
+    }
+
     public static BackupRunner Start(JobSpec spec)
     {
+        try
+        {
+            Directory.CreateDirectory(Settings.Folder);
+            _lock = new FileStream(LockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        }
+        catch (IOException) { /* outra instância rodando: a tarefa segue, mas o agendamento vai respeitar */ }
         var r = new BackupRunner(spec);
         Current = r;
         r.BuildSteps();
@@ -198,7 +220,7 @@ public sealed class BackupRunner
 
     // ---------- Execução ----------
 
-    StepItem? _vss, _files, _drivers, _verify, _prep, _install, _programs;
+    StepItem? _vss, _files, _drivers, _verify, _prep, _install, _programs, _windows;
 
     void BuildSteps()
     {
@@ -225,6 +247,8 @@ public sealed class BackupRunner
             }
             if (Spec.InstallPackages != null || Spec.RestoreSources.Any(s => s.Programs))
                 _programs = Add("Programas (winget)", "Programas", 40);
+            if (Spec.RestoreSources.Any(s => s.WindowsSettings))
+                _windows = Add("Configurações do Windows", "Configurações", 5);
             foreach (var name in Spec.Unavailable) Unavailable(Add(name, name, 0));
             if (Spec.RestoreSources.Any(s => s.Folders == null || s.Folders.Count > 0 || s.Files?.Count > 0))
                 _files = Add("Arquivos e configurações", "Arquivos", 80);
@@ -234,9 +258,8 @@ public sealed class BackupRunner
         var files = Spec.Folders.Count > 0;
         if (files && Spec.UseShadowCopy) _vss = Add("Shadow Copy (VSS)", Spec.FilesLabel, 0);
         if (Spec.Programs) _programs = Add("Programas (winget)", "Programas", 10);
-        if (Spec.Unavailable.Contains("Configurações")) Unavailable(Add("Configurações", "Configurações", 0));
+        if (Spec.WindowsKeys.Count > 0) _windows = Add("Configurações do Windows", "Configurações", 5);
         if (files) _files = Add(Spec.FilesLabel, Spec.FilesLabel, 70);
-        if (Spec.Unavailable.Contains("Saves de jogos")) Unavailable(Add("Saves de jogos", "Saves de jogos", 0));
         if (Spec.Drivers) _drivers = Add("Drivers", "Drivers", 20);
         if (files && Spec.VerifyHash) _verify = Add("Verificar integridade (SHA-256)", Spec.FilesLabel, 25);
     }
@@ -283,6 +306,8 @@ public sealed class BackupRunner
         finally
         {
             lock (_logLock) { _logFile?.Dispose(); _logFile = null; }
+            _lock?.Dispose();
+            _lock = null;
             Notify();
         }
     }
@@ -312,6 +337,12 @@ public sealed class BackupRunner
             manifest.Modules.Add("Programas");
             await ProgramsModule.BackupAsync(this, _programs, manifest, token);
         }
+        if (_windows != null)
+        {
+            manifest.Modules.Add("Configurações do Windows");
+            await ConfigsModule.BackupWindowsAsync(this, _windows, manifest, token);
+        }
+        if (Spec.Games) manifest.SteamLibraries = GamesModule.SteamLibraries();
         if (Spec.Browsers)
         {
             var browsers = BrowsersModule.Detect();
@@ -330,6 +361,7 @@ public sealed class BackupRunner
         manifest.BytesStored = StoredBytes;
         manifest.Completed = true;
         manifest.Save(VersionPath);
+        if (ErrorCount == 0) Retention.Apply(Spec.Destination, Settings.Data.KeepVersions, Info);
         Percent = 100;
     }
 
@@ -345,7 +377,7 @@ public sealed class BackupRunner
             _ => "Destino: locais originais",
         } + $" · se já existir: {Spec.Conflict switch { ConflictMode.Overwrite => "substituir", ConflictMode.KeepBoth => "manter os dois", _ => "pular" }}");
         if (!Sys.IsAdmin) Warn("O app não está rodando como administrador: drivers e pastas protegidas podem falhar.");
-        await RestoreModule.RunAsync(this, _files, _prep, _install, _programs, token);
+        await RestoreModule.RunAsync(this, _files, _prep, _install, _programs, _windows, token);
         foreach (var name in Spec.Unavailable)
             Modules.Add(new ModuleResult(name, "Ainda não disponível nesta versão", StepState.Unavailable));
         Percent = 100;

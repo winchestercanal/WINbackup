@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,44 +11,27 @@ using WINbackup.Services;
 
 namespace WINbackup.Pages;
 
-/// <summary>Prévia dos agendamentos. Os presets listados são os reais do Início.</summary>
+/// <summary>Agendamentos (Agendador de Tarefas do Windows) e presets.</summary>
 public sealed partial class SchedulePage : Page
 {
+    static readonly (DayOfWeek Day, string Label, string Full)[] Week =
+    [
+        (DayOfWeek.Sunday, "D", "Domingo"), (DayOfWeek.Monday, "S", "Segunda"), (DayOfWeek.Tuesday, "T", "Terça"), (DayOfWeek.Wednesday, "Q", "Quarta"),
+        (DayOfWeek.Thursday, "Q", "Quinta"), (DayOfWeek.Friday, "S", "Sexta"), (DayOfWeek.Saturday, "S", "Sábado"),
+    ];
+
+    readonly List<(ToggleButton Button, DayOfWeek Day)> _days = new();
+    readonly List<(RadioButton Button, string Slug)> _presets = new();
+    string _trigger = "time";
+
+    SettingsData S => Settings.Data;
+    static FontFamily Mono => (FontFamily)Application.Current.Resources["Mono"];
+
     public SchedulePage()
     {
         InitializeComponent();
         Responsive.StackWhenNarrow(MainGrid, 1000);
-        var mono = (FontFamily)Application.Current.Resources["Mono"];
-
-        foreach (var (icon, when, what, next) in new[]
-                 {
-                     (Icons.Clock, "Toda sexta, 20:00", "Só documentos · incremental", "Próximo: [DATA]"),
-                     (Icons.Drive, "Ao conectar HD Externo (E:)", "Backup completo · incremental", "Último: [DATA]"),
-                     (Icons.Clock, "Todo dia 1, 09:00", "Ambiente de dev · completo", "Próximo: [DATA]"),
-                 })
-        {
-            var g = new Grid { ColumnSpacing = 14 };
-            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            g.ColumnDefinitions.Add(new ColumnDefinition());
-            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            g.Children.Add(new Border { Width = 38, Height = 38, CornerRadius = new CornerRadius(10), Background = UI.Brush("#12203d"), Child = new Icon { Data = icon, Foreground = UI.BlueSoft } });
-            var t = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-            t.Children.Add(new TextBlock { Text = when, FontSize = 14, FontWeight = FontWeights.SemiBold });
-            t.Children.Add(new TextBlock { Text = what, FontSize = 12, Foreground = UI.Muted });
-            Grid.SetColumn(t, 1);
-            g.Children.Add(t);
-            var n = new TextBlock { Text = next, FontSize = 12, Foreground = UI.Muted, VerticalAlignment = VerticalAlignment.Center };
-            Grid.SetColumn(n, 2);
-            g.Children.Add(n);
-            var card = new Border { Style = (Style)Application.Current.Resources["Card"], Padding = new Thickness(16, 14, 16, 14), BorderBrush = UI.Brush("#22407a"), Child = g };
-            var sw = new ToggleButton { Style = (Style)Application.Current.Resources["Switch"], IsChecked = true };
-            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, "Ativar " + when);
-            sw.Click += (_, _) => card.BorderBrush = UI.Brush(sw.IsChecked == true ? "#22407a" : "#1c2a48");
-            Grid.SetColumn(sw, 3);
-            g.Children.Add(sw);
-            TasksPanel.Children.Add(card);
-        }
+        AdminWarn.Visibility = Sys.IsAdmin ? Visibility.Collapsed : Visibility.Visible;
 
         foreach (var p in Presets.All)
         {
@@ -59,40 +43,189 @@ public sealed partial class SchedulePage : Page
             t.Children.Add(new TextBlock { Text = p.Name, FontWeight = FontWeights.SemiBold });
             t.Children.Add(new TextBlock { Text = p.Description, FontSize = 12, Foreground = UI.Muted, TextTrimming = TextTrimming.CharacterEllipsis });
             g.Children.Add(t);
-            var slug = new TextBlock { Text = "--preset " + p.Slug, FontFamily = mono, FontSize = 11.5, Foreground = UI.NeonSoft, VerticalAlignment = VerticalAlignment.Center };
+            var slug = new TextBlock { Text = "--preset " + p.Slug, FontFamily = Mono, FontSize = 11.5, Foreground = UI.NeonSoft, VerticalAlignment = VerticalAlignment.Center };
             Grid.SetColumn(slug, 1);
             g.Children.Add(slug);
-            var edit = new Button { Style = (Style)Application.Current.Resources["SecondaryButton"], Height = 30, Padding = new Thickness(10, 0, 10, 0), FontSize = 12, FontWeight = FontWeights.Normal, CornerRadius = new CornerRadius(7), Content = "Editar" };
-            edit.Click += OnSoon;
-            Grid.SetColumn(edit, 2);
-            g.Children.Add(edit);
+            var view = new Button { Style = (Style)Application.Current.Resources["SecondaryButton"], Height = 30, Padding = new Thickness(10, 0, 10, 0),
+                FontSize = 12, FontWeight = FontWeights.Normal, CornerRadius = new CornerRadius(7), Content = "O que inclui" };
+            var index = Array.IndexOf(Presets.All, p);
+            view.Click += async (_, _) => await ShowPreset(index);
+            Grid.SetColumn(view, 2);
+            g.Children.Add(view);
             PresetsPanel.Children.Add(g);
         }
 
-        foreach (var (label, full, on) in new[] { ("D", "Domingo", false), ("S", "Segunda", false), ("T", "Terça", false), ("Q", "Quarta", false), ("Q", "Quinta", false), ("S", "Sexta", true), ("S", "Sábado", false) })
+        foreach (var (day, label, full) in Week)
         {
-            var d = new ToggleButton { Style = (Style)Application.Current.Resources["DayToggle"], Content = label, IsChecked = on };
+            var d = new ToggleButton { Style = (Style)Application.Current.Resources["DayToggle"], Content = label, IsChecked = day == DayOfWeek.Friday };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(d, full);
             DaysPanel.Children.Add(d);
+            _days.Add((d, day));
         }
 
         for (var i = 0; i < Presets.All.Length; i++)
-            PresetPick.Children.Add(new RadioButton { Style = (Style)Application.Current.Resources["FilterRadio"], Height = 30, Padding = new Thickness(12, 0, 12, 0),
-                GroupName = "spreset", Content = Presets.All[i].Name, IsChecked = i == 1 });
+        {
+            var rb = new RadioButton { Style = (Style)Application.Current.Resources["FilterRadio"], Height = 30, Padding = new Thickness(12, 0, 12, 0),
+                GroupName = "spreset", Content = Presets.All[i].Name, IsChecked = i == 1 };
+            PresetPick.Children.Add(rb);
+            _presets.Add((rb, Presets.All[i].Slug));
+        }
 
-        DriveName.Text = Destinations.Describe(Settings.Data.Destination).Label;
+        // Discos para o gatilho "ao conectar" (pelo ID do volume; rede não tem)
+        foreach (var d in Destinations.Candidates().Where(d => !d.Path.StartsWith(@"\\") && Scheduler.VolumeId(d.Path) != null))
+            DriveCombo.Items.Add(new ComboBoxItem { Content = $"{d.Label} · {Path.GetPathRoot(d.Path)}", Tag = d.Path });
+        var current = Path.GetPathRoot(S.Destination) ?? "";
+        DriveCombo.SelectedItem = DriveCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(i => string.Equals(Path.GetPathRoot((string)i.Tag), current, StringComparison.OrdinalIgnoreCase))
+                                  ?? DriveCombo.Items.Cast<ComboBoxItem>().FirstOrDefault();
+
         OptIncr.IsOn = true;
         OptAc.IsOn = true;
+        LoadTasks();
     }
+
+    // ---------- Lista ----------
+
+    void LoadTasks()
+    {
+        while (TasksPanel.Children.Count > 1) TasksPanel.Children.RemoveAt(1);
+        if (S.Schedules.Count == 0)
+        {
+            TasksPanel.Children.Add(new TextBlock { Text = "Nenhum agendamento ainda. Crie o primeiro ao lado.", Foreground = UI.Muted, FontSize = 13 });
+            return;
+        }
+        foreach (var def in S.Schedules.ToList())
+        {
+            var state = Scheduler.State(def);
+            var preset = Presets.All.FirstOrDefault(p => p.Slug == def.Preset)?.Name ?? def.Preset;
+            var g = new Grid { ColumnSpacing = 14 };
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            g.ColumnDefinitions.Add(new ColumnDefinition());
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            g.Children.Add(new Border { Width = 38, Height = 38, CornerRadius = new CornerRadius(10), Background = UI.Brush("#12203d"),
+                Child = new Icon { Data = def.Kind == "drive" ? Icons.Drive : Icons.Clock, Foreground = UI.BlueSoft } });
+            var t = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+            t.Children.Add(new TextBlock { Text = def.When, FontSize = 14, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
+            t.Children.Add(new TextBlock { Text = $"{preset} · {(def.Incremental ? "incremental" : "completo")}", FontSize = 12, Foreground = UI.Muted });
+            Grid.SetColumn(t, 1);
+            g.Children.Add(t);
+            var info = !state.Exists ? "Tarefa sumiu do Windows"
+                : state.Next is { } next ? $"Próximo: {next:dd/MM HH:mm}"
+                : def.LastRun is { } last ? $"Último: {last:dd/MM HH:mm}" : "Ainda não rodou";
+            var n = new TextBlock { Text = info, FontSize = 12, Foreground = state.Exists ? UI.Muted : UI.Warn, VerticalAlignment = VerticalAlignment.Center };
+            Grid.SetColumn(n, 2);
+            g.Children.Add(n);
+            var card = new Border { Style = (Style)Application.Current.Resources["Card"], Padding = new Thickness(16, 14, 16, 14),
+                BorderBrush = UI.Brush(state.Enabled ? "#22407a" : "#1c2a48"), Child = g };
+            var sw = new ToggleButton { Style = (Style)Application.Current.Resources["Switch"], IsChecked = state.Enabled, IsEnabled = state.Exists && Sys.IsAdmin };
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, "Ativar " + def.When);
+            sw.Click += async (_, _) =>
+            {
+                try { Scheduler.SetEnabled(def, sw.IsChecked == true); }
+                catch (Exception ex) { await Dialogs.InfoAsync(XamlRoot, "Não foi possível mudar", ex.Message); }
+                LoadTasks();
+            };
+            Grid.SetColumn(sw, 3);
+            g.Children.Add(sw);
+            var del = new Button { Style = (Style)Application.Current.Resources["FlatButton"], Width = 32, Height = 32, CornerRadius = new CornerRadius(6),
+                Foreground = UI.Muted, Content = new Icon { Data = Icons.Close, Width = 12, Height = 12, StrokeThickness = 2.2 }, IsEnabled = Sys.IsAdmin };
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(del, "Excluir " + def.When);
+            del.Click += async (_, _) =>
+            {
+                if (!await Dialogs.ConfirmAsync(XamlRoot, "Excluir agendamento?", $"{def.When} · {preset}. A tarefa também sai do Agendador de Tarefas do Windows.", "Excluir", "Cancelar", danger: true)) return;
+                Scheduler.Delete(def);
+                S.Schedules.Remove(def);
+                Settings.Save();
+                LoadTasks();
+            };
+            Grid.SetColumn(del, 4);
+            g.Children.Add(del);
+            TasksPanel.Children.Add(card);
+        }
+    }
+
+    async Task ShowPreset(int index)
+    {
+        var spec = Presets.Build(index);
+        var parts = new List<string>();
+        var groups = spec.Folders.GroupBy(f => FilesModule.GroupTitle(f.Group)).Select(g => $"{g.Key} ({g.Count()} pastas)");
+        parts.AddRange(groups);
+        if (spec.Programs) parts.Add("Programas (winget)");
+        if (spec.WindowsKeys.Count > 0) parts.Add("Configurações do Windows: " + string.Join(", ", spec.WindowsKeys.Select(k => ConfigsModule.WindowsItems.First(w => w.Key == k).Name)));
+        if (spec.Drivers) parts.Add("Drivers");
+        await Dialogs.InfoAsync(XamlRoot, Presets.All[index].Name,
+            (parts.Count == 0 ? "Nada selecionado." : "• " + string.Join("\n• ", parts)) +
+            "\n\nO que entra em cada parte segue o que estiver marcado nas telas do menu Backup.");
+    }
+
+    // ---------- Novo agendamento ----------
 
     void OnTrigger(object sender, RoutedEventArgs e)
     {
         if (TimePanel == null) return;
-        var tag = (string)((FrameworkElement)sender).Tag;
-        TimePanel.Visibility = tag == "time" ? Visibility.Visible : Visibility.Collapsed;
-        DrivePanel.Visibility = tag == "drive" ? Visibility.Visible : Visibility.Collapsed;
-        LogonText.Visibility = tag == "logon" ? Visibility.Visible : Visibility.Collapsed;
+        _trigger = (string)((FrameworkElement)sender).Tag;
+        TimePanel.Visibility = _trigger == "time" ? Visibility.Visible : Visibility.Collapsed;
+        DrivePanel.Visibility = _trigger == "drive" ? Visibility.Visible : Visibility.Collapsed;
+        LogonText.Visibility = _trigger == "logon" ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    async void OnSoon(object sender, RoutedEventArgs e) => await Dialogs.SoonAsync(XamlRoot, "Agendamentos");
+    void OnDriveChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DriveCombo.SelectedItem is ComboBoxItem { Tag: string path })
+            VolumeText.Text = Scheduler.VolumeId(path) ?? "";
+    }
+
+    async void OnCreate(object sender, RoutedEventArgs e)
+    {
+        if (!Sys.IsAdmin)
+        {
+            await Dialogs.InfoAsync(XamlRoot, "Precisa de administrador", "Abra o WINbackup como administrador para criar agendamentos.");
+            return;
+        }
+        var def = new ScheduleDef
+        {
+            Kind = _trigger, Preset = _presets.First(p => p.Button.IsChecked == true).Slug,
+            Incremental = OptIncr.IsOn, Wake = OptWake.IsOn, AcOnly = OptAc.IsOn,
+        };
+        if (_trigger == "time")
+        {
+            def.Days = _days.Where(d => d.Button.IsChecked == true).Select(d => d.Day).ToList();
+            if (def.Days.Count == 0) { await Dialogs.InfoAsync(XamlRoot, "Escolha os dias", "Marque pelo menos um dia da semana."); return; }
+            if (!TimeSpan.TryParseExact(TimeBox.Text.Trim(), [@"h\:mm", @"hh\:mm"], CultureInfo.InvariantCulture, out var time))
+            {
+                await Dialogs.InfoAsync(XamlRoot, "Horário inválido", "Use o formato 20:00.");
+                return;
+            }
+            def.Time = time.ToString(@"hh\:mm");
+        }
+        else if (_trigger == "drive")
+        {
+            if (DriveCombo.SelectedItem is not ComboBoxItem { Tag: string path } item || Scheduler.VolumeId(path) is not { } volume)
+            {
+                await Dialogs.InfoAsync(XamlRoot, "Escolha o disco", "Conecte o HD externo e escolha-o na lista.");
+                return;
+            }
+            def.VolumeId = volume;
+            def.VolumeLabel = ((string)item.Content).Split(" · ")[0];
+            // Mesma pasta do destino atual, se for neste disco; senão, \Backup
+            var root = Path.GetPathRoot(path)!;
+            def.VolumeSubPath = S.Destination.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? S.Destination[root.Length..] : "Backup";
+        }
+
+        try
+        {
+            Scheduler.Register(def);
+        }
+        catch (Exception ex)
+        {
+            await Dialogs.InfoAsync(XamlRoot, "Não foi possível criar", ex.Message);
+            return;
+        }
+        S.Schedules.Add(def);
+        Settings.Save();
+        LoadTasks();
+        await Dialogs.InfoAsync(XamlRoot, "Agendamento criado", $"{def.When} · {Presets.All.First(p => p.Slug == def.Preset).Name}. " +
+            "Ele roda pelo Agendador de Tarefas, mesmo com o WINbackup fechado. Se mover a pasta do WINbackup, recrie os agendamentos.");
+    }
 }

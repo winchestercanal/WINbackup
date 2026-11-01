@@ -13,6 +13,12 @@ WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar 
 | Apoie o projeto | Pix com QR Code e "copia e cola" (BR Code gerado no app) e LivePix; lembrete a cada 5 backups bem-sucedidos, com "não mostrar de novo" |
 | Programas | Lista real do `winget list` (winget, Microsoft Store, sem pacote); salva `Programas\Programas.json` (formato do `winget import`, só os marcados) e `Instalar_manualmente.html` com os sem pacote; reinstala um por um com `winget install` (os já instalados são pulados); "Exportar lista" e "Importar lista e instalar" avulsos |
 | Navegadores | Perfis reais de Edge, Chrome, Brave, Vivaldi, Opera (via `Local State`) e Firefox (via `profiles.ini`); copia favoritos, configurações e notas (Chromium) ou favoritos, preferências e extensões (Firefox), mais a lista de perfis; gera `Navegadores\Extensoes.html` com link da loja de cada extensão; senhas só por exportação guiada (abre a página do navegador como usuário comum, via Explorer) e o .csv que o usuário adicionar |
+| Configurações | Windows: Wi-Fi (`netsh wlan export`, com senha como administrador), tema e papel de parede, impressoras (PrintBrm), fontes do usuário, variáveis de ambiente e hosts, exportados para `Configuracoes\Windows` e reaplicados na restauração (reg import ajustando a pasta do usuário). Apps: Windows Terminal, PowerShell, VS Code (com lista de extensões), Git, Notepad++, PowerToys, Komorebi, YASB, AutoHotkey, Rainmeter |
+| Saves de jogos | My Games, Saved Games, pastas de estúdios em Documentos, Unreal (`Saved\SaveGames`), Unity (`LocalLow`), Steam Cloud (nome pelo appmanifest) e Ubisoft; guarda as bibliotecas da Steam |
+| Agendamentos | Tarefas no Agendador do Windows (`\WINbackup`): por horário, ao conectar o disco (evento Partition/Diagnostic 1006, disco reconhecido pelo ID do volume) ou ao entrar; acordar o PC, só na tomada, incremental |
+| Linha de comando | `--preset`, `--only`, `--restore [--postformat] [--no-reboot]`, `--silent`, `--schedule`, `--remind`; um backup por vez (trava em `executando.lock`) |
+| Opções | SHA-256, notificações, lembrete de 30 dias (ao abrir o app e, se ligado como administrador, ao entrar no Windows), modo portátil (`portable.txt` ao lado do .exe guarda tudo em `Dados\`) e "Criar versão portátil no pendrive" |
+| Retenção | Mantém as últimas N versões de cada tipo de backup; nunca apaga o último completo nem versões das quais as mantidas dependem |
 | Drivers | Lista real (WMI), exporta com `pnputil /export-driver` para a pasta `Drivers` (sem compactar); restaura da pasta, de outra pasta com .inf ou de `.zip` com `pnputil /add-driver /install` |
 | Em andamento | Progresso, velocidade, tempo restante, etapas, log ao vivo, pausar/continuar, cancelar |
 | Relatório | Resumo, por módulo, avisos, exportar HTML, abrir pasta, "Reiniciar agora" quando os drivers pedem |
@@ -23,7 +29,7 @@ WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar 
 | Restaurar backup | Versões reais do destino, conteúdo por grupo e pasta, busca de arquivos soltos; restaura para os locais originais (Documentos, Imagens etc. vão para onde essas pastas estão hoje, inclusive OneDrive), para outro usuário ou para outra pasta; Pular / Substituir / Manter os dois; confere SHA-256; drivers primeiro |
 | Pós-formatação | Pega a versão mais recente de drivers, Criadores e arquivos e restaura nessa ordem. Configs de programas substituem as padrão; arquivos pessoais nunca são sobrescritos. Pede para reiniciar no fim se os drivers precisarem (a menos que "Não reiniciar" esteja ligado) |
 
-**Prévia (layout fiel ao protótipo, dados de exemplo, botões avisam "Em breve")**: Configurações do Windows, Saves de jogos, Agendamentos, criptografia, modo portátil, linha de comando.
+**Ainda não implementado:** criptografia 7z AES-256 (aparece como "Em breve" em Opções).
 
 Nos presets, as etapas que ainda não existem aparecem como "Em breve nesta versão" no progresso e no relatório. O preset Gamer ainda não tem nada executável, por isso o app avisa em vez de começar.
 
@@ -39,6 +45,8 @@ Dados de doação (Pix e LivePix) ficam em `Services/Donation.cs`.
   Criadores\<Programa>\...      presets, configs e plugins de cada programa
   Programas\Programas.json      lista para o winget import
   Programas\Instalar_manualmente.html   os sem pacote, com link de busca
+  Configuracoes\Windows\         Wi-Fi, .reg do tema/fontes/variáveis, hosts, impressoras, papel de parede
+  Configurações\<App>\  Saves de jogos\<Jogo>\  Navegadores\<Navegador>\   pastas copiadas
   Drivers\oemNN_<dispositivo>\  pacotes .inf exportados + drivers.json
   manifest.json                 tudo o que a versão contém
   backup_audit_<data>.log       log da execução

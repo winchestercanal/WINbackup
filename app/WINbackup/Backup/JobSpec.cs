@@ -22,6 +22,10 @@ public class JobSpec
     public bool Programs { get; init; }
     /// <summary>As pastas incluem perfis de navegador: gera a lista de extensões e o aviso das senhas.</summary>
     public bool Browsers { get; init; }
+    /// <summary>As pastas incluem saves de jogos: guarda também as bibliotecas da Steam.</summary>
+    public bool Games { get; init; }
+    /// <summary>Configurações do Windows a exportar ("wifi", "theme"…); vazio = nenhuma.</summary>
+    public List<string> WindowsKeys { get; init; } = new();
     /// <summary>IDs do winget que ficam de fora (desmarcados na tela Programas).</summary>
     public HashSet<string> ProgramsOff { get; init; } = new(Settings.Data.ProgramsOff, StringComparer.OrdinalIgnoreCase);
     /// <summary>"Importar lista e instalar": pacotes de um Programas.json avulso.</summary>
@@ -50,7 +54,7 @@ public class JobSpec
     public bool DownloadCloudFiles { get; init; } = Settings.Data.DownloadCloudFiles;
     public List<string> Exclusions { get; init; } = new(Settings.Data.Exclusions);
 
-    public bool HasWork => Folders.Count > 0 || Drivers || Programs;
+    public bool HasWork => Folders.Count > 0 || Drivers || Programs || WindowsKeys.Count > 0;
 }
 
 /// <summary>Pastas pessoais padrão + pastas adicionadas pelo usuário.</summary>
@@ -95,32 +99,46 @@ public static class Presets
         new("Criadores", "Adobe, DaVinci, OBS, Stream Deck, áudio e 3D", "criadores", Controls.Icons.Creator),
     ];
 
-    public static JobSpec Creators() => new()
+    public static JobSpec Creators(string? destination = null, bool? incremental = null) => new()
     {
         Title = "Criadores", FilesLabel = "Criadores", Folders = CreatorApps.SelectedFolders(),
+        Destination = destination ?? Settings.Data.Destination, Incremental = incremental ?? Settings.Data.Incremental,
         Exclusions = Settings.Data.Exclusions.Concat(CreatorApps.Exclusions).Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
     };
 
-    public static JobSpec Build(int index)
+    /// <summary>Configurações do Windows marcadas na tela Configurações.</summary>
+    public static List<string> WindowsKeys() => ConfigsModule.WindowsItems.Select(i => i.Key).Where(ConfigsModule.IsSelected).ToList();
+
+    /// <summary>destination/incremental: usados pelos agendamentos (disco reconhecido pelo ID, opção do agendamento).</summary>
+    public static JobSpec Build(int index, string? destination = null, bool? incremental = null)
     {
         var p = All[index];
+        var dest = destination ?? Settings.Data.Destination;
+        var incr = incremental ?? Settings.Data.Incremental;
+        var creatorExcl = Settings.Data.Exclusions.Concat(CreatorApps.Exclusions).Concat(ConfigsModule.Exclusions).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         return index switch
         {
             0 => new JobSpec
             {
-                Title = p.Name, FilesLabel = "Arquivos e navegadores", Folders = [.. PersonalFolders.Selected(), .. BrowsersModule.SelectedFolders()],
-                Drivers = true, Programs = true, Browsers = true,
-                Unavailable = ["Configurações", "Saves de jogos"],
+                Title = p.Name, FilesLabel = "Arquivos, jogos e configurações", Destination = dest, Incremental = incr, Exclusions = creatorExcl,
+                Folders = [.. PersonalFolders.Selected(), .. GamesModule.SelectedFolders(), .. ConfigsModule.SelectedAppFolders(), .. BrowsersModule.SelectedFolders()],
+                Drivers = true, Programs = true, Browsers = true, Games = true, WindowsKeys = WindowsKeys(),
             },
-            1 => new JobSpec { Title = p.Name, Folders = PersonalFolders.ByKeys("doc", "img", "dsk") },
+            1 => new JobSpec { Title = p.Name, Destination = dest, Incremental = incr, Folders = PersonalFolders.ByKeys("doc", "img", "dsk") },
             2 => new JobSpec
             {
-                Title = p.Name, Folders = PersonalFolders.ByKeys("ssh").Where(f => Directory.Exists(f.Path)).ToList(),
-                Programs = true,
-                Unavailable = ["Configurações"],
+                Title = p.Name, FilesLabel = "Arquivos e configurações", Destination = dest, Incremental = incr, Exclusions = creatorExcl,
+                Folders = [.. PersonalFolders.ByKeys("ssh").Where(f => Directory.Exists(f.Path)),
+                           .. ConfigsModule.SelectedAppFolders().Where(f => f.Key.StartsWith("config:terminal") || f.Key.StartsWith("config:pwsh") || f.Key.StartsWith("config:vscode") || f.Key.StartsWith("config:git"))],
+                Programs = true, WindowsKeys = WindowsKeys().Where(k => k is "env" or "hosts").ToList(),
             },
-            3 => new JobSpec { Title = p.Name, Unavailable = ["Saves de jogos", "Configurações"] },
-            _ => Creators(),
+            3 => new JobSpec
+            {
+                Title = p.Name, FilesLabel = "Saves e configurações", Destination = dest, Incremental = incr, Exclusions = creatorExcl,
+                Folders = [.. GamesModule.SelectedFolders(), .. CreatorApps.SelectedFolders().Where(f => f.Group.EndsWith("OBS Studio"))],
+                Programs = true, Games = true,
+            },
+            _ => Creators(dest, incr),
         };
     }
 }

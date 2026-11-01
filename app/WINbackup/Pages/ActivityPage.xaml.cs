@@ -36,30 +36,36 @@ public sealed partial class ActivityPage : Page
         DestStatus.Text = space is { } s ? $"Conectado · {Sys.Bytes(s.Free)} livres" : "Indisponível";
         DestStatus.Foreground = DestDot.Fill = space != null ? UI.Ok : UI.Warn;
 
-        // Automações: exemplo do protótipo (agendamentos ainda não existem)
-        foreach (var (icon, when, what, status, on) in new[]
-                 {
-                     (Icons.Clock, "Toda sexta, 20:00", "Só documentos · incremental", "Ativo", true),
-                     (Icons.Drive, "Ao conectar HD Externo (E:)", "Backup completo · incremental", "Ativo", true),
-                     (Icons.Clock, "Todo dia 1, 09:00", "Ambiente de dev · completo", "Pausado", false),
-                 })
+        // Automações: os agendamentos reais e o estado de cada tarefa no Windows
+        var schedules = Settings.Data.Schedules.Select(d => (Def: d, State: Scheduler.State(d))).ToList();
+        foreach (var (def, state) in schedules)
         {
+            var preset = Presets.All.FirstOrDefault(p => p.Slug == def.Preset)?.Name ?? def.Preset;
             var g = new Grid { ColumnSpacing = 12, Padding = new Thickness(18, 14, 18, 14), BorderBrush = UI.Brush("#16223d"), BorderThickness = new Thickness(0, 0, 0, 1) };
             g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             g.ColumnDefinitions.Add(new ColumnDefinition());
             g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             g.Children.Add(new Border { Width = 36, Height = 36, CornerRadius = new CornerRadius(10), Background = UI.Brush("#12203d"),
-                Child = new Icon { Data = icon, Foreground = UI.BlueSoft } });
+                Child = new Icon { Data = def.Kind == "drive" ? Icons.Drive : Icons.Clock, Foreground = UI.BlueSoft } });
             var t = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-            t.Children.Add(new TextBlock { Text = when, FontWeight = FontWeights.SemiBold });
-            t.Children.Add(new TextBlock { Text = what, FontSize = 12, Foreground = UI.Muted });
+            t.Children.Add(new TextBlock { Text = def.When, FontWeight = FontWeights.SemiBold });
+            t.Children.Add(new TextBlock { Text = $"{preset} · {(def.Incremental ? "incremental" : "completo")}", FontSize = 12, Foreground = UI.Muted });
             Grid.SetColumn(t, 1);
             g.Children.Add(t);
-            var st = new TextBlock { Text = status, FontSize = 12, Foreground = on ? UI.Ok : UI.Muted, VerticalAlignment = VerticalAlignment.Center };
+            var st = new TextBlock { Text = !state.Exists ? "Sumiu do Windows" : state.Enabled ? "Ativo" : "Pausado", FontSize = 12,
+                Foreground = !state.Exists ? UI.Warn : state.Enabled ? UI.Ok : UI.Muted, VerticalAlignment = VerticalAlignment.Center };
             Grid.SetColumn(st, 2);
             g.Children.Add(st);
             AutoPanel.Children.Add(g);
         }
+        if (schedules.Count == 0)
+            AutoPanel.Children.Add(new TextBlock { Text = "Nenhum agendamento. Crie em Agendamentos.", Foreground = UI.Muted, Margin = new Thickness(18, 14, 18, 14) });
+
+        var next = schedules.Where(s => s.State.Enabled && s.State.Next != null).OrderBy(s => s.State.Next).FirstOrDefault();
+        var onDrive = schedules.FirstOrDefault(s => s.State.Enabled && s.Def.Kind != "time");
+        (NextText.Text, NextWhat.Text) = next.Def != null
+            ? (next.State.Next!.Value.ToString("ddd, dd/MM HH:mm"), $"{Presets.All.FirstOrDefault(p => p.Slug == next.Def.Preset)?.Name} · {(next.Def.Incremental ? "incremental" : "completo")}")
+            : onDrive.Def != null ? (onDrive.Def.When, "quando acontecer") : ("Nenhum", "Crie em Agendamentos");
 
         // Atividade recente: as últimas versões reais do destino
         var recent = versions.Take(6).Select(v =>

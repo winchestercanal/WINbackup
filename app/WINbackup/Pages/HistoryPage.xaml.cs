@@ -34,11 +34,12 @@ public sealed partial class HistoryPage : Page
             VersionsPanel.Children.Add(new TextBlock { Text = "Nenhuma versão no destino atual ainda.", Foreground = UI.Muted, Margin = new Thickness(18, 14, 18, 14) });
             return;
         }
+        var removable = Retention.Removable(Settings.Data.Destination, Settings.Data.KeepVersions);
         for (var i = 0; i < versions.Count; i++)
         {
             var v = versions[i];
             var m = Manifest.Load(v);
-            var expiring = i >= Settings.Data.KeepVersions && m?.Kind != "Completo";
+            var expiring = removable.Contains(Path.GetFileName(v));
             var g = new Grid { ColumnSpacing = 12, Padding = new Thickness(18, 12, 18, 12), Opacity = expiring ? 0.45 : 1,
                 BorderBrush = UI.Brush("#16223d"), BorderThickness = new Thickness(0, 0, 0, 1) };
             foreach (var w in new[] { 1.8, 1, 0.9, 1.2, 1, 1.6 }) g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w, GridUnitType.Star) });

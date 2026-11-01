@@ -2,7 +2,7 @@
 
 App gratuito para Windows do **[Canal WINchester](https://www.youtube.com/WINchesterCanal)** para fazer backup antes de formatar e deixar o PC como estava depois.
 
-> **Status: 0.1 beta (testes).** Já funcionam de verdade: backup de Arquivos pessoais, Criadores, Programas, Navegadores e Drivers, e a restauração. As outras telas mostram como os módulos vão funcionar e entram nas próximas versões.
+> **Status: 0.1 beta (testes).** Todos os módulos funcionam: backup, restauração, pós-formatação, agendamentos e linha de comando. Falta só a criptografia dos backups.
 
 ## O que ele faz
 
@@ -12,9 +12,13 @@ App gratuito para Windows do **[Canal WINchester](https://www.youtube.com/WINche
 | **Criadores** | Presets, workspaces, scripts e plugins de Premiere, After Effects, Photoshop, Illustrator, Lightroom, DaVinci Resolve, OBS, Stream Deck, Voicemeeter, Blender e outros |
 | **Programas** | Lista o que está instalado via winget, salva a lista para reinstalar tudo sozinho depois de formatar e gera uma lista dos que precisam ser instalados à mão |
 | **Navegadores** | Favoritos, configurações e perfis de Edge, Chrome, Brave, Vivaldi, Opera e Firefox, mais a lista de extensões com link da loja. Senhas: exportação guiada, o app nunca as lê |
+| **Configurações** | Redes Wi-Fi, tema e papel de parede, impressoras, fontes, variáveis de ambiente e hosts, mais configurações de Terminal, PowerShell, VS Code, Git e outros |
+| **Saves de jogos** | Detecta saves em My Games, Saved Games, jogos Unreal e Unity, Steam Cloud e Ubisoft |
 | **Drivers** | Exporta os drivers de terceiros com PnPUtil e reinstala depois |
 | **Restaurar** | Escolhe a versão e o que trazer de volta (pastas ou arquivos soltos), para o lugar original, outro usuário ou outra pasta. O modo Pós-formatação restaura drivers, configurações e arquivos na ordem certa |
-| Configurações do Windows, Saves de jogos, Agendamentos | Em desenvolvimento |
+| **Agendamentos** | Backups automáticos por horário, ao conectar o HD externo ou ao entrar no Windows, pelo Agendador de Tarefas |
+| **Linha de comando** | `WINbackup.exe --preset completo --dest E:\Backup`, `--only apps,configs`, `--restore E:\Backup --postformat --silent` |
+| Criptografia dos backups | Em desenvolvimento |
 
 O backup fica em pastas comuns no destino que você escolher (HD externo, outro disco ou rede), com um `manifest.json` e um log por execução. Nada é enviado para a internet.
 

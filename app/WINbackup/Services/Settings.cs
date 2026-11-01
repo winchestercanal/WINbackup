@@ -24,6 +24,18 @@ public class SettingsData
     public List<string> BrowsersOff { get; set; } = new();
     public List<string> PasswordCsvs { get; set; } = new();
 
+    // Configurações: itens desmarcados ("wifi", "vscode"…) e pastas extras
+    public List<string> ConfigsOff { get; set; } = new();
+    public List<string> ConfigCustomFolders { get; set; } = new();
+
+    // Saves de jogos
+    public Dictionary<string, bool> GamesSelection { get; set; } = new();
+    public List<string> GameCustomFolders { get; set; } = new();
+    public bool SkipCloudGames { get; set; } = true;
+
+    // Agendamentos
+    public List<ScheduleDef> Schedules { get; set; } = new();
+
     // Criadores
     public Dictionary<string, bool> CreatorSelection { get; set; } = new();
     public List<string> CreatorCustomFolders { get; set; } = new();
@@ -37,6 +49,7 @@ public class SettingsData
     public bool VerifyHash { get; set; } = true;
     public bool NotifyDone { get; set; } = true;
     public bool NotifyErrors { get; set; } = true;
+    public bool NotifyReminder { get; set; } = true;
     public int KeepVersions { get; set; } = 5;
 }
 
@@ -44,9 +57,15 @@ public class SettingsData
 public static class Settings
 {
     public static SettingsData Data { get; private set; } = new();
-    // WINBACKUP_DATA troca a pasta (testes e, no futuro, o modo portátil)
+    public const string PortableMarker = "portable.txt";
+
+    /// <summary>Modo portátil: portable.txt ao lado do .exe guarda tudo em Dados\, sem tocar no PC.</summary>
+    public static bool IsPortable => File.Exists(Path.Combine(AppContext.BaseDirectory, PortableMarker));
+
+    // WINBACKUP_DATA troca a pasta (testes); portable.txt usa a pasta Dados ao lado do .exe
     public static string Folder { get; } = Environment.GetEnvironmentVariable("WINBACKUP_DATA") is { Length: > 0 } custom
         ? custom
+        : IsPortable ? Path.Combine(AppContext.BaseDirectory, "Dados")
         : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WINbackup");
     static string FilePath => Path.Combine(Folder, "settings.json");
     static readonly JsonSerializerOptions Json = new() { WriteIndented = true };

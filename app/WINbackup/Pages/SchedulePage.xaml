@@ -10,7 +10,9 @@
                 <TextBlock Text="Agendamentos e presets" Style="{StaticResource H1}"/>
                 <TextBlock Text="Backups que rodam sozinhos, por horário ou quando você conecta o HD externo." Style="{StaticResource Sub}"/>
             </StackPanel>
-            <c:PreviewNotice Text="Prévia: os agendamentos (Agendador de Tarefas do Windows) entram numa próxima versão. Os presets já funcionam no Início."/>
+            <Border x:Name="AdminWarn" Style="{StaticResource WarnCard}" Visibility="Collapsed">
+                <TextBlock Foreground="{StaticResource WarnText}" TextWrapping="Wrap" Text="Criar e mudar agendamentos exige abrir o WINbackup como administrador (as tarefas rodam com privilégios para salvar drivers e arquivos em uso)."/>
+            </Border>
 
             <Grid x:Name="MainGrid" ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="400"/></Grid.ColumnDefinitions>
@@ -21,7 +23,7 @@
                     <StackPanel Spacing="10">
                         <Grid>
                             <TextBlock Text="Presets" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <Button Style="{StaticResource SmallButton}" Height="32" Padding="12,0" FontSize="12" Content="Novo preset" HorizontalAlignment="Right" Click="OnSoon"/>
+                            
                         </Grid>
                         <Border Style="{StaticResource TableCard}">
                             <StackPanel x:Name="PresetsPanel"/>
@@ -47,13 +49,13 @@
                             <StackPanel x:Name="DaysPanel" Orientation="Horizontal" Spacing="6"/>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <TextBlock Text="Horário" FontSize="12" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
-                                <TextBox Style="{StaticResource MonoInput}" Width="90" Height="34" MinHeight="34" FontSize="13" Text="20:00" AutomationProperties.Name="Horário"/>
+                                <TextBox x:Name="TimeBox" Style="{StaticResource MonoInput}" Width="90" Height="34" MinHeight="34" FontSize="13" Text="20:00" AutomationProperties.Name="Horário"/>
                             </StackPanel>
                         </StackPanel>
                         <Border x:Name="DrivePanel" Padding="12" CornerRadius="10" Background="{StaticResource SurfaceDeep}" BorderBrush="{StaticResource Line}" BorderThickness="1" Visibility="Collapsed">
                             <StackPanel Spacing="8">
-                                <TextBlock x:Name="DriveName" FontSize="13" FontWeight="SemiBold"/>
-                                <TextBlock Text="\\?\Volume{[GUID do volume]}" FontSize="11.5" FontFamily="{StaticResource Mono}" Foreground="{StaticResource TextMuted}"/>
+                                <ComboBox x:Name="DriveCombo" HorizontalAlignment="Stretch" AutomationProperties.Name="Disco do gatilho" SelectionChanged="OnDriveChanged"/>
+                                <TextBlock x:Name="VolumeText" Text="" FontSize="11.5" FontFamily="{StaticResource Mono}" Foreground="{StaticResource TextMuted}"/>
                                 <TextBlock Text="Reconhece o disco pelo ID, mesmo se a letra mudar." FontSize="12" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
@@ -66,7 +68,7 @@
                         <c:ToggleRow x:Name="OptIncr" Title="Incremental (só o que mudou)"/>
                         <c:ToggleRow x:Name="OptWake" Title="Acordar o PC para rodar"/>
                         <c:ToggleRow x:Name="OptAc" Title="Só quando estiver na tomada"/>
-                        <Button Style="{StaticResource PrimaryButton}" Height="42" HorizontalAlignment="Stretch" Content="Criar agendamento" Click="OnSoon"/>
+                        <Button Style="{StaticResource PrimaryButton}" Height="42" HorizontalAlignment="Stretch" Content="Criar agendamento" Click="OnCreate"/>
                         <TextBlock Text="Usa o Agendador de Tarefas do Windows." FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                 </Border>

@@ -148,6 +148,11 @@ public sealed partial class MainWindow : Window
         Navigate("progress");
     }
 
+    public void Minimize()
+    {
+        if (AppWindow.Presenter is OverlappedPresenter p) p.Minimize();
+    }
+
     public void BringToFront()
     {
         AppWindow.Show();
