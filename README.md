@@ -116,7 +116,7 @@
 | <img src="docs/img/icons/restore.svg" width="32" alt=""><br>**Restaurar** | Escolha a versão e o que trazer de volta (pastas ou arquivos soltos), para o lugar original, outro usuário ou outra pasta |
 | <img src="docs/img/icons/schedule.svg" width="32" alt=""><br>**Agendamentos** | Backups automáticos pelo Agendador de Tarefas do Windows |
 | <img src="docs/img/icons/terminal.svg" width="32" alt=""><br>**Linha de comando** | Tudo também roda pelo terminal, para scripts e automações |
-| <img src="docs/img/icons/configs.svg" width="32" alt=""><br>**Temas e idiomas** | Português, inglês e espanhol. Temas Winchester (o padrão), claro, escuro e escuro OLED, em Opções |
+| <img src="docs/img/icons/configs.svg" width="32" alt=""><br>**Temas e idiomas** | Português, inglês e espanhol. Temas WINchester (o padrão), escuro, escuro OLED e claro, em Opções |
 | <img src="docs/img/icons/lock.svg" width="32" alt=""><br>Criptografia | *Em desenvolvimento* |
 
 ## 📸 Telas

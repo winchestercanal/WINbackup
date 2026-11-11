@@ -14,7 +14,7 @@ public static class Theme
 {
     public static readonly (string Code, string Name)[] Themes =
     [
-        ("light", "Claro"), ("neutral", "Escuro"), ("oled", "Escuro OLED"), ("winchester", "Winchester"),
+        ("winchester", "WINchester"), ("neutral", "Escuro"), ("oled", "Escuro OLED"), ("light", "Claro"),
     ];
 
     public static string Current { get; private set; } = "winchester";
