@@ -89,9 +89,9 @@ WINbackup/
 
 ## Idiomas e temas
 
-- **Idiomas**: o texto em português é a chave. No C#, `L.T("Iniciar backup")`, `L.F("{0} pastas", n)` e `L.N(n, "1 pasta", "{0} pastas")`; no XAML, `Text="{s:T K='Iniciar backup'}"` (no XAML, `\` precisa ser escrito `\\`). Sem tradução, aparece o português. O idioma padrão segue o do Windows (pt, es; o resto vira inglês) e trocar em Opções reabre o app.
+- **Idiomas**: o texto em português é a chave. No C#, `L.T("Iniciar backup")`, `L.F("{0} pastas", n)` e `L.N(n, "1 pasta", "{0} pastas")`; no XAML, `Text="{s:T K='Iniciar backup'}"` (no XAML, `\` precisa ser escrito `\\`). Sem tradução, aparece o português. O idioma padrão segue o do Windows (pt, es; o resto vira inglês). Trocar em Opções vale na hora: o menu e a tela atual são refeitos (por isso listas com textos traduzidos são propriedades calculadas, não campos estáticos).
 - **O que fica em português de propósito**: tudo que é gravado no backup ou nas configurações (nomes das pastas do backup, `Title`, `Kind`, `Modules` e grupos do manifesto, nome das tarefas no Agendador). Assim um backup feito em um idioma restaura em outro e a retenção continua agrupando as versões. Esses textos são traduzidos só na hora de mostrar (`L.T(m.Title)`, `Preset.Label`).
-- **Temas**: as cores continuam escritas na paleta WINchester (Styles.xaml e `UI.Brush("#…")`); `Theme.cs` tem, para cada tema, a troca de cada cor. Os pincéis são compartilhados, então trocar entre os temas escuros é ao vivo. Entre claro e escuro o app reabre, porque o tema dos controles nativos (caixas de texto, rolagem) só pode ser escolhido antes de carregar o XAML.
+- **Temas**: as cores continuam escritas na paleta WINchester (Styles.xaml e `UI.Brush("#…")`); `Theme.cs` tem, para cada tema, a troca de cada cor. Os pincéis são compartilhados, então a troca de tema é ao vivo. Entre claro e escuro, a janela muda o RequestedTheme da raiz; o tema do app (controles nativos fora da janela) é escolhido ao abrir. O Icon segue a cor do controle em volta, porque ao trocar o tema o WinUI devolveria a ele a cor padrão do tema do app.
 - **Cor nova**: use uma cor que já existe na paleta ou acrescente a cor nova nas três tabelas de `Theme.cs`.
 
 

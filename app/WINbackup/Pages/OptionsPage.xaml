@@ -21,8 +21,7 @@
                     <StackPanel Spacing="12">
                         <TextBlock Text="{s:T K='IDIOMA'}" Style="{StaticResource Overline}"/>
                         <Grid x:Name="LangGrid" ColumnSpacing="10"/>
-                        <TextBlock x:Name="LangNote" Style="{StaticResource Small}" Text="{s:T K='O WINbackup reabre sozinho para trocar o idioma ou para mudar entre claro e escuro.'}"/>
-                    </StackPanel>
+                                </StackPanel>
                 </StackPanel>
             </Border>
 

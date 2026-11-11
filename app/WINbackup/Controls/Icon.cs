@@ -31,6 +31,26 @@ public sealed partial class Icon : UserControl
         Content = new Viewbox { Child = canvas, Stretch = Stretch.Uniform };
         _path.SetBinding(Shape.StrokeProperty, new Binding { Source = this, Path = new PropertyPath(nameof(Foreground)) });
         _path.StrokeThickness = StrokeThickness;
+        Loaded += (_, _) => FollowParent();
+        ActualThemeChanged += (_, _) => FollowParent();
+    }
+
+    bool _following;
+
+    /// <summary>
+    /// Sem Foreground próprio, o ícone pega a cor do ContentPresenter ou controle em volta. Herdar não basta: ao trocar o tema
+    /// da janela, o WinUI devolve ao ícone a cor padrão do tema do app em vez da do botão.
+    /// </summary>
+    void FollowParent()
+    {
+        if (!_following && ReadLocalValue(ForegroundProperty) != DependencyProperty.UnsetValue) return;
+        for (var p = VisualTreeHelper.GetParent(this); p != null; p = VisualTreeHelper.GetParent(p))
+        {
+            if (p is not (ContentPresenter or Control)) continue;
+            SetBinding(ForegroundProperty, new Binding { Source = p, Path = new PropertyPath(nameof(Foreground)) });
+            _following = true;
+            return;
+        }
     }
 
     public static readonly DependencyProperty DataProperty = DependencyProperty.Register(

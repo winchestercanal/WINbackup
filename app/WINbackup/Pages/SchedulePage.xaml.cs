@@ -14,7 +14,7 @@ namespace WINbackup.Pages;
 /// <summary>Agendamentos (Agendador de Tarefas do Windows) e presets.</summary>
 public sealed partial class SchedulePage : Page
 {
-    static readonly (DayOfWeek Day, string Label, string Full)[] Week =
+    static (DayOfWeek Day, string Label, string Full)[] Week =>
     [
         (DayOfWeek.Sunday, "D", L.T("Domingo")), (DayOfWeek.Monday, "S", L.T("Segunda")), (DayOfWeek.Tuesday, "T", L.T("Terça")), (DayOfWeek.Wednesday, "Q", L.T("Quarta")),
         (DayOfWeek.Thursday, "Q", L.T("Quinta")), (DayOfWeek.Friday, "S", L.T("Sexta")), (DayOfWeek.Saturday, "S", L.T("Sábado")),

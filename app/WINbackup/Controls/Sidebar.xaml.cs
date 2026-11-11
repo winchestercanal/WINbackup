@@ -16,7 +16,7 @@ public sealed partial class Sidebar : UserControl
     record Item(string Key, string Label, string Icon);
     record Group(string Key, string Label, string Icon, Item[] Items);
 
-    static readonly Group[] Groups =
+    static Group[] Groups =>
     [
         new("backup", L.T("Backup"), Icons.Download,
         [

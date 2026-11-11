@@ -26,8 +26,8 @@ public class ScheduleDef
 
     public string TaskName => $"Backup {Id}";
 
-    static readonly string[] DayNames = [L.T("dom"), L.T("seg"), L.T("ter"), L.T("qua"), L.T("qui"), L.T("sex"), L.T("sáb")];
-    static readonly string[] DayFull = [L.T("domingo"), L.T("segunda"), L.T("terça"), L.T("quarta"), L.T("quinta"), L.T("sexta"), L.T("sábado")];
+    static string[] DayNames => [L.T("dom"), L.T("seg"), L.T("ter"), L.T("qua"), L.T("qui"), L.T("sex"), L.T("sáb")];
+    static string[] DayFull => [L.T("domingo"), L.T("segunda"), L.T("terça"), L.T("quarta"), L.T("quinta"), L.T("sexta"), L.T("sábado")];
 
     public string When => Kind switch
     {

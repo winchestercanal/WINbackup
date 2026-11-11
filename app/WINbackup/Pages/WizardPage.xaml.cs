@@ -15,7 +15,7 @@ public sealed partial class WizardPage : Page
 {
     record Step(string Key, string Name, string Desc);
 
-    static readonly Step[] Steps =
+    static Step[] Steps =>
     [
         new("drv", L.T("Drivers"), L.T("Instala os .inf de terceiros (Wi-Fi primeiro, para ter internet)")),
         new("apps", L.T("Programas"), L.T("Reinstala pelo winget + lista dos que precisam de instalação manual")),

@@ -61,7 +61,7 @@ public static class Theme
 
     static void Walk(ResourceDictionary d)
     {
-        foreach (var md in d.MergedDictionaries) Walk(md);
+        foreach (var md in d.MergedDictionaries.Where(md => md is not Microsoft.UI.Xaml.Controls.XamlControlsResources)) Walk(md);
         foreach (var td in d.ThemeDictionaries.Values.OfType<ResourceDictionary>()) Walk(td);
         foreach (var key in d.Keys.ToList())
         {

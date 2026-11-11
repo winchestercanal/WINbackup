@@ -12,7 +12,7 @@ namespace WINbackup.Pages;
 /// <summary>Opções. Só a criptografia ainda está marcada como "Em breve".</summary>
 public sealed partial class OptionsPage : Page
 {
-    static readonly (string Comment, string Command)[] Cli =
+    static (string Comment, string Command)[] Cli =>
     [
         (L.T("# backup com um preset"), @"WINbackup.exe --preset completo --dest E:\Backup"),
         (L.T("# só programas e configurações"), @"WINbackup.exe --only apps,configs --dest E:\Backup"),
@@ -74,15 +74,8 @@ public sealed partial class OptionsPage : Page
             rb.Checked += (_, _) =>
             {
                 if (Theme.Current == code) return;
-                var familyChanges = (code == "light") != Theme.IsLight;
                 Settings.Data.Theme = code;
                 Settings.Save();
-                // Claro e escuro usam controles nativos diferentes, escolhidos ao abrir o app
-                if (familyChanges && BackupRunner.Current is not { IsFinished: false })
-                {
-                    App.Shell.Restart();
-                    return;
-                }
                 Theme.Apply(code);
                 App.Shell.Reload();
             };
@@ -120,19 +113,14 @@ public sealed partial class OptionsPage : Page
             LangGrid.ColumnDefinitions.Add(new ColumnDefinition());
             var rb = new RadioButton { Style = (Style)Application.Current.Resources["ChoiceCard"], GroupName = "lang",
                 Content = new TextBlock { Text = name, FontSize = 13, HorizontalAlignment = HorizontalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis }, IsChecked = setting == code || (code == "auto" && !L.Languages.Any(l => l.Code == setting)) };
-            rb.Checked += async (_, _) =>
+            rb.Checked += (_, _) =>
             {
                 if (Settings.Data.Language == code) return;
                 Settings.Data.Language = code;
                 Settings.Save();
-                var next = code == "auto" ? L.SystemLanguage : code;
-                if (next == L.Current) return;
-                if (BackupRunner.Current is { IsFinished: false })
-                {
-                    await Dialogs.InfoAsync(XamlRoot, L.T("Idioma salvo"), L.T("Há uma tarefa em andamento. O novo idioma vale na próxima vez que abrir o WINbackup."));
-                    return;
-                }
-                App.Shell.Restart();
+                var before = L.Current;
+                L.Apply(code);
+                if (L.Current != before) App.Shell.Reload();
             };
             Grid.SetColumn(rb, LangGrid.Children.Count);
             LangGrid.Children.Add(rb);

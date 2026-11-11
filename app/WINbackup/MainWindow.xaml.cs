@@ -79,6 +79,8 @@ public sealed partial class MainWindow : Window
     void ApplyChrome()
     {
         Root.RequestedTheme = Theme.Element;
+        ToolTipService.SetToolTip(BackButton, L.T("Voltar (Alt+Seta para a esquerda)"));
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(BackButton, L.T("Voltar"));
         var tb = AppWindow.TitleBar;
         tb.ButtonBackgroundColor = Colors.Transparent;
         tb.ButtonInactiveBackgroundColor = Colors.Transparent;
@@ -175,17 +177,6 @@ public sealed partial class MainWindow : Window
         }
         BackupRunner.Start(spec);
         Navigate("progress");
-    }
-
-    /// <summary>Abre o WINbackup de novo e fecha esta janela (troca de idioma).</summary>
-    public void Restart()
-    {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!)
-        {
-            UseShellExecute = true, WorkingDirectory = AppContext.BaseDirectory,
-        });
-        _closeConfirmed = true;
-        Close();
     }
 
     public void Minimize()
