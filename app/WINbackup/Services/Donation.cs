@@ -5,7 +5,7 @@ namespace WINbackup.Services;
 
 /// <summary>
 /// Dados de doação do Canal WINchester e o código Pix "copia e cola" (BR Code estático do Banco Central).
-/// Preencha PixKey, PixName, PixCity e LivePixUrl; enquanto vazios, a tela mostra "em breve".
+/// Preencha PixKey, PixName, PixCity, LivePixUrl e PayPalUrl; enquanto vazios, a tela mostra "em breve".
 /// </summary>
 public static class Donation
 {
@@ -13,9 +13,11 @@ public static class Donation
     public const string PixName = "Canal WINchester"; // nome do recebedor, como aparece no app do banco (até 25 letras)
     public const string PixCity = "São Paulo";        // cidade do recebedor (até 15 letras)
     public const string LivePixUrl = "https://livepix.gg/canalwinchester"; // ex.: https://livepix.gg/seucanal
+    public const string PayPalUrl = "https://www.paypal.com/donate/?hosted_button_id=SANZPNKWBY8GN"; // botão de doação do PayPal (doações de fora do Brasil)
 
     public static bool PixReady => PixKey.Length > 0 && PixName.Length > 0 && PixCity.Length > 0;
     public static bool LivePixReady => LivePixUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    public static bool PayPalReady => PayPalUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Lembrete a cada N backups bem-sucedidos.</summary>
     public const int ReminderEvery = 5;
@@ -26,7 +28,7 @@ public static class Donation
         var s = Settings.Data;
         s.SuccessfulBackups++;
         Settings.Save();
-        return !s.DonationReminderOff && (PixReady || LivePixReady) && s.SuccessfulBackups % ReminderEvery == 0;
+        return !s.DonationReminderOff && (PixReady || LivePixReady || PayPalReady) && s.SuccessfulBackups % ReminderEvery == 0;
     }
 
     /// <summary>Payload EMV do Pix. Sem valor, quem paga digita o valor no banco.</summary>

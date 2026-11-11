@@ -11,7 +11,7 @@ using WINbackup.Services;
 
 namespace WINbackup.Pages;
 
-/// <summary>Área de doação: Pix com QR Code e valor sugerido, e LivePix.</summary>
+/// <summary>Área de doação: Pix com QR Code e valor sugerido, PayPal (para quem está fora do Brasil) e LivePix.</summary>
 public sealed partial class DonatePage : Page
 {
     static readonly decimal?[] Suggested = [5, 10, 25, 50, null];
@@ -20,12 +20,21 @@ public sealed partial class DonatePage : Page
     public DonatePage()
     {
         InitializeComponent();
+        // O Pix só funciona no Brasil: em inglês e espanhol o PayPal vem primeiro (antes de montar o layout responsivo)
+        if (L.Current != "pt")
+        {
+            Grid.SetColumn(SideStack, 0);
+            Grid.SetColumn(PixCard, 1);
+            MainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            MainGrid.ColumnDefinitions[1].Width = new GridLength(1.15, GridUnitType.Star);
+        }
         Responsive.StackWhenNarrow(MainGrid, 820);
 
         ReminderToggle.IsOn = !Settings.Data.DonationReminderOff;
         ReminderToggle.Toggled += (_, on) => { Settings.Data.DonationReminderOff = !on; Settings.Save(); };
 
         LivePixButton.IsEnabled = Donation.LivePixReady;
+        PayPalButton.IsEnabled = Donation.PayPalReady;
         LivePixSoon.Visibility = Donation.LivePixReady ? Visibility.Collapsed : Visibility.Visible;
 
         if (!Donation.PixReady)
@@ -88,5 +97,6 @@ public sealed partial class DonatePage : Page
     }
 
     void OnLivePix(object sender, RoutedEventArgs e) => Sys.Open(Donation.LivePixUrl);
+    void OnPayPal(object sender, RoutedEventArgs e) => Sys.Open(Donation.PayPalUrl);
     void OnYouTube(object sender, RoutedEventArgs e) => Sys.Open("https://www.youtube.com/WINchesterCanal");
 }

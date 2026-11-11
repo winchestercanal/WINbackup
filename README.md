@@ -187,9 +187,10 @@ Feito em **WinUI 3** (Windows App SDK) e **.NET 10**. Detalhes da arquitetura, d
 
 ## 💙 Apoie
 
-O WINbackup é gratuito e sem anúncios. Se ele te ajudou, considere apoiar o projeto:
+O WINbackup é gratuito e sem anúncios. Se ele te ajudou, considere apoiar o projeto. Fora do Brasil, use o PayPal:
 
 <p>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=SANZPNKWBY8GN"><img src="https://img.shields.io/badge/PayPal-doar-2f7bff?logo=paypal&logoColor=white&labelColor=0a0f1c&style=for-the-badge" alt="Doar pelo PayPal"></a>
   <a href="https://livepix.gg/canalwinchester"><img src="https://img.shields.io/badge/LivePix-apoiar-ff6b8a?labelColor=0a0f1c&style=for-the-badge" alt="Apoiar pelo LivePix"></a>
   <img src="https://img.shields.io/badge/Pix-winchestercanal%40gmail.com-3ddc97?labelColor=0a0f1c&style=for-the-badge" alt="Pix: winchestercanal@gmail.com">
   <a href="https://www.youtube.com/WINchesterCanal"><img src="https://img.shields.io/badge/YouTube-Canal%20WINchester-ff0000?logo=youtube&logoColor=white&labelColor=0a0f1c&style=for-the-badge" alt="Canal WINchester no YouTube"></a>
