@@ -2,27 +2,28 @@
     x:Class="WINbackup.Pages.SchedulePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="20" Padding="36,28,36,36">
             <StackPanel Spacing="4">
-                <TextBlock Text="Agendamentos e presets" Style="{StaticResource H1}"/>
-                <TextBlock Text="Backups que rodam sozinhos, por horário ou quando você conecta o HD externo." Style="{StaticResource Sub}"/>
+                <TextBlock Text="{s:T K='Agendamentos e presets'}" Style="{StaticResource H1}"/>
+                <TextBlock Text="{s:T K='Backups que rodam sozinhos, por horário ou quando você conecta o HD externo.'}" Style="{StaticResource Sub}"/>
             </StackPanel>
             <Border x:Name="AdminWarn" Style="{StaticResource WarnCard}" Visibility="Collapsed">
-                <TextBlock Foreground="{StaticResource WarnText}" TextWrapping="Wrap" Text="Criar e mudar agendamentos exige abrir o WINbackup como administrador (as tarefas rodam com privilégios para salvar drivers e arquivos em uso)."/>
+                <TextBlock Foreground="{StaticResource WarnText}" TextWrapping="Wrap" Text="{s:T K='Criar e mudar agendamentos exige abrir o WINbackup como administrador (as tarefas rodam com privilégios para salvar drivers e arquivos em uso).'}"/>
             </Border>
 
             <Grid x:Name="MainGrid" ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="400"/></Grid.ColumnDefinitions>
                 <StackPanel Spacing="16">
                     <StackPanel x:Name="TasksPanel" Spacing="10">
-                        <TextBlock Text="Ativos" FontSize="15" FontWeight="SemiBold"/>
+                        <TextBlock Text="{s:T K='Ativos'}" FontSize="15" FontWeight="SemiBold"/>
                     </StackPanel>
                     <StackPanel Spacing="10">
                         <Grid>
-                            <TextBlock Text="Presets" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{s:T K='Presets'}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             
                         </Grid>
                         <Border Style="{StaticResource TableCard}">
@@ -33,43 +34,43 @@
 
                 <Border Grid.Column="1" Style="{StaticResource Card}" VerticalAlignment="Top" Background="{StaticResource SurfaceStrong}" BorderBrush="{StaticResource LineStrong}">
                     <StackPanel Spacing="14">
-                        <TextBlock Text="Novo agendamento" FontSize="15" FontWeight="SemiBold"/>
+                        <TextBlock Text="{s:T K='Novo agendamento'}" FontSize="15" FontWeight="SemiBold"/>
                         <StackPanel Spacing="6">
-                            <TextBlock Text="Quando" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
+                            <TextBlock Text="{s:T K='Quando'}" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
                             <Border Style="{StaticResource SegHost}" Background="{StaticResource SurfaceDeep}" HorizontalAlignment="Stretch">
                                 <Grid ColumnSpacing="4">
                                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                    <RadioButton Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="Horário" Tag="time" IsChecked="True" Checked="OnTrigger"/>
-                                    <RadioButton Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="Ao conectar disco" Tag="drive" Checked="OnTrigger"/>
-                                    <RadioButton Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="Ao entrar" Tag="logon" Checked="OnTrigger"/>
+                                    <RadioButton Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="{s:T K='Horário'}" Tag="time" IsChecked="True" Checked="OnTrigger"/>
+                                    <RadioButton Grid.Column="1" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="{s:T K='Ao conectar disco'}" Tag="drive" Checked="OnTrigger"/>
+                                    <RadioButton Grid.Column="2" Style="{StaticResource SegSmall}" Height="32" Padding="6,0" GroupName="trig" Content="{s:T K='Ao entrar'}" Tag="logon" Checked="OnTrigger"/>
                                 </Grid>
                             </Border>
                         </StackPanel>
                         <StackPanel x:Name="TimePanel" Spacing="12">
                             <StackPanel x:Name="DaysPanel" Orientation="Horizontal" Spacing="6"/>
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <TextBlock Text="Horário" FontSize="12" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
-                                <TextBox x:Name="TimeBox" Style="{StaticResource MonoInput}" Width="90" Height="34" MinHeight="34" FontSize="13" Text="20:00" AutomationProperties.Name="Horário"/>
+                                <TextBlock Text="{s:T K='Horário'}" FontSize="12" Foreground="{StaticResource TextMuted2}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="TimeBox" Style="{StaticResource MonoInput}" Width="90" Height="34" MinHeight="34" FontSize="13" Text="20:00" AutomationProperties.Name="{s:T K='Horário'}"/>
                             </StackPanel>
                         </StackPanel>
                         <Border x:Name="DrivePanel" Padding="12" CornerRadius="10" Background="{StaticResource SurfaceDeep}" BorderBrush="{StaticResource Line}" BorderThickness="1" Visibility="Collapsed">
                             <StackPanel Spacing="8">
-                                <ComboBox x:Name="DriveCombo" HorizontalAlignment="Stretch" AutomationProperties.Name="Disco do gatilho" SelectionChanged="OnDriveChanged"/>
+                                <ComboBox x:Name="DriveCombo" HorizontalAlignment="Stretch" AutomationProperties.Name="{s:T K='Disco do gatilho'}" SelectionChanged="OnDriveChanged"/>
                                 <TextBlock x:Name="VolumeText" Text="" FontSize="11.5" FontFamily="{StaticResource Mono}" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="Reconhece o disco pelo ID, mesmo se a letra mudar." FontSize="12" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{s:T K='Reconhece o disco pelo ID, mesmo se a letra mudar.'}" FontSize="12" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
                         <TextBlock x:Name="LogonText" Visibility="Collapsed" FontSize="12" LineHeight="18" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap"
-                                   Text="Roda alguns minutos depois de entrar no Windows, no máximo uma vez por dia."/>
+                                   Text="{s:T K='Roda alguns minutos depois de entrar no Windows, no máximo uma vez por dia.'}"/>
                         <StackPanel Spacing="6">
-                            <TextBlock Text="Preset" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
+                            <TextBlock Text="{s:T K='Preset'}" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
                             <c:WrapPanel x:Name="PresetPick" Spacing="6" LineSpacing="6"/>
                         </StackPanel>
-                        <c:ToggleRow x:Name="OptIncr" Title="Incremental (só o que mudou)"/>
-                        <c:ToggleRow x:Name="OptWake" Title="Acordar o PC para rodar"/>
-                        <c:ToggleRow x:Name="OptAc" Title="Só quando estiver na tomada"/>
-                        <Button Style="{StaticResource PrimaryButton}" Height="42" HorizontalAlignment="Stretch" Content="Criar agendamento" Click="OnCreate"/>
-                        <TextBlock Text="Usa o Agendador de Tarefas do Windows." FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
+                        <c:ToggleRow x:Name="OptIncr" Title="{s:T K='Incremental (só o que mudou)'}"/>
+                        <c:ToggleRow x:Name="OptWake" Title="{s:T K='Acordar o PC para rodar'}"/>
+                        <c:ToggleRow x:Name="OptAc" Title="{s:T K='Só quando estiver na tomada'}"/>
+                        <Button Style="{StaticResource PrimaryButton}" Height="42" HorizontalAlignment="Stretch" Content="{s:T K='Criar agendamento'}" Click="OnCreate"/>
+                        <TextBlock Text="{s:T K='Usa o Agendador de Tarefas do Windows.'}" FontSize="11.5" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                 </Border>
             </Grid>

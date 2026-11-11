@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:c="using:WINbackup.Controls"
+    xmlns:s="using:WINbackup.Services"
     Title="WINbackup">
 
     <Grid x:Name="Root" Background="{StaticResource BgWindow}">
@@ -16,7 +17,7 @@
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="8,0,0,0" VerticalAlignment="Center">
                 <!-- Voltar: fica na área da barra de título liberada para clique (ver UpdateTitleBarRegions) -->
                 <Button x:Name="BackButton" Style="{StaticResource FlatButton}" Width="40" Height="32" CornerRadius="6" Visibility="Collapsed"
-                        Foreground="{StaticResource TextNav}" Click="OnBack" AutomationProperties.Name="Voltar" ToolTipService.ToolTip="Voltar (Alt+Seta para a esquerda)">
+                        Foreground="{StaticResource TextNav}" Click="OnBack" AutomationProperties.Name="{s:T K='Voltar'}" ToolTipService.ToolTip="{s:T K='Voltar (Alt+Seta para a esquerda)'}">
                     <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M19 12H5M11 6l-6 6 6 6"/>
                 </Button>
                 <Grid Width="18" Height="18" ColumnSpacing="2" RowSpacing="2" Margin="6,0,0,0">
@@ -28,13 +29,13 @@
                     <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource Neon}" CornerRadius="2"/>
                 </Grid>
                 <TextBlock Text="WINbackup" FontSize="12" FontWeight="SemiBold" CharacterSpacing="16" VerticalAlignment="Center"/>
-                <TextBlock Text="v0.1 beta · Canal WINchester" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                <TextBlock Text="{s:T K='v0.1 beta · Canal WINchester'}" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
             </StackPanel>
             <Border x:Name="AdminBadge" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,150,0"
-                    Padding="10,3" CornerRadius="6" Background="#0f1d36" BorderBrush="#1f3560" BorderThickness="1">
+                    Padding="10,3" CornerRadius="6" Background="{StaticResource BadgeBg}" BorderBrush="{StaticResource BadgeLine}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <c:Icon x:Name="AdminIcon" Width="12" Height="12" StrokeThickness="2" Data="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z" Foreground="{StaticResource BlueLink}"/>
-                    <TextBlock x:Name="AdminText" Text="Administrador" FontSize="11" Foreground="{StaticResource BlueLink}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="AdminText" Text="{s:T K='Administrador'}" FontSize="11" Foreground="{StaticResource BlueLink}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -44,7 +45,7 @@
                 <ColumnDefinition Width="248"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <c:Sidebar x:Name="Nav"/>
+            <Border x:Name="NavHost"/>
             <Frame x:Name="ContentFrame" Grid.Column="1"/>
         </Grid>
     </Grid>

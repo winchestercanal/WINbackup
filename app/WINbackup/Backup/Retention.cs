@@ -1,3 +1,5 @@
+using WINbackup.Services;
+
 namespace WINbackup.Backup;
 
 /// <summary>
@@ -42,11 +44,11 @@ public static class Retention
             {
                 Directory.Delete(v.Path, true);
                 removed.Add(v.Name);
-                log($"Retenção: versão antiga removida ({v.Name})");
+                log(L.F("Retenção: versão antiga removida ({0})", v.Name));
             }
             catch (Exception ex)
             {
-                log($"Retenção: não foi possível remover {v.Name}: {ex.Message}");
+                log(L.F("Retenção: não foi possível remover {0}: {1}", v.Name, ex.Message));
             }
         }
         return removed;

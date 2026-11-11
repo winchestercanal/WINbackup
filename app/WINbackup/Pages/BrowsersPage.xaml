@@ -2,13 +2,14 @@
     x:Class="WINbackup.Pages.BrowsersPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="20" Padding="36,28,36,36">
             <StackPanel Spacing="4">
-                <TextBlock Text="Navegadores" Style="{StaticResource H1}"/>
-                <TextBlock Text="Favoritos, lista de extensões e configurações de cada perfil detectado." Style="{StaticResource Sub}"/>
+                <TextBlock Text="{s:T K='Navegadores'}" Style="{StaticResource H1}"/>
+                <TextBlock Text="{s:T K='Favoritos, lista de extensões e configurações de cada perfil detectado.'}" Style="{StaticResource Sub}"/>
             </StackPanel>
 
             <Border x:Name="RunningWarn" Style="{StaticResource WarnCard}" Visibility="Collapsed">
@@ -16,7 +17,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <c:Icon Width="20" Height="20" Data="M12 3 2 20h20zM12 10v4M12 17h.01" Foreground="{StaticResource Warn}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="RunningText" Grid.Column="1" Foreground="{StaticResource WarnText}" TextWrapping="Wrap" LineHeight="20" VerticalAlignment="Center"/>
-                    <Button Grid.Column="2" Style="{StaticResource LinkButton}" Content="Verificar de novo" Foreground="{StaticResource WarnText}" Click="OnRecheck"/>
+                    <Button Grid.Column="2" Style="{StaticResource LinkButton}" Content="{s:T K='Verificar de novo'}" Foreground="{StaticResource WarnText}" Click="OnRecheck"/>
                 </Grid>
             </Border>
 
@@ -31,25 +32,25 @@
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                         <c:Icon Width="20" Height="20" Foreground="{StaticResource Neon}" Data="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" VerticalAlignment="Top"/>
                         <StackPanel Grid.Column="1" Spacing="2">
-                            <TextBlock Text="Senhas: exportação guiada" FontWeight="SemiBold"/>
-                            <TextBlock Style="{StaticResource Small}" Text="Por segurança o WINbackup não lê suas senhas. Abra a página de senhas do navegador, use Exportar senhas e depois adicione aqui o .csv: ele entra no próximo backup."/>
+                            <TextBlock Text="{s:T K='Senhas: exportação guiada'}" FontWeight="SemiBold"/>
+                            <TextBlock Style="{StaticResource Small}" Text="{s:T K='Por segurança o WINbackup não lê suas senhas. Abra a página de senhas do navegador, use Exportar senhas e depois adicione aqui o .csv: ele entra no próximo backup.'}"/>
                         </StackPanel>
                     </Grid>
                     <c:WrapPanel x:Name="PwButtons"/>
                     <Grid ColumnSpacing="10">
                         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <StackPanel x:Name="CsvList" Spacing="6" VerticalAlignment="Center"/>
-                        <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="Adicionar .csv exportado" VerticalAlignment="Top" Click="OnAddCsv"/>
+                        <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="{s:T K='Adicionar .csv exportado'}" VerticalAlignment="Top" Click="OnAddCsv"/>
                     </Grid>
                     <TextBlock x:Name="CsvWarn" Style="{StaticResource Small}" Foreground="{StaticResource WarnText}" Visibility="Collapsed"
-                               Text="O .csv guarda as senhas em texto puro e o backup ainda não é criptografado. Guarde o HD de backup em local seguro e apague o .csv do PC depois."/>
+                               Text="{s:T K='O .csv guarda as senhas em texto puro e o backup ainda não é criptografado. Guarde o HD de backup em local seguro e apague o .csv do PC depois.'}"/>
                 </StackPanel>
             </Border>
 
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <c:SaveTargetBar Suffix="Navegadores"/>
-                <Button x:Name="SaveButton" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="Salvar navegadores" Click="OnSave"/>
+                <Button x:Name="SaveButton" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="{s:T K='Salvar navegadores'}" Click="OnSave"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

@@ -22,14 +22,14 @@ public sealed partial class ProgressPage : Page
         InitializeComponent();
         if (_runner == null)
         {
-            TitleText.Text = "Nenhuma tarefa em andamento";
+            TitleText.Text = L.T("Nenhuma tarefa em andamento");
             StateLabel.Text = "";
-            SubText.Text = "Comece um backup pelo Início ou pelas telas do menu Backup.";
+            SubText.Text = L.T("Comece um backup pelo Início ou pelas telas do menu Backup.");
             PauseButton.Visibility = CancelButton.Visibility = OpenLogButton.Visibility = HashBadge.Visibility = Visibility.Collapsed;
             return;
         }
 
-        TitleText.Text = _runner.Spec.Title;
+        TitleText.Text = L.T(_runner.Spec.Title);
         HashBadge.Visibility = _runner.Spec.Kind == JobKind.Backup && _runner.Spec.Folders.Count > 0 && _runner.Spec.VerifyHash
             ? Visibility.Visible : Visibility.Collapsed;
         StepsRepeater.ItemsSource = _runner.Steps;
@@ -47,15 +47,15 @@ public sealed partial class ProgressPage : Page
         var (label, brush) = r.State switch
         {
             RunState.Paused => ("PAUSADO", UI.Warn),
-            RunState.Completed => ("CONCLUÍDO", UI.Ok),
+            RunState.Completed => (L.T("CONCLUÍDO"), UI.Ok),
             RunState.Canceled => ("CANCELADO", UI.Warn),
             RunState.Failed => ("FALHOU", UI.ErrSoft),
-            _ => ("EM ANDAMENTO", UI.Neon),
+            _ => (L.T("EM ANDAMENTO"), UI.Neon),
         };
         StateLabel.Text = label;
         StateLabel.Foreground = brush;
         Bar.Background = brush;
-        PauseButton.Content = r.State == RunState.Paused ? "Continuar" : "Pausar";
+        PauseButton.Content = r.State == RunState.Paused ? L.T("Continuar") : L.T("Pausar");
         var done = r.IsFinished;
         PauseButton.Visibility = CancelButton.Visibility = done ? Visibility.Collapsed : Visibility.Visible;
         ReportButton.Visibility = done ? Visibility.Visible : Visibility.Collapsed;
@@ -79,11 +79,11 @@ public sealed partial class ProgressPage : Page
         NowText.Inlines.Clear();
         if (r.IsFinished)
         {
-            NowText.Inlines.Add(new Run { Text = r.State == RunState.Completed ? "Tudo pronto" : "Parado" });
+            NowText.Inlines.Add(new Run { Text = r.State == RunState.Completed ? L.T("Tudo pronto") : L.T("Parado") });
         }
         else
         {
-            NowText.Inlines.Add(new Run { Text = r.Activity == "integridade" ? "Conferindo " : r.Spec.IsRestore ? "Restaurando " : "Copiando " });
+            NowText.Inlines.Add(new Run { Text = r.Activity == "integridade" ? L.T("Conferindo ") : r.Spec.IsRestore ? L.T("Restaurando ") : L.T("Copiando ") });
             NowText.Inlines.Add(new Run { Text = r.Activity, FontWeight = FontWeights.Bold });
             if (!string.IsNullOrEmpty(r.CurrentFile))
             {
@@ -103,13 +103,13 @@ public sealed partial class ProgressPage : Page
 
         var phaseTotal = r.PhaseTotal;
         BytesText.Text = phaseTotal > 0
-            ? $"{Sys.Bytes(r.PhaseDone)} de {Sys.Bytes(phaseTotal)} · {_speed / 1048576:0.0} MB/s"
-            : $"Decorrido: {Sys.Duration(r.Elapsed)}";
-        if (r.IsFinished) EtaText.Text = $"Duração: {Sys.Duration(r.Elapsed)}";
-        else if (r.State == RunState.Paused) EtaText.Text = "Pausado";
+            ? L.F("{0} de {1} · {2:0.0} MB/s", Sys.Bytes(r.PhaseDone), Sys.Bytes(phaseTotal), _speed / 1048576)
+            : L.F("Decorrido: {0}", Sys.Duration(r.Elapsed));
+        if (r.IsFinished) EtaText.Text = L.F("Duração: {0}", Sys.Duration(r.Elapsed));
+        else if (r.State == RunState.Paused) EtaText.Text = L.T("Pausado");
         else if (pct is > 1 and < 100)
-            EtaText.Text = $"Tempo restante: {Sys.Duration(TimeSpan.FromSeconds(r.Elapsed.TotalSeconds * (100 - pct) / pct))}";
-        else EtaText.Text = "Tempo restante: calculando…";
+            EtaText.Text = L.F("Tempo restante: {0}", Sys.Duration(TimeSpan.FromSeconds(r.Elapsed.TotalSeconds * (100 - pct) / pct)));
+        else EtaText.Text = L.T("Tempo restante: calculando…");
     }
 
     void OnPause(object sender, RoutedEventArgs e)
@@ -120,8 +120,8 @@ public sealed partial class ProgressPage : Page
 
     async void OnCancel(object sender, RoutedEventArgs e)
     {
-        var ok = await Dialogs.ConfirmAsync(XamlRoot, "Cancelar agora?",
-            "O que já foi copiado fica no destino, mas esta versão fica incompleta.", "Cancelar tarefa", "Continuar", danger: true);
+        var ok = await Dialogs.ConfirmAsync(XamlRoot, L.T("Cancelar agora?"),
+            L.T("O que já foi copiado fica no destino, mas esta versão fica incompleta."), L.T("Cancelar tarefa"), L.T("Continuar"), danger: true);
         if (ok) _runner!.Cancel();
     }
 

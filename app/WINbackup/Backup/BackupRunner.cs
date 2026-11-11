@@ -41,7 +41,7 @@ public sealed class BackupRunner
     public string LogPath { get; private set; } = "";
 
     // Lidos pela interface a cada atualização
-    public volatile string Activity = "Preparando…";
+    public volatile string Activity = L.T("Preparando…");
     public volatile string CurrentFile = "";
     long _bytesMoved, _phaseDone, _phaseTotal;
     public long BytesMoved => Interlocked.Read(ref _bytesMoved);
@@ -52,7 +52,7 @@ public sealed class BackupRunner
     // Resumo para o relatório
     public int ItemsSaved;
     public long StoredBytes;
-    public string Integrity = "Desativada";
+    public string Integrity = L.T("Desativada");
     public bool IntegrityOk = true;
     public bool RebootRequired;
     public int ErrorCount, WarningCount;
@@ -117,7 +117,7 @@ public sealed class BackupRunner
         _gate.Reset();
         _pausedAt = DateTime.Now;
         SetState(RunState.Paused);
-        Info("Pausado pelo usuário");
+        Info(L.T("Pausado pelo usuário"));
         foreach (var s in Steps) s.Paused = true;
     }
 
@@ -127,7 +127,7 @@ public sealed class BackupRunner
         _pausedTotal += DateTime.Now - _pausedAt;
         SetState(RunState.Running);
         foreach (var s in Steps) s.Paused = false;
-        Info("Continuando");
+        Info(L.T("Continuando"));
         _gate.Set();
     }
 
@@ -234,40 +234,40 @@ public sealed class BackupRunner
 
         if (Spec.Kind == JobKind.RestoreDrivers)
         {
-            _prep = Add("Preparar arquivos", "Drivers", 15);
-            _install = Add("Instalar drivers (PnPUtil)", "Drivers", 85);
+            _prep = Add(L.T("Preparar arquivos"), L.T("Drivers"), 15);
+            _install = Add(L.T("Instalar drivers (PnPUtil)"), L.T("Drivers"), 85);
             return;
         }
         if (Spec.Kind == JobKind.Restore)
         {
             if (Spec.RestoreSources.Any(s => s.Drivers))
             {
-                _prep = Add("Preparar drivers", "Drivers", 3);
-                _install = Add("Instalar drivers (PnPUtil)", "Drivers", 17);
+                _prep = Add(L.T("Preparar drivers"), L.T("Drivers"), 3);
+                _install = Add(L.T("Instalar drivers (PnPUtil)"), L.T("Drivers"), 17);
             }
             if (Spec.InstallPackages != null || Spec.RestoreSources.Any(s => s.Programs))
-                _programs = Add("Programas (winget)", "Programas", 40);
+                _programs = Add(L.T("Programas (winget)"), L.T("Programas"), 40);
             if (Spec.RestoreSources.Any(s => s.WindowsSettings))
-                _windows = Add("Configurações do Windows", "Configurações", 5);
+                _windows = Add(L.T("Configurações do Windows"), L.T("Configurações"), 5);
             foreach (var name in Spec.Unavailable) Unavailable(Add(name, name, 0));
             if (Spec.RestoreSources.Any(s => s.Folders == null || s.Folders.Count > 0 || s.Files?.Count > 0))
-                _files = Add("Arquivos e configurações", "Arquivos", 80);
+                _files = Add(L.T("Arquivos e configurações"), L.T("Arquivos"), 80);
             return;
         }
 
         var files = Spec.Folders.Count > 0;
-        if (files && Spec.UseShadowCopy) _vss = Add("Shadow Copy (VSS)", Spec.FilesLabel, 0);
-        if (Spec.Programs) _programs = Add("Programas (winget)", "Programas", 10);
-        if (Spec.WindowsKeys.Count > 0) _windows = Add("Configurações do Windows", "Configurações", 5);
-        if (files) _files = Add(Spec.FilesLabel, Spec.FilesLabel, 70);
-        if (Spec.Drivers) _drivers = Add("Drivers", "Drivers", 20);
-        if (files && Spec.VerifyHash) _verify = Add("Verificar integridade (SHA-256)", Spec.FilesLabel, 25);
+        if (files && Spec.UseShadowCopy) _vss = Add(L.T("Shadow Copy (VSS)"), L.T(Spec.FilesLabel), 0);
+        if (Spec.Programs) _programs = Add(L.T("Programas (winget)"), L.T("Programas"), 10);
+        if (Spec.WindowsKeys.Count > 0) _windows = Add(L.T("Configurações do Windows"), L.T("Configurações"), 5);
+        if (files) _files = Add(L.T(Spec.FilesLabel), L.T(Spec.FilesLabel), 70);
+        if (Spec.Drivers) _drivers = Add(L.T("Drivers"), L.T("Drivers"), 20);
+        if (files && Spec.VerifyHash) _verify = Add(L.T("Verificar integridade (SHA-256)"), L.T(Spec.FilesLabel), 25);
     }
 
     static void Unavailable(StepItem s)
     {
         s.State = StepState.Unavailable;
-        s.Status = "Em breve nesta versão";
+        s.Status = L.T("Em breve nesta versão");
     }
 
     async Task RunAsync()
@@ -283,24 +283,24 @@ public sealed class BackupRunner
                 await RunBackupAsync(token);
 
             EndedAt = DateTime.Now;
-            Info($"Concluído em {Sys.Duration(Elapsed)}");
+            Info(L.F("Concluído em {0}", Sys.Duration(Elapsed)));
             SetState(RunState.Completed);
         }
         catch (OperationCanceledException)
         {
             EndedAt = DateTime.Now;
-            Warn("Cancelado pelo usuário", report: false);
+            Warn(L.T("Cancelado pelo usuário"), report: false);
             foreach (var s in Steps.Where(s => s.State is StepState.Running or StepState.Waiting))
-                Step(s, StepState.Skipped, "Cancelado");
+                Step(s, StepState.Skipped, L.T("Cancelado"));
             SetState(RunState.Canceled);
         }
         catch (Exception ex)
         {
             EndedAt = DateTime.Now;
             CrashLog.Write(ex);
-            Error("Falha inesperada: " + ex.Message);
+            Error(L.T("Falha inesperada: ") + ex.Message);
             foreach (var s in Steps.Where(s => s.State == StepState.Running))
-                Step(s, StepState.Error, "Falhou");
+                Step(s, StepState.Error, L.T("Falhou"));
             SetState(RunState.Failed);
         }
         finally
@@ -315,14 +315,14 @@ public sealed class BackupRunner
     async Task RunBackupAsync(CancellationToken token)
     {
         if (string.IsNullOrEmpty(Spec.Destination))
-            throw new InvalidOperationException("Escolha o destino dos backups no menu lateral.");
+            throw new InvalidOperationException(L.T("Escolha o destino dos backups no menu lateral."));
 
         var stamp = StartedAt.ToString("yyyy-MM-dd_HH-mm-ss");
         VersionPath = Path.Combine(Spec.Destination, "WINbackup_" + stamp);
         Directory.CreateDirectory(VersionPath);
         OpenLog(Path.Combine(VersionPath, $"backup_audit_{stamp}.log"));
-        Info($"{Spec.Title} · destino {VersionPath}");
-        if (!Sys.IsAdmin) Warn("O app não está rodando como administrador: alguns arquivos e os drivers podem falhar.");
+        Info(L.F("{0} · destino {1}", L.T(Spec.Title), VersionPath));
+        if (!Sys.IsAdmin) Warn(L.T("O app não está rodando como administrador: alguns arquivos e os drivers podem falhar."));
 
         var manifest = new Manifest { CreatedAt = StartedAt, Title = Spec.Title };
         manifest.Save(VersionPath);
@@ -348,7 +348,7 @@ public sealed class BackupRunner
             var browsers = BrowsersModule.Detect();
             BrowsersModule.WriteExtensionList(VersionPath, browsers);
             if (Settings.Data.PasswordCsvs.Count == 0 && browsers.Any(b => b.Installed))
-                Warn("Senhas dos navegadores não foram exportadas. Faça a exportação guiada em Navegadores antes de formatar.");
+                Warn(L.T("Senhas dos navegadores não foram exportadas. Faça a exportação guiada em Navegadores antes de formatar."));
         }
         if (_drivers != null)
         {
@@ -356,7 +356,7 @@ public sealed class BackupRunner
             await DriversModule.BackupAsync(this, _drivers, manifest, token);
         }
         foreach (var name in Spec.Unavailable)
-            Modules.Add(new ModuleResult(name, "Ainda não disponível nesta versão", StepState.Unavailable));
+            Modules.Add(new ModuleResult(name, L.T("Ainda não disponível nesta versão"), StepState.Unavailable));
 
         manifest.BytesStored = StoredBytes;
         manifest.Completed = true;
@@ -369,17 +369,17 @@ public sealed class BackupRunner
     {
         var stamp = StartedAt.ToString("yyyy-MM-dd_HH-mm-ss");
         OpenLog(Path.Combine(Settings.Folder, "logs", $"restaurar_{stamp}.log"));
-        foreach (var s in Spec.RestoreSources) Info($"Restaurando de {s.VersionPath}");
+        foreach (var s in Spec.RestoreSources) Info(L.F("Restaurando de {0}", s.VersionPath));
         Info(Spec.Target switch
         {
-            RestoreTarget.Folder => $"Destino: outra pasta ({Spec.TargetPath})",
-            RestoreTarget.OtherUser => $"Destino: outro usuário ({Spec.TargetPath})",
-            _ => "Destino: locais originais",
-        } + $" · se já existir: {Spec.Conflict switch { ConflictMode.Overwrite => "substituir", ConflictMode.KeepBoth => "manter os dois", _ => "pular" }}");
-        if (!Sys.IsAdmin) Warn("O app não está rodando como administrador: drivers e pastas protegidas podem falhar.");
+            RestoreTarget.Folder => L.F("Destino: outra pasta ({0})", Spec.TargetPath),
+            RestoreTarget.OtherUser => L.F("Destino: outro usuário ({0})", Spec.TargetPath),
+            _ => L.T("Destino: locais originais"),
+        } + L.F(" · se já existir: {0}", Spec.Conflict switch { ConflictMode.Overwrite => "substituir", ConflictMode.KeepBoth => "manter os dois", _ => "pular" }));
+        if (!Sys.IsAdmin) Warn(L.T("O app não está rodando como administrador: drivers e pastas protegidas podem falhar."));
         await RestoreModule.RunAsync(this, _files, _prep, _install, _programs, _windows, token);
         foreach (var name in Spec.Unavailable)
-            Modules.Add(new ModuleResult(name, "Ainda não disponível nesta versão", StepState.Unavailable));
+            Modules.Add(new ModuleResult(name, L.T("Ainda não disponível nesta versão"), StepState.Unavailable));
         Percent = 100;
     }
 
@@ -387,7 +387,7 @@ public sealed class BackupRunner
     {
         var stamp = StartedAt.ToString("yyyy-MM-dd_HH-mm-ss");
         OpenLog(Path.Combine(Settings.Folder, "logs", $"restaurar_drivers_{stamp}.log"));
-        Info($"Restaurando drivers de {Spec.DriverSource}");
+        Info(L.F("Restaurando drivers de {0}", Spec.DriverSource));
         await DriversModule.RestoreAsync(this, _prep!, _install!, Spec.DriverSource!, token);
         Percent = 100;
     }
@@ -397,12 +397,12 @@ public sealed class BackupRunner
         var failed = State == RunState.Failed || ErrorCount > 0;
         if (State == RunState.Canceled) return;
         if (failed ? !Settings.Data.NotifyErrors : !Settings.Data.NotifyDone) return;
-        var what = Spec.IsRestore ? "Restauração" : "Backup";
+        var what = Spec.IsRestore ? L.T("Restauração") : L.T("Backup");
         var title = State == RunState.Failed ? $"{what} falhou"
-            : WarningCount + ErrorCount > 0 ? $"{what} concluído com {WarningCount + ErrorCount} avisos" : $"{what} concluído";
+            : WarningCount + ErrorCount > 0 ? L.F("{0} concluído com {1} avisos", what, WarningCount + ErrorCount) : L.F("{0} concluído", what);
         var body = Spec.IsRestore
-            ? (RebootRequired ? "Reinicie o computador para terminar." : "Drivers instalados.")
-            : $"{Sys.Bytes(StoredBytes)} salvos em {Spec.Destination}" + (IntegrityOk && Spec.VerifyHash ? " · integridade conferida" : "");
+            ? (RebootRequired ? L.T("Reinicie o computador para terminar.") : L.T("Drivers instalados."))
+            : L.F("{0} salvos em {1}", Sys.Bytes(StoredBytes), Spec.Destination) + (IntegrityOk && Spec.VerifyHash ? L.T(" · integridade conferida") : "");
         Notifier.Show(title, body);
     }
 }

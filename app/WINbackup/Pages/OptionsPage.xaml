@@ -2,40 +2,55 @@
     x:Class="WINbackup.Pages.OptionsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="20" Padding="36,28,36,36">
             <StackPanel Spacing="4">
-                <TextBlock Text="Opções" Style="{StaticResource H1}"/>
-                <TextBlock Text="Segurança, notificações, automação e modo portátil." Style="{StaticResource Sub}"/>
+                <TextBlock Text="{s:T K='Opções'}" Style="{StaticResource H1}"/>
+                <TextBlock Text="{s:T K='Aparência, segurança, notificações, automação e modo portátil.'}" Style="{StaticResource Sub}"/>
             </StackPanel>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel Spacing="22">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="{s:T K='TEMA'}" Style="{StaticResource Overline}"/>
+                        <Grid x:Name="ThemeGrid" ColumnSpacing="10"/>
+                    </StackPanel>
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="{s:T K='IDIOMA'}" Style="{StaticResource Overline}"/>
+                        <Grid x:Name="LangGrid" ColumnSpacing="10"/>
+                        <TextBlock x:Name="LangNote" Style="{StaticResource Small}" Text="{s:T K='O WINbackup reabre sozinho para trocar o idioma ou para mudar entre claro e escuro.'}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <StackPanel Spacing="16">
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="14">
-                            <TextBlock Text="SEGURANÇA" Style="{StaticResource Overline}"/>
-                            <c:ToggleRow x:Name="Encrypt" Title="Criptografar backups (7z AES-256)" Description="Em breve · desativado por padrão · recomendado se tiver .ssh, Wi-Fi ou senhas"/>
-                            <c:ToggleRow x:Name="Hash" Title="Verificar integridade (SHA-256)" Description="Confere cada arquivo depois da cópia e gera relatório"/>
+                            <TextBlock Text="{s:T K='SEGURANÇA'}" Style="{StaticResource Overline}"/>
+                            <c:ToggleRow x:Name="Encrypt" Title="{s:T K='Criptografar backups (7z AES-256)'}" Description="{s:T K='Em breve · desativado por padrão · recomendado se tiver .ssh, Wi-Fi ou senhas'}"/>
+                            <c:ToggleRow x:Name="Hash" Title="{s:T K='Verificar integridade (SHA-256)'}" Description="{s:T K='Confere cada arquivo depois da cópia e gera relatório'}"/>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="14">
-                            <TextBlock Text="NOTIFICAÇÕES" Style="{StaticResource Overline}"/>
-                            <c:ToggleRow x:Name="NotifyDone" Title="Ao terminar um backup" Description="Notificação do Windows com o resumo"/>
-                            <c:ToggleRow x:Name="NotifyErr" Title="Quando houver erros" Description="Mesmo em backups agendados"/>
-                            <c:ToggleRow x:Name="Remind" Title="Lembrete de backup" Description="Avisa ao abrir o app e ao entrar no Windows se passar 30 dias sem backup"/>
+                            <TextBlock Text="{s:T K='NOTIFICAÇÕES'}" Style="{StaticResource Overline}"/>
+                            <c:ToggleRow x:Name="NotifyDone" Title="{s:T K='Ao terminar um backup'}" Description="{s:T K='Notificação do Windows com o resumo'}"/>
+                            <c:ToggleRow x:Name="NotifyErr" Title="{s:T K='Quando houver erros'}" Description="{s:T K='Mesmo em backups agendados'}"/>
+                            <c:ToggleRow x:Name="Remind" Title="{s:T K='Lembrete de backup'}" Description="{s:T K='Avisa ao abrir o app e ao entrar no Windows se passar 30 dias sem backup'}"/>
                         </StackPanel>
                     </Border>
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="14">
-                            <TextBlock Text="VERSÕES" Style="{StaticResource Overline}"/>
+                            <TextBlock Text="{s:T K='VERSÕES'}" Style="{StaticResource Overline}"/>
                             <TextBlock FontSize="13" Foreground="{StaticResource TextMuted2}" LineHeight="20" TextWrapping="Wrap">
-                                <Run Text="Manter as últimas "/><Run x:Name="KeepRun" FontWeight="Bold" Foreground="{StaticResource Text}"/><Run Text=" versões. O último backup completo nunca é apagado."/>
+                                <Run Text="{s:T K='Manter as últimas '}"/><Run x:Name="KeepRun" FontWeight="Bold" Foreground="{StaticResource Text}"/><Run Text="{s:T K=' versões. O último backup completo nunca é apagado.'}"/>
                             </TextBlock>
-                            <Button Style="{StaticResource LinkButton}" Content="Ajustar retenção" HorizontalAlignment="Left" Click="OnHistory"/>
+                            <Button Style="{StaticResource LinkButton}" Content="{s:T K='Ajustar retenção'}" HorizontalAlignment="Left" Click="OnHistory"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -44,19 +59,19 @@
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="12">
                             <Grid>
-                                <TextBlock Text="LINHA DE COMANDO" Style="{StaticResource Overline}" VerticalAlignment="Center"/>
-                                <Button x:Name="CopyButton" Style="{StaticResource SmallButton}" Height="28" Padding="10,0" FontSize="12" Content="Copiar exemplos" HorizontalAlignment="Right" Click="OnCopy"/>
+                                <TextBlock Text="{s:T K='LINHA DE COMANDO'}" Style="{StaticResource Overline}" VerticalAlignment="Center"/>
+                                <Button x:Name="CopyButton" Style="{StaticResource SmallButton}" Height="28" Padding="10,0" FontSize="12" Content="{s:T K='Copiar exemplos'}" HorizontalAlignment="Right" Click="OnCopy"/>
                             </Grid>
                             <TextBlock FontSize="13" Foreground="{StaticResource TextMuted2}" LineHeight="20" TextWrapping="Wrap"
-                                       Text="Tudo o que a interface faz também roda por comando, para scripts, agendamentos e o autounattend."/>
+                                       Text="{s:T K='Tudo o que a interface faz também roda por comando, para scripts, agendamentos e o autounattend.'}"/>
                             <Border Padding="14" CornerRadius="10" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource Divider}" BorderThickness="1">
                                 <StackPanel x:Name="CliLines" Spacing="4"/>
                             </Border>
                             <Border Padding="14,12" CornerRadius="10" Background="{StaticResource SurfaceInfo}" BorderBrush="{StaticResource LineStrong}" BorderThickness="1">
                                 <StackPanel Spacing="4">
-                                    <TextBlock Text="No autounattend.xml" FontSize="12" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{s:T K='No autounattend.xml'}" FontSize="12" FontWeight="SemiBold"/>
                                     <TextBlock FontSize="12" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap">
-                                        <Run Text="Adicione o comando de pós-formatação em "/><Run Text="FirstLogonCommands" FontFamily="{StaticResource Mono}"/><Run Text=" para restaurar tudo logo no primeiro login."/>
+                                        <Run Text="{s:T K='Adicione o comando de pós-formatação em '}"/><Run Text="{s:T K='FirstLogonCommands'}" FontFamily="{StaticResource Mono}"/><Run Text="{s:T K=' para restaurar tudo logo no primeiro login.'}"/>
                                     </TextBlock>
                                 </StackPanel>
                             </Border>
@@ -64,13 +79,13 @@
                     </Border>
                     <Border Style="{StaticResource Card}">
                         <StackPanel Spacing="14">
-                            <TextBlock Text="MODO PORTÁTIL E GERAL" Style="{StaticResource Overline}"/>
-                            <c:ToggleRow x:Name="Portable" Title="Modo portátil" Description="Salva as configurações ao lado do .exe, sem instalar nada"/>
-                            <TextBlock Style="{StaticResource Small}" Text="Não é preciso deixar o app aberto na bandeja: os agendamentos (inclusive ao conectar o HD externo) rodam pelo Agendador de Tarefas do Windows."/>
+                            <TextBlock Text="{s:T K='MODO PORTÁTIL E GERAL'}" Style="{StaticResource Overline}"/>
+                            <c:ToggleRow x:Name="Portable" Title="{s:T K='Modo portátil'}" Description="{s:T K='Salva as configurações ao lado do .exe, sem instalar nada'}"/>
+                            <TextBlock Style="{StaticResource Small}" Text="{s:T K='Não é preciso deixar o app aberto na bandeja: os agendamentos (inclusive ao conectar o HD externo) rodam pelo Agendador de Tarefas do Windows.'}"/>
                             <Button x:Name="PortableButton" Style="{StaticResource AccentButton}" Height="40" FontSize="13" HorizontalAlignment="Stretch" Click="OnMakePortable">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <c:Icon Width="16" Height="16" Data="M9 2h6v6H9zM7 8h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/>
-                                    <TextBlock Text="Criar versão portátil no pendrive"/>
+                                    <TextBlock Text="{s:T K='Criar versão portátil no pendrive'}"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>

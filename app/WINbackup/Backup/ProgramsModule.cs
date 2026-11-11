@@ -33,7 +33,7 @@ public static class ProgramsModule
     public static async Task<List<InstalledProgram>> ListAsync(CancellationToken token)
     {
         var winget = Proc.Winget() ?? throw new FileNotFoundException(
-            "O winget não foi encontrado. Instale ou atualize o \"Instalador de Aplicativo\" pela Microsoft Store.");
+            L.T("O winget não foi encontrado. Instale ou atualize o \"Instalador de Aplicativo\" pela Microsoft Store."));
         var lines = new List<string>();
         await Proc.RunAsync(winget, "list --accept-source-agreements --disable-interactivity", lines.Add, token, Encoding.UTF8);
         return Parse(lines);
@@ -83,15 +83,15 @@ public static class ProgramsModule
 
     public static async Task BackupAsync(BackupRunner r, StepItem step, Manifest m, CancellationToken token)
     {
-        r.Activity = "Programas";
+        r.Activity = L.T("Programas");
         r.CurrentFile = "";
-        r.Step(step, StepState.Running, "Lendo programas instalados…");
+        r.Step(step, StepState.Running, L.T("Lendo programas instalados…"));
         var winget = Proc.Winget();
         if (winget == null)
         {
-            r.Step(step, StepState.Error, "winget não encontrado");
-            r.Error("O winget não foi encontrado. Instale ou atualize o \"Instalador de Aplicativo\" pela Microsoft Store.");
-            r.Modules.Add(new ModuleResult("Programas", "winget não encontrado", StepState.Error));
+            r.Step(step, StepState.Error, L.T("winget não encontrado"));
+            r.Error(L.T("O winget não foi encontrado. Instale ou atualize o \"Instalador de Aplicativo\" pela Microsoft Store."));
+            r.Modules.Add(new ModuleResult(L.T("Programas"), L.T("winget não encontrado"), StepState.Error));
             return;
         }
 
@@ -102,7 +102,7 @@ public static class ProgramsModule
 
         var folder = Path.Combine(r.VersionPath, Folder);
         Directory.CreateDirectory(folder);
-        r.Step(step, StepState.Running, "Exportando a lista do winget…");
+        r.Step(step, StepState.Running, L.T("Exportando a lista do winget…"));
         var export = Path.Combine(folder, "winget_export.json");
         var output = new List<string>();
         await Proc.RunAsync(winget, $"export -o \"{export}\" --accept-source-agreements --disable-interactivity", output.Add, token, Encoding.UTF8);
@@ -116,7 +116,7 @@ public static class ProgramsModule
         }
         else
         {
-            r.Warn("O winget export não gerou o arquivo: " + string.Join(" ", output.TakeLast(2)));
+            r.Warn(L.T("O winget export não gerou o arquivo: ") + string.Join(" ", output.TakeLast(2)));
         }
         WriteManualList(Path.Combine(folder, ManualFile), manual);
 
@@ -126,21 +126,21 @@ public static class ProgramsModule
         r.ItemsSaved += exported;
         r.StoredBytes += new DirectoryInfo(folder).EnumerateFiles().Sum(f => f.Length);
 
-        var status = $"{exported} no winget" + (manual.Count > 0 ? $" · {manual.Count} manuais" : "");
+        var status = L.F("{0} no winget", exported) + (manual.Count > 0 ? L.F(" · {0} manuais", manual.Count) : "");
         r.Step(step, exported > 0 ? StepState.Done : StepState.Warning, status);
-        r.Ok($"Programas: {status}");
+        r.Ok(L.F("Programas: {0}", status));
         if (manual.Count > 0)
-            r.Warn($"{manual.Count} programas não têm pacote no winget. A lista para instalar à mão foi salva em {ManualFile}.");
-        r.Modules.Add(new ModuleResult("Programas", status, manual.Count > 0 ? StepState.Warning : StepState.Done));
+            r.Warn(L.F("{0} programas não têm pacote no winget. A lista para instalar à mão foi salva em {1}.", manual.Count, ManualFile));
+        r.Modules.Add(new ModuleResult(L.T("Programas"), status, manual.Count > 0 ? StepState.Warning : StepState.Done));
     }
 
     /// <summary>"Exportar lista (.json)": Programas.json com os pacotes escolhidos, onde o usuário quiser.</summary>
     public static async Task<int> ExportAsync(string targetFile, HashSet<string> ids, CancellationToken token)
     {
-        var winget = Proc.Winget() ?? throw new FileNotFoundException("O winget não foi encontrado.");
+        var winget = Proc.Winget() ?? throw new FileNotFoundException(L.T("O winget não foi encontrado."));
         var temp = Path.Combine(Path.GetTempPath(), $"winbackup_export_{Guid.NewGuid():N}.json");
         await Proc.RunAsync(winget, $"export -o \"{temp}\" --accept-source-agreements --disable-interactivity", null, token, Encoding.UTF8);
-        if (!File.Exists(temp)) throw new IOException("O winget export não gerou o arquivo.");
+        if (!File.Exists(temp)) throw new IOException(L.T("O winget export não gerou o arquivo."));
         try { return WriteImportFile(temp, targetFile, ids); }
         finally { File.Delete(temp); }
     }
@@ -167,15 +167,15 @@ public static class ProgramsModule
     {
         static string H(string s) => WebUtility.HtmlEncode(s);
         var sb = new StringBuilder()
-            .Append("<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><title>Instalar manualmente · WINbackup</title><style>")
+            .Append($"<!doctype html><html lang=\"{L.Culture.Name}\"><head><meta charset=\"utf-8\"><title>{H(L.T("Instalar manualmente"))} · WINbackup</title><style>")
             .Append("body{margin:0;background:#0a0f1c;color:#e8f0ff;font:14px 'Segoe UI',system-ui,sans-serif;padding:32px}h1{font-size:24px;margin:0 0 6px}")
             .Append("p{color:#8ea3c7;margin:0 0 20px}table{width:100%;border-collapse:collapse;background:#0e1526;border:1px solid #1c2a48}")
             .Append("td,th{padding:10px 16px;border-bottom:1px solid #16223d;text-align:left}th{color:#8ea3c7;font-weight:400;font-size:12px}")
             .Append("a{color:#19e3ff}</style></head><body>")
-            .Append($"<h1>Programas para instalar à mão</h1><p>{manual.Count} programas não têm pacote no winget nem na Microsoft Store. Baixe cada um no site do fabricante.</p>")
-            .Append("<table><tr><th>Programa</th><th>Versão</th><th></th></tr>");
+            .Append($"<h1>{H(L.T("Programas para instalar à mão"))}</h1><p>{H(L.F("{0} programas não têm pacote no winget nem na Microsoft Store. Baixe cada um no site do fabricante.", manual.Count))}</p>")
+            .Append($"<table><tr><th>{H(L.T("Programa"))}</th><th>{H(L.T("Versão"))}</th><th></th></tr>");
         foreach (var p in manual)
-            sb.Append($"<tr><td>{H(p.Name)}</td><td>{H(p.Version)}</td><td><a href=\"https://www.google.com/search?q={WebUtility.UrlEncode(p.Name + " download")}\">Procurar download</a></td></tr>");
+            sb.Append($"<tr><td>{H(p.Name)}</td><td>{H(p.Version)}</td><td><a href=\"https://www.google.com/search?q={WebUtility.UrlEncode(p.Name + " download")}\">{H(L.T("Procurar download"))}</a></td></tr>");
         sb.Append("</table></body></html>");
         File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
     }
@@ -205,13 +205,13 @@ public static class ProgramsModule
     /// <summary>Instala um pacote por vez: dá progresso real e o resultado de cada programa.</summary>
     public static async Task InstallAsync(BackupRunner r, StepItem step, List<(string Id, string Name, string Source)> packages, string? manualList, CancellationToken token)
     {
-        r.Activity = "Programas";
+        r.Activity = L.T("Programas");
         var winget = Proc.Winget();
         if (winget == null)
         {
-            r.Step(step, StepState.Error, "winget não encontrado");
-            r.Error("O winget não foi encontrado. Abra a Microsoft Store, atualize o \"Instalador de Aplicativo\" e tente de novo.");
-            r.Modules.Add(new ModuleResult("Programas", "winget não encontrado", StepState.Error));
+            r.Step(step, StepState.Error, L.T("winget não encontrado"));
+            r.Error(L.T("O winget não foi encontrado. Abra a Microsoft Store, atualize o \"Instalador de Aplicativo\" e tente de novo."));
+            r.Modules.Add(new ModuleResult(L.T("Programas"), L.T("winget não encontrado"), StepState.Error));
             return;
         }
 
@@ -221,27 +221,27 @@ public static class ProgramsModule
             r.Checkpoint(token);
             var (id, name, source) = packages[i];
             r.CurrentFile = name;
-            r.Step(step, StepState.Running, $"Instalando {i + 1} de {packages.Count}…");
+            r.Step(step, StepState.Running, L.F("Instalando {0} de {1}…", i + 1, packages.Count));
             var output = new List<string>();
             var code = await Proc.RunAsync(winget,
                 $"install --id \"{id}\" --exact --source {source} --accept-package-agreements --accept-source-agreements --disable-interactivity --silent",
                 output.Add, token, Encoding.UTF8);
-            if (code == 0) { ok++; r.Ok($"Instalado: {name}"); }
-            else if (code is AlreadyInstalled or NoApplicableUpgrade) { already++; r.Info($"Já instalado: {name}"); }
+            if (code == 0) { ok++; r.Ok(L.F("Instalado: {0}", name)); }
+            else if (code is AlreadyInstalled or NoApplicableUpgrade) { already++; r.Info(L.F("Já instalado: {0}", name)); }
             else
             {
                 failed++;
-                r.Warn($"Não instalou {name} ({id}): código 0x{code:X8}. {output.LastOrDefault(l => l.Length > 3)}");
+                r.Warn(L.F("Não instalou {0} ({1}): código 0x{2:X8}. {3}", name, id, code, output.LastOrDefault(l => l.Length > 3)));
             }
             r.Progress(step, (i + 1.0) / packages.Count);
         }
 
         r.ItemsSaved += ok;
-        var status = $"{ok} instalados" + (already > 0 ? $" · {already} já estavam" : "") + (failed > 0 ? $" · {failed} com erro" : "");
+        var status = $"{ok} instalados" + (already > 0 ? L.F(" · {0} já estavam", already) : "") + (failed > 0 ? L.F(" · {0} com erro", failed) : "");
         r.Step(step, failed > 0 ? StepState.Warning : StepState.Done, status);
-        r.Ok($"Programas: {status}");
+        r.Ok(L.F("Programas: {0}", status));
         if (manualList != null)
-            r.Warn($"Alguns programas precisam de instalação manual: veja {manualList}");
-        r.Modules.Add(new ModuleResult("Programas", status, failed > 0 ? StepState.Warning : StepState.Done));
+            r.Warn(L.F("Alguns programas precisam de instalação manual: veja {0}", manualList));
+        r.Modules.Add(new ModuleResult(L.T("Programas"), status, failed > 0 ? StepState.Warning : StepState.Done));
     }
 }

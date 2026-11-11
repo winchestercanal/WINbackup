@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using WINbackup.Services;
 
 namespace WINbackup.Models;
 
@@ -66,7 +67,7 @@ public class StepItem : Observable
     public string Name { get; init; } = "";
     public string Module { get; init; } = "";
 
-    string _status = "Na fila";
+    string _status = L.T("Na fila");
     public string Status { get => _status; set => Set(ref _status, value); }
 
     StepState _state;

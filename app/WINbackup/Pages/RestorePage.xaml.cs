@@ -34,7 +34,7 @@ public sealed partial class RestorePage : Page
         {
             if (on && !await Dialogs.NoRebootAsync(XamlRoot)) row.SetQuietly(false);
             var off = !row.IsOn;
-            NoRebootStatus.Text = off ? "Reinicia após os drivers" : "Sem reinício · por sua conta";
+            NoRebootStatus.Text = off ? L.T("Reinicia após os drivers") : L.T("Sem reinício · por sua conta");
             NoRebootStatus.Foreground = off ? UI.Muted : UI.Brush("#ff8fa1");
         };
         LoadVersions();
@@ -54,7 +54,7 @@ public sealed partial class RestorePage : Page
             .ToList();
         if (versions.Count == 0)
         {
-            VersionsPanel.Children.Add(new TextBlock { Text = "Nenhum backup do WINbackup nesta pasta.", Margin = new Thickness(16, 12, 16, 12),
+            VersionsPanel.Children.Add(new TextBlock { Text = L.T("Nenhum backup do WINbackup nesta pasta."), Margin = new Thickness(16, 12, 16, 12),
                 Foreground = UI.Muted, TextWrapping = TextWrapping.Wrap });
             ShowTree();
             return;
@@ -70,10 +70,10 @@ public sealed partial class RestorePage : Page
             var dot = new Border { Width = 14, Height = 14, CornerRadius = new CornerRadius(7), BorderThickness = new Thickness(1.5), VerticalAlignment = VerticalAlignment.Center };
             g.Children.Add(dot);
             var t = new StackPanel { Spacing = 2 };
-            t.Children.Add(new TextBlock { Text = HomePage.VersionDate(path)?.ToString("dd/MM/yyyy HH:mm") ?? Path.GetFileName(path), FontSize = 13,
+            t.Children.Add(new TextBlock { Text = HomePage.VersionDate(path)?.ToString("g") ?? Path.GetFileName(path), FontSize = 13,
                 FontWeight = FontWeights.SemiBold, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"] });
             var size = m!.Files.Sum(f => f.Size);
-            t.Children.Add(new TextBlock { Text = $"{m.Title} · {m.Kind}{(m.Completed ? "" : " (incompleto)")} · {Sys.Bytes(size)}", FontSize = 12,
+            t.Children.Add(new TextBlock { Text = $"{L.T(m.Title)} · {L.T(m.Kind)}{(m.Completed ? "" : L.T(" (incompleto)"))} · {Sys.Bytes(size)}", FontSize = 12,
                 Foreground = m.Completed ? UI.Muted : UI.Warn, TextTrimming = TextTrimming.CharacterEllipsis });
             Grid.SetColumn(t, 1);
             g.Children.Add(t);
@@ -84,7 +84,7 @@ public sealed partial class RestorePage : Page
                 g.Children.Add(lk);
             }
             var rb = new RadioButton { GroupName = "ver", Content = g, HorizontalAlignment = HorizontalAlignment.Stretch };
-            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(rb, $"Versão {Path.GetFileName(path)}");
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(rb, L.F("Versão {0}", Path.GetFileName(path)));
             rb.Template = (ControlTemplate)Microsoft.UI.Xaml.Markup.XamlReader.Load(
                 "<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='RadioButton'>" +
                 "<Border Background='{TemplateBinding Background}' Padding='16,11' BorderBrush='#16223d' BorderThickness='0,0,0,1'>" +
@@ -127,13 +127,13 @@ public sealed partial class RestorePage : Page
         {
             var keys = top.Select(t => t.F.Key).ToHashSet();
             var files = m.Files.Where(x => keys.Contains(x.Folder)).ToList();
-            var head = Item(GroupTitle(top.Key), "", $"{files.Count:N0} arquivos · {Sys.Bytes(files.Sum(x => x.Size))}", Icons.Folder, 0);
+            var head = Item(GroupTitle(top.Key), "", L.F("{0:N0} arquivos · {1}", files.Count, Sys.Bytes(files.Sum(x => x.Size))), Icons.Folder, 0);
             _nodes.Add(new Node(head, top.Key, null, false));
             foreach (var (f, group) in top)
             {
                 var ff = m.Files.Where(x => x.Folder == f.Key).ToList();
                 var app = group.Contains('\\') ? group[(group.IndexOf('\\') + 1)..] : null;
-                var child = Item(app != null ? $"{app} · {f.Name}" : f.Name, Sys.Pretty(f.Source), $"{ff.Count:N0} · {Sys.Bytes(ff.Sum(x => x.Size))}", Icons.Folder, 1);
+                var child = Item(app != null ? $"{app} · {L.T(f.Name)}" : L.T(f.Name), Sys.Pretty(f.Source), $"{ff.Count:N0} · {Sys.Bytes(ff.Sum(x => x.Size))}", Icons.Folder, 1);
                 _nodes.Add(new Node(child, top.Key, f, false));
             }
         }
@@ -141,19 +141,19 @@ public sealed partial class RestorePage : Page
         if (packaged > 0)
         {
             var manual = m.Programs.Count - packaged;
-            _nodes.Add(new Node(Item("Programas", "Reinstalados pelo winget, um por vez" + (manual > 0 ? $"; {manual} sem pacote ficam na lista manual" : ""),
-                $"{packaged} programas", Icons.Apps, 0), null, null, false, true));
+            _nodes.Add(new Node(Item(L.T("Programas"), L.T("Reinstalados pelo winget, um por vez") + (manual > 0 ? L.F("; {0} sem pacote ficam na lista manual", manual) : ""),
+                L.F("{0} programas", packaged), Icons.Apps, 0), null, null, false, true));
         }
         if (m.WindowsSettings.Count > 0)
         {
             var names = m.WindowsSettings.Select(k => ConfigsModule.WindowsItems.FirstOrDefault(w => w.Key == k)?.Name ?? k);
-            _nodes.Add(new Node(Item("Configurações do Windows", string.Join(", ", names), $"{m.WindowsSettings.Count} itens", Icons.Configs, 0),
+            _nodes.Add(new Node(Item(L.T("Configurações do Windows"), string.Join(", ", names), L.F("{0} itens", m.WindowsSettings.Count), Icons.Configs, 0),
                 null, null, false, false, true));
         }
         if (_version != null && (Directory.Exists(Path.Combine(_version, "Drivers")) || File.Exists(Path.Combine(_version, "Drivers_Backup.zip"))))
         {
             var count = m.Drivers.Count;
-            _nodes.Add(new Node(Item("Drivers", "Instalados com PnPUtil antes dos arquivos", count > 0 ? $"{count} drivers" : "pasta Drivers", Icons.Drivers, 0), null, null, true));
+            _nodes.Add(new Node(Item(L.T("Drivers"), L.T("Instalados com PnPUtil antes dos arquivos"), count > 0 ? L.F("{0} drivers", count) : L.T("pasta Drivers"), Icons.Drivers, 0), null, null, true));
         }
         foreach (var n in _nodes) n.Item.Changed += OnNodeChanged;
     }
@@ -184,8 +184,8 @@ public sealed partial class RestorePage : Page
         _view.Clear();
         foreach (var n in _nodes) _view.Add(n.Item);
         TreeEmpty.Visibility = _nodes.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        TreeEmpty.Text = _manifest == null ? "Escolha a pasta onde estão os backups." : "Esta versão não tem arquivos.";
-        ContentTitle.Text = _version == null ? "Conteúdo do backup" : $"Conteúdo de {Path.GetFileName(_version)}";
+        TreeEmpty.Text = _manifest == null ? L.T("Escolha a pasta onde estão os backups.") : L.T("Esta versão não tem arquivos.");
+        ContentTitle.Text = _version == null ? L.T("Conteúdo do backup") : L.F("Conteúdo de {0}", Path.GetFileName(_version));
         UpdateSummary();
     }
 
@@ -217,7 +217,7 @@ public sealed partial class RestorePage : Page
             _view.Add(item);
         }
         TreeEmpty.Visibility = _view.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        TreeEmpty.Text = "Nenhum arquivo com esse nome nesta versão.";
+        TreeEmpty.Text = L.T("Nenhum arquivo com esse nome nesta versão.");
         UpdateSummary();
     }
 
@@ -235,24 +235,24 @@ public sealed partial class RestorePage : Page
         RebootCard.Visibility = DriversChosen ? Visibility.Visible : Visibility.Collapsed;
         if (_manifest == null)
         {
-            RestoreButton.Content = "Restaurar";
+            RestoreButton.Content = L.T("Restaurar");
             RestoreButton.IsEnabled = false;
             return;
         }
         if (FileMode)
         {
-            RestoreButton.Content = _pickedFiles.Count == 1 ? "Restaurar 1 arquivo" : $"Restaurar {_pickedFiles.Count} arquivos";
+            RestoreButton.Content = _pickedFiles.Count == 1 ? L.T("Restaurar 1 arquivo") : L.F("Restaurar {0} arquivos", _pickedFiles.Count);
             RestoreButton.IsEnabled = true;
             return;
         }
         var keys = ChosenFolders().Select(f => f.Key).ToHashSet();
         var files = _manifest.Files.Where(f => keys.Contains(f.Folder)).ToList();
         var parts = new List<string>();
-        if (keys.Count > 0) parts.Add($"{files.Count:N0} arquivos ({Sys.Bytes(files.Sum(f => f.Size))})");
-        if (ProgramsChosen) parts.Add("programas");
-        if (WindowsChosen) parts.Add("configurações do Windows");
-        if (DriversChosen) parts.Add("drivers");
-        RestoreButton.Content = parts.Count == 0 ? "Nada selecionado" : "Restaurar " + string.Join(" e ", parts);
+        if (keys.Count > 0) parts.Add(L.F("{0:N0} arquivos ({1})", files.Count, Sys.Bytes(files.Sum(f => f.Size))));
+        if (ProgramsChosen) parts.Add(L.T("programas"));
+        if (WindowsChosen) parts.Add(L.T("configurações do Windows"));
+        if (DriversChosen) parts.Add(L.T("drivers"));
+        RestoreButton.Content = parts.Count == 0 ? L.T("Nada selecionado") : L.T("Restaurar ") + string.Join(" e ", parts);
         RestoreButton.IsEnabled = parts.Count > 0;
     }
 
@@ -266,20 +266,20 @@ public sealed partial class RestorePage : Page
         (TargetBox.PlaceholderText, TargetHint.Text) = Target switch
         {
             RestoreTarget.OtherUser => (@"C:\Users\nome", "Pasta do outro usuário. Documentos, Imagens etc. vão para as pastas padrão dele; o resto, para o caminho equivalente dentro dela."),
-            RestoreTarget.Folder => (@"D:\Restaurado", "Tudo vai para dentro desta pasta, organizado como no backup. Bom para conferir antes de substituir algo."),
-            _ => ("", "Cada pasta volta para onde estava. Documentos, Imagens e Área de Trabalho vão para onde essas pastas estão hoje (OneDrive incluído)."),
+            RestoreTarget.Folder => (@"D:\Restaurado", L.T("Tudo vai para dentro desta pasta, organizado como no backup. Bom para conferir antes de substituir algo.")),
+            _ => ("", L.T("Cada pasta volta para onde estava. Documentos, Imagens e Área de Trabalho vão para onde essas pastas estão hoje (OneDrive incluído).")),
         };
     }
 
     void OnBrowseTarget(object sender, RoutedEventArgs e)
     {
-        var f = FileDialog.PickFolder(Target == RestoreTarget.OtherUser ? "Pasta do usuário (C:\\Users\\nome)" : "Restaurar para esta pasta");
+        var f = FileDialog.PickFolder(Target == RestoreTarget.OtherUser ? L.T("Pasta do usuário (C:\\Users\\nome)") : L.T("Restaurar para esta pasta"));
         if (f != null) TargetBox.Text = f;
     }
 
     void OnBrowse(object sender, RoutedEventArgs e)
     {
-        var f = FileDialog.PickFolder("Pasta onde estão os backups");
+        var f = FileDialog.PickFolder(L.T("Pasta onde estão os backups"));
         if (f == null) return;
         // Aceita também uma pasta de versão escolhida por engano
         if (Path.GetFileName(f).StartsWith("WINbackup_", StringComparison.OrdinalIgnoreCase)) f = Path.GetDirectoryName(f)!;
@@ -310,7 +310,7 @@ public sealed partial class RestorePage : Page
         var targetPath = TargetBox.Text.Trim();
         if (target != RestoreTarget.Original && (targetPath.Length < 3 || !Path.IsPathRooted(targetPath)))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", target == RestoreTarget.OtherUser ? "Informe a pasta do outro usuário, como C:\\Users\\nome." : "Escolha a pasta para onde restaurar.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), target == RestoreTarget.OtherUser ? L.T("Informe a pasta do outro usuário, como C:\\Users\\nome.") : L.T("Escolha a pasta para onde restaurar."));
             return;
         }
 
@@ -320,24 +320,24 @@ public sealed partial class RestorePage : Page
 
         var where = target switch
         {
-            RestoreTarget.Folder => $"para {targetPath}",
-            RestoreTarget.OtherUser => $"para o usuário em {targetPath}",
-            _ => "para os locais originais",
+            RestoreTarget.Folder => L.F("para {0}", targetPath),
+            RestoreTarget.OtherUser => L.F("para o usuário em {0}", targetPath),
+            _ => L.T("para os locais originais"),
         };
         var rule = Conflict switch
         {
-            ConflictMode.Overwrite => "Arquivos que já existirem serão SUBSTITUÍDOS pela versão do backup.",
-            ConflictMode.KeepBoth => "Se já existir, a cópia do backup entra com \"(restaurado)\" no nome.",
-            _ => "Arquivos que já existirem serão mantidos (pulados).",
+            ConflictMode.Overwrite => L.T("Arquivos que já existirem serão SUBSTITUÍDOS pela versão do backup."),
+            ConflictMode.KeepBoth => L.T("Se já existir, a cópia do backup entra com \"(restaurado)\" no nome."),
+            _ => L.T("Arquivos que já existirem serão mantidos (pulados)."),
         };
-        var drivers = source.Drivers ? " Os drivers são instalados primeiro" + (NoReboot.IsOn ? ", sem reiniciar no fim." : " e o app pede para reiniciar no fim.") : "";
-        if (!_manifest.Completed) rule += " Atenção: esta versão está incompleta (o backup foi cancelado).";
+        var drivers = source.Drivers ? L.T(" Os drivers são instalados primeiro") + (NoReboot.IsOn ? L.T(", sem reiniciar no fim.") : L.T(" e o app pede para reiniciar no fim.")) : "";
+        if (!_manifest.Completed) rule += L.T(" Atenção: esta versão está incompleta (o backup foi cancelado).");
         if (source.Folders?.Any(k => _manifest.Folders.FirstOrDefault(f => f.Key == k) is { } mf && RestoreModule.GroupOf(_manifest, mf).StartsWith("Navegadores")) == true
             && BrowsersModule.Running(BrowsersModule.Detect()) is { Count: > 0 } open)
-            rule += $" Feche {string.Join(", ", open)} antes: o navegador aberto sobrescreve os favoritos ao fechar.";
-        var ok = await Dialogs.ConfirmAsync(XamlRoot, "Restaurar agora?",
-            $"{RestoreButton.Content} da versão de {HomePage.VersionDate(_version):dd/MM/yyyy HH:mm}, {where}. {rule}{drivers}",
-            "Restaurar", "Cancelar", danger: Conflict == ConflictMode.Overwrite);
+            rule += L.F(" Feche {0} antes: o navegador aberto sobrescreve os favoritos ao fechar.", string.Join(", ", open));
+        var ok = await Dialogs.ConfirmAsync(XamlRoot, L.T("Restaurar agora?"),
+            L.F("{0} da versão de {1:g}, {2}. {3}{4}", RestoreButton.Content, HomePage.VersionDate(_version), where, rule, drivers),
+            L.T("Restaurar"), L.T("Cancelar"), danger: Conflict == ConflictMode.Overwrite);
         if (!ok) return;
 
         App.Shell.Run(new JobSpec

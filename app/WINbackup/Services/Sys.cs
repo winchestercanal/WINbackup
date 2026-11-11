@@ -28,7 +28,7 @@ public static partial class Sys
     {
         get
         {
-            foreach (var v in new[] { "OneDrive", "OneDriveConsumer", "OneDriveCommercial" })
+            foreach (var v in new[] { L.T("OneDrive"), L.T("OneDriveConsumer"), L.T("OneDriveCommercial") })
             {
                 var p = Environment.GetEnvironmentVariable(v);
                 if (!string.IsNullOrEmpty(p) && Directory.Exists(p)) return p.TrimEnd('\\');

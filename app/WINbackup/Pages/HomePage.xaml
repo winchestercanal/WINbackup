@@ -1,28 +1,29 @@
 <Page
     x:Class="WINbackup.Pages.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch" MaxWidth="900" Spacing="36" Padding="36">
             <StackPanel Spacing="8" HorizontalAlignment="Center">
-                <TextBlock Text="Seus dados, a salvo." FontSize="32" FontWeight="Bold" CharacterSpacing="-12" HorizontalAlignment="Center"/>
-                <TextBlock Text="Faça backup antes de formatar. Restaure tudo depois." FontSize="15" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{s:T K='Seus dados, a salvo.'}" FontSize="32" FontWeight="Bold" CharacterSpacing="-12" HorizontalAlignment="Center"/>
+                <TextBlock Text="{s:T K='Faça backup antes de formatar. Restaure tudo depois.'}" FontSize="15" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
             </StackPanel>
 
             <Grid ColumnSpacing="28">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <Button Style="{StaticResource HeroButton}" Tag="M12 4v11M7 10l5 5 5-5M5 20h14" Click="OnBackup"
-                        AutomationProperties.Name="Iniciar backup">
+                        AutomationProperties.Name="{s:T K='Iniciar backup'}">
                     <StackPanel Spacing="16">
-                        <TextBlock Text="Iniciar backup" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{s:T K='Iniciar backup'}" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <TextBlock x:Name="BackupSub" FontSize="13" Foreground="{StaticResource TextMuted2}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="1" Style="{StaticResource HeroButton}" Tag="M12 15V4M7 9l5-5 5 5M5 20h14" Click="OnRestore"
-                        AutomationProperties.Name="Restaurar backup">
+                        AutomationProperties.Name="{s:T K='Restaurar backup'}">
                     <StackPanel Spacing="16">
-                        <TextBlock Text="Restaurar backup" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{s:T K='Restaurar backup'}" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <TextBlock x:Name="RestoreSub" FontSize="13" Foreground="{StaticResource TextMuted2}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
                     </StackPanel>
                 </Button>
@@ -30,8 +31,8 @@
 
             <StackPanel Spacing="10">
                 <Grid>
-                    <TextBlock Text="PRESETS" Style="{StaticResource Overline}" VerticalAlignment="Center"/>
-                    <Button Style="{StaticResource LinkButton}" Content="Gerenciar presets" FontSize="12.5" HorizontalAlignment="Right" Click="OnManagePresets"/>
+                    <TextBlock Text="{s:T K='PRESETS'}" Style="{StaticResource Overline}" VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource LinkButton}" Content="{s:T K='Gerenciar presets'}" FontSize="12.5" HorizontalAlignment="Right" Click="OnManagePresets"/>
                 </Grid>
                 <Grid x:Name="PresetGrid" ColumnSpacing="10">
                     <Grid.ColumnDefinitions>

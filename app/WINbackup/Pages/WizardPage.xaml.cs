@@ -17,12 +17,12 @@ public sealed partial class WizardPage : Page
 
     static readonly Step[] Steps =
     [
-        new("drv", "Drivers", "Instala os .inf de terceiros (Wi-Fi primeiro, para ter internet)"),
-        new("apps", "Programas", "Reinstala pelo winget + lista dos que precisam de instalação manual"),
-        new("win", "Configurações do Windows", "Wi-Fi, tema, fontes, impressoras, variáveis, hosts"),
-        new("cfg", "Configurações de apps", "Terminal, VS Code, Git… e os presets e plugins de Criadores"),
-        new("files", "Arquivos pessoais e saves", "Volta para as pastas originais, incluindo o OneDrive"),
-        new("nav", "Navegadores", "Favoritos, configurações e perfis"),
+        new("drv", L.T("Drivers"), L.T("Instala os .inf de terceiros (Wi-Fi primeiro, para ter internet)")),
+        new("apps", L.T("Programas"), L.T("Reinstala pelo winget + lista dos que precisam de instalação manual")),
+        new("win", L.T("Configurações do Windows"), L.T("Wi-Fi, tema, fontes, impressoras, variáveis, hosts")),
+        new("cfg", L.T("Configurações de apps"), L.T("Terminal, VS Code, Git… e os presets e plugins de Criadores")),
+        new("files", L.T("Arquivos pessoais e saves"), L.T("Volta para as pastas originais, incluindo o OneDrive")),
+        new("nav", L.T("Navegadores"), L.T("Favoritos, configurações e perfis")),
     ];
 
     readonly RestorePlan _plan = RestorePlan.Latest(Settings.Data.Destination);
@@ -34,8 +34,8 @@ public sealed partial class WizardPage : Page
         Responsive.StackWhenNarrow(MainGrid, 960);
         _on = Steps.ToDictionary(s => s.Key, s => Part(s.Key) != null);
 
-        var dest = string.IsNullOrEmpty(Settings.Data.Destination) ? "[destino]" : Settings.Data.Destination;
-        FoundText.Inlines.Add(new Run { Text = _plan.Empty ? "Nenhum backup encontrado em " : "Backups encontrados em " });
+        var dest = string.IsNullOrEmpty(Settings.Data.Destination) ? L.T("[destino]") : Settings.Data.Destination;
+        FoundText.Inlines.Add(new Run { Text = _plan.Empty ? L.T("Nenhum backup encontrado em ") : L.T("Backups encontrados em ") });
         FoundText.Inlines.Add(new Run { Text = dest, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontWeight = FontWeights.SemiBold });
 
         NotifyEnd.IsOn = true;
@@ -58,7 +58,7 @@ public sealed partial class WizardPage : Page
         _ => null,
     };
 
-    static string When(string path) => HomePage.VersionDate(path)?.ToString("dd/MM HH:mm") ?? "";
+    static string When(string path) => HomePage.VersionDate(path)?.ToString("g") ?? "";
 
     static long Bytes(RestorePlan.Part p)
     {
@@ -68,16 +68,16 @@ public sealed partial class WizardPage : Page
 
     (string, Microsoft.UI.Xaml.Media.Brush) Note(string key)
     {
-        if (Part(key) is not { } p) return ("Sem backup", UI.Label);
+        if (Part(key) is not { } p) return (L.T("Sem backup"), UI.Label);
         return key switch
         {
-            "drv" => ($"{p.M.Drivers.Count} drivers · {When(p.Path)}\n" + (NoReboot.IsOn ? "sem reinício (por sua conta)" : "pede para reiniciar no fim"),
+            "drv" => (L.F("{0} drivers · {1}\n", p.M.Drivers.Count, When(p.Path)) + (NoReboot.IsOn ? L.T("sem reinício (por sua conta)") : L.T("pede para reiniciar no fim")),
                       NoReboot.IsOn ? UI.Brush("#ff8fa1") : UI.Warn),
-            "apps" => ($"{p.M.Programs.Count(x => x.Source is "winget" or "msstore")} programas · {When(p.Path)}\npela internet, via winget", UI.Muted),
-            "win" => ($"{p.M.WindowsSettings.Count} itens · {When(p.Path)}", UI.Muted),
-            "cfg" => ($"{Sys.Bytes(Bytes(p))} · {When(p.Path)}\nsubstitui as configs padrão", UI.Muted),
-            "files" => ($"{Sys.Bytes(Bytes(p))} · {When(p.Path)}\npula o que já existir", UI.Muted),
-            "nav" => ($"{p.Folders.Count(f => f.Name != "Lista de perfis" && f.Name != "Senhas exportadas")} perfis · {When(p.Path)}\nfeche os navegadores antes", UI.Warn),
+            "apps" => (L.F("{0} programas · {1}\npela internet, via winget", p.M.Programs.Count(x => x.Source is "winget" or "msstore"), When(p.Path)), UI.Muted),
+            "win" => (L.F("{0} itens · {1}", p.M.WindowsSettings.Count, When(p.Path)), UI.Muted),
+            "cfg" => (L.F("{0} · {1}\nsubstitui as configs padrão", Sys.Bytes(Bytes(p)), When(p.Path)), UI.Muted),
+            "files" => (L.F("{0} · {1}\npula o que já existir", Sys.Bytes(Bytes(p)), When(p.Path)), UI.Muted),
+            "nav" => (L.F("{0} perfis · {1}\nfeche os navegadores antes", p.Folders.Count(f => f.Name != "Lista de perfis" && f.Name != "Senhas exportadas"), When(p.Path)), UI.Warn),
             _ => ("", UI.Muted),
         };
     }
@@ -115,13 +115,13 @@ public sealed partial class WizardPage : Page
             Grid.SetColumn(n, 2);
             g.Children.Add(n);
             var sw = new ToggleButton { Style = (Style)Application.Current.Resources["Switch"], IsChecked = on, IsEnabled = available };
-            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, "Incluir etapa " + s.Name);
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, L.T("Incluir etapa ") + s.Name);
             sw.Click += (_, _) => { _on[s.Key] = sw.IsChecked == true; Build(); };
             Grid.SetColumn(sw, 3);
             g.Children.Add(sw);
             StepsPanel.Children.Add(g);
         }
-        StepsNote.Text = $"{active} de {Steps.Length} etapas · {(NoReboot.IsOn || !_on["drv"] ? "sem reinício" : "reinicia 1 vez no fim")}";
+        StepsNote.Text = L.F("{0} de {1} etapas · {2}", active, Steps.Length, (NoReboot.IsOn || !_on["drv"] ? L.T("sem reinício") : L.T("reinicia 1 vez no fim")));
         EstimateText.Text = Estimate();
     }
 
@@ -135,9 +135,9 @@ public sealed partial class WizardPage : Page
         foreach (var key in new[] { "cfg", "files", "nav" })
             if (_on[key] && Part(key) is { } p) seconds += Bytes(p) / (80.0 * 1024 * 1024) + p.Folders.Count * 0.5;
         if (seconds == 0) return "—";
-        if (seconds < 60) return "menos de 1 min";
+        if (seconds < 60) return L.T("menos de 1 min");
         var ts = TimeSpan.FromSeconds(seconds);
-        return ts.TotalHours >= 1 ? $"~{(int)ts.TotalHours} h {ts.Minutes:00} min" : $"~{Math.Ceiling(ts.TotalMinutes)} min";
+        return ts.TotalHours >= 1 ? L.F("~{0} h {1:00} min", (int)ts.TotalHours, ts.Minutes) : L.F("~{0} min", Math.Ceiling(ts.TotalMinutes));
     }
 
     void OnChange(object sender, RoutedEventArgs e) => App.Shell.Navigate("restore");
@@ -148,22 +148,22 @@ public sealed partial class WizardPage : Page
         var sources = _plan.Sources(_on["drv"], _on["apps"], _on["win"], _on["cfg"], _on["files"], _on["nav"]);
         if (sources.Count == 0)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Nada para restaurar", "Nenhuma etapa disponível está ligada. Confira o destino dos backups no menu lateral.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Nada para restaurar"), L.T("Nenhuma etapa disponível está ligada. Confira o destino dos backups no menu lateral."));
             return;
         }
         if (!Silent.IsOn)
         {
             var parts = new List<string>();
             if (_on["drv"] && _plan.Drivers != null) parts.Add("drivers");
-            if (_on["apps"] && _plan.Programs != null) parts.Add("programas (pela internet)");
-            if (_on["win"] && _plan.Windows != null) parts.Add("configurações do Windows");
-            if (_on["cfg"] && _plan.Configs != null) parts.Add("configurações de apps (substituindo as padrão)");
-            if (_on["files"] && _plan.Files != null) parts.Add("arquivos e saves (sem sobrescrever)");
-            if (_on["nav"] && _plan.Browsers != null) parts.Add("navegadores (feche-os antes)");
-            var ok = await Dialogs.ConfirmAsync(XamlRoot, "Iniciar a restauração completa?",
-                $"Vai restaurar {string.Join(", ", parts)} para os locais originais." +
-                (sources.Any(x => x.Drivers) && !NoReboot.IsOn ? " No fim, o app pede para reiniciar." : ""),
-                "Iniciar", "Agora não");
+            if (_on["apps"] && _plan.Programs != null) parts.Add(L.T("programas (pela internet)"));
+            if (_on["win"] && _plan.Windows != null) parts.Add(L.T("configurações do Windows"));
+            if (_on["cfg"] && _plan.Configs != null) parts.Add(L.T("configurações de apps (substituindo as padrão)"));
+            if (_on["files"] && _plan.Files != null) parts.Add(L.T("arquivos e saves (sem sobrescrever)"));
+            if (_on["nav"] && _plan.Browsers != null) parts.Add(L.T("navegadores (feche-os antes)"));
+            var ok = await Dialogs.ConfirmAsync(XamlRoot, L.T("Iniciar a restauração completa?"),
+                L.F("Vai restaurar {0} para os locais originais.", string.Join(", ", parts)) +
+                (sources.Any(x => x.Drivers) && !NoReboot.IsOn ? L.T(" No fim, o app pede para reiniciar.") : ""),
+                L.T("Iniciar"), L.T("Agora não"));
             if (!ok) return;
         }
         App.Shell.Run(new JobSpec

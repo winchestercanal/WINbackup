@@ -27,7 +27,7 @@ public sealed partial class AppsPage : Page
     async Task LoadAsync()
     {
         Loading.Visibility = Visibility.Visible;
-        LoadingText.Text = "Perguntando ao winget o que está instalado…";
+        LoadingText.Text = L.T("Perguntando ao winget o que está instalado…");
         ScanButton.IsEnabled = SaveButton.IsEnabled = ExportButton.IsEnabled = false;
         _rows.Clear();
         List<InstalledProgram> programs;
@@ -49,8 +49,8 @@ public sealed partial class AppsPage : Page
             var (label, bg, fg) = p.Source switch
             {
                 "winget" => ("winget", "#0b2a2e", "#7befff"),
-                "msstore" => ("Microsoft Store", "#12203d", "#9fc3ff"),
-                _ => ("Sem pacote", "#2a1f0b", "#ffd89a"),
+                "msstore" => (L.T("Microsoft Store"), "#12203d", "#9fc3ff"),
+                _ => (L.T("Sem pacote"), "#2a1f0b", "#ffd89a"),
             };
             var item = new CheckItem
             {
@@ -93,7 +93,7 @@ public sealed partial class AppsPage : Page
     void Count()
     {
         var n = _all.Count(i => i.Enabled && i.IsChecked);
-        SaveButton.Content = n == 1 ? "Salvar 1 programa" : $"Salvar {n} programas";
+        SaveButton.Content = n == 1 ? L.T("Salvar 1 programa") : L.F("Salvar {0} programas", n);
         SaveButton.IsEnabled = n > 0;
     }
 
@@ -113,7 +113,7 @@ public sealed partial class AppsPage : Page
     {
         if (string.IsNullOrEmpty(Settings.Data.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         App.Shell.Run(new JobSpec { Title = "Programas", Programs = true });
@@ -121,18 +121,18 @@ public sealed partial class AppsPage : Page
 
     async void OnExport(object sender, RoutedEventArgs e)
     {
-        var folder = FileDialog.PickFolder("Salvar Programas.json nesta pasta");
+        var folder = FileDialog.PickFolder(L.T("Salvar Programas.json nesta pasta"));
         if (folder == null) return;
         var target = Path.Combine(folder, "Programas.json");
         ExportButton.IsEnabled = false;
         try
         {
             var n = await ProgramsModule.ExportAsync(target, ChosenIds(), _cts.Token);
-            await Dialogs.InfoAsync(XamlRoot, "Lista exportada", $"{n} programas salvos em {target}. Para instalar em outro PC: Programas → Importar lista e instalar.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Lista exportada"), L.F("{0} programas salvos em {1}. Para instalar em outro PC: Programas → Importar lista e instalar.", n, target));
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Não foi possível exportar", ex.Message);
+            await Dialogs.InfoAsync(XamlRoot, L.T("Não foi possível exportar"), ex.Message);
         }
         finally
         {
@@ -142,7 +142,7 @@ public sealed partial class AppsPage : Page
 
     async void OnImport(object sender, RoutedEventArgs e)
     {
-        var file = FileDialog.PickFile("Lista de programas para instalar", "Lista do winget (*.json)", "*.json");
+        var file = FileDialog.PickFile(L.T("Lista de programas para instalar"), L.T("Lista do winget (*.json)"), "*.json");
         if (file == null) return;
         List<(string Id, string Source)> packages;
         try
@@ -151,17 +151,17 @@ public sealed partial class AppsPage : Page
         }
         catch (Exception ex)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Arquivo inválido", "Esse arquivo não parece uma lista do winget (Programas.json). " + ex.Message);
+            await Dialogs.InfoAsync(XamlRoot, L.T("Arquivo inválido"), L.T("Esse arquivo não parece uma lista do winget (Programas.json). ") + ex.Message);
             return;
         }
         if (packages.Count == 0)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Lista vazia", "Nenhum programa nesse arquivo.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Lista vazia"), L.T("Nenhum programa nesse arquivo."));
             return;
         }
-        var ok = await Dialogs.ConfirmAsync(XamlRoot, $"Instalar {packages.Count} programas?",
-            "Cada programa é baixado e instalado pelo winget, um por vez. Os que já estiverem instalados são pulados. Pode demorar e usar bastante internet.",
-            "Instalar", "Agora não");
+        var ok = await Dialogs.ConfirmAsync(XamlRoot, L.F("Instalar {0} programas?", packages.Count),
+            L.T("Cada programa é baixado e instalado pelo winget, um por vez. Os que já estiverem instalados são pulados. Pode demorar e usar bastante internet."),
+            L.T("Instalar"), L.T("Agora não"));
         if (!ok) return;
         App.Shell.Run(new JobSpec
         {

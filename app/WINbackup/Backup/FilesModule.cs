@@ -2,6 +2,7 @@ using System.Buffers;
 using System.IO.Enumeration;
 using System.Security.Cryptography;
 using WINbackup.Models;
+using WINbackup.Services;
 
 namespace WINbackup.Backup;
 
@@ -26,9 +27,9 @@ public static class FilesModule
         await Task.Yield();
         var spec = r.Spec;
         var versionName = Path.GetFileName(r.VersionPath);
-        r.Activity = spec.FilesLabel;
-        r.Step(step, StepState.Running, "Calculando…");
-        if (vssStep != null) r.Step(vssStep, StepState.Running, "Pronta se precisar");
+        r.Activity = L.T(spec.FilesLabel);
+        r.Step(step, StepState.Running, L.T("Calculando…"));
+        if (vssStep != null) r.Step(vssStep, StepState.Running, L.T("Pronta se precisar"));
 
         // Base para o incremental: a cópia mais recente de cada arquivo entre as versões completas
         // (Arquivos e Criadores podem se alternar no mesmo destino)
@@ -58,7 +59,7 @@ public static class FilesModule
             r.Checkpoint(token);
             if (!Directory.Exists(folder.Path))
             {
-                r.Warn($"Pasta não encontrada, ignorada: {folder.Path}");
+                r.Warn(L.F("Pasta não encontrada, ignorada: {0}", folder.Path));
                 continue;
             }
             var stored = folder.Name;
@@ -97,16 +98,16 @@ public static class FilesModule
                 entry.Stored = Path.Combine(versionName, storedRoot, rel);
                 work.Add(new Work(entry, file.FullName, Path.Combine(r.VersionPath, storedRoot, rel), file.Attributes, file.CreationTimeUtc, groupTitle));
                 total += entry.Size;
-                if (work.Count % 500 == 0) r.Step(step, StepState.Running, $"Calculando… {work.Count + reused:N0} arquivos");
+                if (work.Count % 500 == 0) r.Step(step, StepState.Running, L.F("Calculando… {0:N0} arquivos", work.Count + reused));
             }
         }
         m.BasedOn = m.Files.Select(f => f.Stored.Split(Path.DirectorySeparatorChar)[0]).OrderByDescending(v => v, StringComparer.OrdinalIgnoreCase).FirstOrDefault();
         m.Kind = m.BasedOn != null ? "Incremental" : "Completo";
-        if (m.BasedOn != null) r.Info($"Incremental: {reused:N0} arquivos sem mudança desde {m.BasedOn}");
-        if (denied > 0) r.Warn($"{denied} pastas sem permissão de leitura foram puladas");
-        if (skippedCloud > 0) r.Warn($"{skippedCloud} arquivos só na nuvem (OneDrive) foram pulados");
-        r.Info($"{work.Count + reused:N0} arquivos encontrados · {work.Count:N0} para copiar ({Services.Sys.Bytes(total)})" +
-               (reused > 0 ? $" · {reused:N0} sem mudança" : ""));
+        if (m.BasedOn != null) r.Info(L.F("Incremental: {0:N0} arquivos sem mudança desde {1}", reused, m.BasedOn));
+        if (denied > 0) r.Warn(L.F("{0} pastas sem permissão de leitura foram puladas", denied));
+        if (skippedCloud > 0) r.Warn(L.F("{0} arquivos só na nuvem (OneDrive) foram pulados", skippedCloud));
+        r.Info(L.F("{0:N0} arquivos encontrados · {1:N0} para copiar ({2})", work.Count + reused, work.Count, Services.Sys.Bytes(total)) +
+               (reused > 0 ? L.F(" · {0:N0} sem mudança", reused) : ""));
 
         // 2. Cópia
         long done = 0;
@@ -114,7 +115,7 @@ public static class FilesModule
         var copiedBy = new Dictionary<string, int>();
         var failedBy = new Dictionary<string, int>();
         r.SetPhase(0, total);
-        r.Step(step, StepState.Running, "Copiando…");
+        r.Step(step, StepState.Running, L.T("Copiando…"));
         using (var shadows = spec.UseShadowCopy ? new ShadowCopies(r) : null)
         {
             foreach (var w in work)
@@ -142,7 +143,7 @@ public static class FilesModule
                         fileDone = 0;
                         w.Entry.Sha256 = Copy(shadowPath, w.Target, spec.VerifyHash, Advance, r, token);
                         viaShadow++;
-                        r.Warn($"Arquivo em uso copiado via VSS: {w.Entry.Path}", report: false);
+                        r.Warn(L.F("Arquivo em uso copiado via VSS: {0}", w.Entry.Path), report: false);
                     }
                     Finish(w, spec.KeepAcl);
                     m.Files.Add(w.Entry);
@@ -158,40 +159,40 @@ public static class FilesModule
                     done += w.Entry.Size - fileDone;
                     r.Error(ex switch
                     {
-                        IOException io when IsLocked(io) => $"Arquivo em uso, não foi copiado: {w.Entry.Path}",
-                        UnauthorizedAccessException => $"Sem permissão para ler: {w.Entry.Path}",
-                        FileNotFoundException or DirectoryNotFoundException => $"Arquivo sumiu durante o backup: {w.Entry.Path}",
-                        IOException io when (io.HResult & 0xFFFF) is 112 or 39 => $"Destino sem espaço ao copiar: {w.Entry.Path}",
-                        _ => $"Não foi possível copiar {w.Entry.Path}: {ex.Message}",
+                        IOException io when IsLocked(io) => L.F("Arquivo em uso, não foi copiado: {0}", w.Entry.Path),
+                        UnauthorizedAccessException => L.F("Sem permissão para ler: {0}", w.Entry.Path),
+                        FileNotFoundException or DirectoryNotFoundException => L.F("Arquivo sumiu durante o backup: {0}", w.Entry.Path),
+                        IOException io when (io.HResult & 0xFFFF) is 112 or 39 => L.F("Destino sem espaço ao copiar: {0}", w.Entry.Path),
+                        _ => L.F("Não foi possível copiar {0}: {1}", w.Entry.Path, ex.Message),
                     });
                 }
                 if (copied % 200 == 0) m.Save(r.VersionPath);
             }
             if (vssStep != null)
                 r.Step(vssStep, shadows!.Failed > 0 && shadows.Created == 0 ? StepState.Warning : StepState.Done,
-                    shadows.Failed > 0 && shadows.Created == 0 ? (Services.Sys.IsAdmin ? "Indisponível" : "Indisponível sem administrador")
-                    : shadows.Created == 0 ? "Não foi necessária" : $"Usada em {N(viaShadow, "arquivo", "arquivos")}");
+                    shadows.Failed > 0 && shadows.Created == 0 ? (Services.Sys.IsAdmin ? L.T("Indisponível") : L.T("Indisponível sem administrador"))
+                    : shadows.Created == 0 ? L.T("Não foi necessária") : L.F("Usada em {0}", L.N(viaShadow, "1 arquivo", "{0:N0} arquivos")));
         }
         r.ItemsSaved += copied + reused;
         m.Save(r.VersionPath);
 
-        var summary = N(copied, "copiado", "copiados") + (reused > 0 ? $" · {reused:N0} sem mudança" : "") + (failed > 0 ? $" · {failed} com erro" : "");
+        var summary = L.N(copied, "1 copiado", "{0:N0} copiados") + (reused > 0 ? L.F(" · {0:N0} sem mudança", reused) : "") + (failed > 0 ? L.F(" · {0} com erro", failed) : "");
         r.Step(step, failed > 0 ? StepState.Warning : StepState.Done, summary);
-        r.Ok($"{spec.FilesLabel}: {summary}");
+        r.Ok($"{L.T(spec.FilesLabel)}: {summary}");
         // Uma linha por grupo no relatório (Arquivos pessoais, Criadores, Navegadores)
         foreach (var group in reusedBy.Keys)
         {
             var c = copiedBy.GetValueOrDefault(group) + reusedBy[group];
             var f = failedBy.GetValueOrDefault(group);
-            var detail = N(c, "arquivo", "arquivos") + (f > 0 ? $" · {f} com erro" : "");
+            var detail = L.N(c, "1 arquivo", "{0:N0} arquivos") + (f > 0 ? L.F(" · {0} com erro", f) : "");
             r.Modules.Add(new ModuleResult(group, detail, f > 0 ? StepState.Warning : StepState.Done));
         }
-        if (viaShadow > 0) r.Info($"{viaShadow} arquivos em uso foram copiados via Shadow Copy");
+        if (viaShadow > 0) r.Info(L.F("{0} arquivos em uso foram copiados via Shadow Copy", viaShadow));
 
         // 3. Verificação
         if (verifyStep == null) return;
-        r.Activity = "integridade";
-        r.Step(verifyStep, StepState.Running, "Conferindo SHA-256…");
+        r.Activity = L.T("integridade");
+        r.Step(verifyStep, StepState.Running, L.T("Conferindo SHA-256…"));
         var toCheck = work.Where(w => w.Entry.Sha256 != null).ToList();
         long vTotal = toCheck.Sum(w => w.Entry.Size), vDone = 0;
         int mismatches = 0;
@@ -204,7 +205,7 @@ public static class FilesModule
             {
                 var hash = Hash(w.Target, n => { vDone += n; r.AddBytes(n); r.SetPhase(vDone, vTotal); r.Progress(verifyStep, vTotal == 0 ? 1 : (double)vDone / vTotal); }, r, token);
                 if (hash == w.Entry.Sha256) continue;
-                r.Warn($"Hash divergente: {w.Entry.Path}, copiado de novo");
+                r.Warn(L.F("Hash divergente: {0}, copiado de novo", w.Entry.Path));
                 w.Entry.Sha256 = Copy(w.Source, w.Target, true, _ => { }, r, token);
                 if (Hash(w.Target, _ => { }, r, token) != w.Entry.Sha256) mismatches++;
             }
@@ -212,17 +213,17 @@ public static class FilesModule
             catch (Exception ex)
             {
                 mismatches++;
-                r.Error($"Não foi possível verificar {w.Entry.Path}: {ex.Message}");
+                r.Error(L.F("Não foi possível verificar {0}: {1}", w.Entry.Path, ex.Message));
             }
         }
         m.HashChecked = true;
         m.HashMismatches = mismatches;
         m.Save(r.VersionPath);
         r.IntegrityOk = mismatches == 0;
-        r.Integrity = mismatches == 0 ? "SHA-256 OK" : $"{mismatches} divergentes";
+        r.Integrity = mismatches == 0 ? L.T("SHA-256 OK") : $"{mismatches} divergentes";
         r.Step(verifyStep, mismatches == 0 ? StepState.Done : StepState.Error,
-            mismatches == 0 ? N(toCheck.Count, "arquivo conferido", "arquivos conferidos") : $"{mismatches} arquivos divergentes");
-        if (mismatches == 0) r.Ok("Verificação SHA-256 concluída");
+            mismatches == 0 ? L.N(toCheck.Count, "1 arquivo conferido", "{0:N0} arquivos conferidos") : L.F("{0} arquivos divergentes", mismatches));
+        if (mismatches == 0) r.Ok(L.T("Verificação SHA-256 concluída"));
     }
 
     /// <summary>Quantos arquivos e bytes a pasta tem, já aplicando as exclusões (estimativa da tela).</summary>
@@ -292,8 +293,6 @@ public static class FilesModule
         }
         return false;
     }
-
-    static string N(int n, string one, string many) => n == 1 ? $"1 {one}" : $"{n:N0} {many}";
 
     static bool IsLocked(IOException ex) => (ex.HResult & 0xFFFF) is 32 or 33;
 

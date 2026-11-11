@@ -2,15 +2,16 @@
     x:Class="WINbackup.Pages.DonatePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="20" Padding="36,28,36,36" MaxWidth="980">
             <StackPanel Spacing="6">
-                <TextBlock Text="APOIE O PROJETO" FontSize="12" FontWeight="Bold" CharacterSpacing="100" Foreground="#ff8fb8"/>
-                <TextBlock Text="O WINbackup é gratuito." Style="{StaticResource H1}"/>
+                <TextBlock Text="{s:T K='APOIE O PROJETO'}" FontSize="12" FontWeight="Bold" CharacterSpacing="100" Foreground="{StaticResource PinkText}"/>
+                <TextBlock Text="{s:T K='O WINbackup é gratuito.'}" Style="{StaticResource H1}"/>
                 <TextBlock Style="{StaticResource Sub}" LineHeight="21"
-                           Text="Sem anúncios, sem versão paga e sem coleta de dados. Se ele já salvou seus arquivos antes de uma formatação, considere doar o valor que achar justo. Cada apoio ajuda o Canal WINchester a manter o app atualizado e a criar novos módulos."/>
+                           Text="{s:T K='Sem anúncios, sem versão paga e sem coleta de dados. Se ele já salvou seus arquivos antes de uma formatação, considere doar o valor que achar justo. Cada apoio ajuda o Canal WINchester a manter o app atualizado e a criar novos módulos.'}"/>
             </StackPanel>
 
             <Grid x:Name="MainGrid" ColumnSpacing="16">
@@ -21,35 +22,35 @@
                     <StackPanel Spacing="16">
                         <Grid ColumnSpacing="12">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                            <Border Width="40" Height="40" CornerRadius="10" Background="#0b2a2e">
-                                <TextBlock Text="PIX" FontSize="12" FontWeight="Bold" Foreground="{StaticResource NeonSoft}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource CyanChipBg}">
+                                <TextBlock Text="{s:T K='PIX'}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource NeonSoft}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                <TextBlock Text="Doar com Pix" FontSize="16" FontWeight="SemiBold"/>
-                                <TextBlock Text="Sem taxas: o valor inteiro chega ao canal." Style="{StaticResource Small}"/>
+                                <TextBlock Text="{s:T K='Doar com Pix'}" FontSize="16" FontWeight="SemiBold"/>
+                                <TextBlock Text="{s:T K='Sem taxas: o valor inteiro chega ao canal.'}" Style="{StaticResource Small}"/>
                             </StackPanel>
                         </Grid>
 
                         <StackPanel x:Name="PixPanel" Spacing="16">
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Escolha um valor (opcional)" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
+                                <TextBlock Text="{s:T K='Escolha um valor (opcional)'}" FontSize="12" Foreground="{StaticResource TextMuted2}"/>
                                 <c:WrapPanel x:Name="Amounts" Spacing="8" LineSpacing="8"/>
                             </StackPanel>
                             <Grid ColumnSpacing="18">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                                 <Border Width="188" Height="188" CornerRadius="12" Background="White" Padding="10">
-                                    <Image x:Name="QrImage" Stretch="Uniform" AutomationProperties.Name="QR Code do Pix"/>
+                                    <Image x:Name="QrImage" Stretch="Uniform" AutomationProperties.Name="{s:T K='QR Code do Pix'}"/>
                                 </Border>
                                 <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
                                     <TextBlock x:Name="AmountText" FontSize="22" FontWeight="Bold"/>
                                     <TextBlock Style="{StaticResource Small}" LineHeight="18"
-                                               Text="Abra o app do seu banco, escolha Pix e aponte a câmera para o código. Ou copie o código e use &quot;Pix copia e cola&quot;."/>
-                                    <Button x:Name="CopyCodeButton" Style="{StaticResource PrimaryButton}" Height="40" FontSize="13" Content="Copiar código Pix" HorizontalAlignment="Left" Click="OnCopyCode"/>
+                                               Text="{s:T K='Abra o app do seu banco, escolha Pix e aponte a câmera para o código. Ou copie o código e use &quot;Pix copia e cola&quot;.'}"/>
+                                    <Button x:Name="CopyCodeButton" Style="{StaticResource PrimaryButton}" Height="40" FontSize="13" Content="{s:T K='Copiar código Pix'}" HorizontalAlignment="Left" Click="OnCopyCode"/>
                                     <Button x:Name="CopyKeyButton" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Click="OnCopyKey"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
-                        <TextBlock x:Name="PixSoon" Visibility="Collapsed" Style="{StaticResource Small}" Text="A chave Pix do canal ainda não foi configurada nesta versão."/>
+                        <TextBlock x:Name="PixSoon" Visibility="Collapsed" Style="{StaticResource Small}" Text="{s:T K='A chave Pix do canal ainda não foi configurada nesta versão.'}"/>
                     </StackPanel>
                 </Border>
 
@@ -59,39 +60,39 @@
                         <StackPanel Spacing="14">
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <Border Width="40" Height="40" CornerRadius="10" Background="#2a0d1f">
-                                    <c:Icon Width="20" Height="20" Foreground="#ff8fb8" Data="M6.5 5h11A4 4 0 0 1 21.5 9v6a4 4 0 0 1-4 4h-11a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zM10 9l5 3-5 3z"/>
+                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource PinkBg}">
+                                    <c:Icon Width="20" Height="20" Foreground="{StaticResource PinkText}" Data="M6.5 5h11A4 4 0 0 1 21.5 9v6a4 4 0 0 1-4 4h-11a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zM10 9l5 3-5 3z"/>
                                 </Border>
                                 <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Doar pelo LivePix" FontSize="16" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Pix ou cartão, com mensagem que aparece na live." Style="{StaticResource Small}"/>
+                                    <TextBlock Text="{s:T K='Doar pelo LivePix'}" FontSize="16" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{s:T K='Pix ou cartão, com mensagem que aparece na live.'}" Style="{StaticResource Small}"/>
                                 </StackPanel>
                             </Grid>
                             <Button x:Name="LivePixButton" Style="{StaticResource AccentButton}" HorizontalAlignment="Stretch" Click="OnLivePix">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="Abrir o LivePix"/>
+                                    <TextBlock Text="{s:T K='Abrir o LivePix'}"/>
                                     <c:Icon Width="14" Height="14" StrokeThickness="2" Data="M7 17 17 7M9 7h8v8"/>
                                 </StackPanel>
                             </Button>
-                            <TextBlock x:Name="LivePixSoon" Visibility="Collapsed" Style="{StaticResource Small}" Text="O link do LivePix ainda não foi configurado nesta versão."/>
+                            <TextBlock x:Name="LivePixSoon" Visibility="Collapsed" Style="{StaticResource Small}" Text="{s:T K='O link do LivePix ainda não foi configurado nesta versão.'}"/>
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource Card}" Padding="22">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Outras formas de ajudar" Style="{StaticResource CardTitle}"/>
-                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="• Indique o WINbackup para quem vai formatar o PC"/>
-                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="• Se inscreva e comente nos vídeos do Canal WINchester"/>
-                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="• Conte o que faltou: isso define os próximos módulos"/>
-                            <Button Style="{StaticResource LinkButton}" Content="Abrir o canal no YouTube" HorizontalAlignment="Left" Foreground="{StaticResource YouTube}" Click="OnYouTube"/>
+                            <TextBlock Text="{s:T K='Outras formas de ajudar'}" Style="{StaticResource CardTitle}"/>
+                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="{s:T K='• Indique o WINbackup para quem vai formatar o PC'}"/>
+                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="{s:T K='• Se inscreva e comente nos vídeos do Canal WINchester'}"/>
+                            <TextBlock Style="{StaticResource Small}" LineHeight="18" Text="{s:T K='• Conte o que faltou: isso define os próximos módulos'}"/>
+                            <Button Style="{StaticResource LinkButton}" Content="{s:T K='Abrir o canal no YouTube'}" HorizontalAlignment="Left" Foreground="{StaticResource YouTube}" Click="OnYouTube"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </Grid>
 
             <Border Style="{StaticResource Card}" Padding="18,14">
-                <c:ToggleRow x:Name="ReminderToggle" Title="Lembrar de apoiar de vez em quando"
-                             Description="Um aviso discreto a cada 5 backups concluídos. Desligue se já apoiou ou prefere não ver."/>
+                <c:ToggleRow x:Name="ReminderToggle" Title="{s:T K='Lembrar de apoiar de vez em quando'}"
+                             Description="{s:T K='Um aviso discreto a cada 5 backups concluídos. Desligue se já apoiou ou prefere não ver.'}"/>
             </Border>
         </StackPanel>
     </ScrollViewer>

@@ -19,8 +19,8 @@ public sealed partial class HomePage : Page
             var p = Presets.All[i];
             var index = i;
             var content = new StackPanel { Spacing = 8 };
-            content.Children.Add(new TextBlock { Text = p.Name, FontSize = 13, FontWeight = FontWeights.SemiBold, HorizontalAlignment = HorizontalAlignment.Center });
-            content.Children.Add(new TextBlock { Text = p.Description, FontSize = 11.5, LineHeight = 16, Foreground = UI.Muted,
+            content.Children.Add(new TextBlock { Text = p.Label, FontSize = 13, FontWeight = FontWeights.SemiBold, HorizontalAlignment = HorizontalAlignment.Center });
+            content.Children.Add(new TextBlock { Text = p.Info, FontSize = 11.5, LineHeight = 16, Foreground = UI.Muted,
                 TextAlignment = TextAlignment.Center, TextWrapping = TextWrapping.Wrap });
             var rb = new RadioButton { Style = (Style)Application.Current.Resources["PresetCard"], GroupName = "preset", Tag = p.Icon,
                 Content = content, IsChecked = Settings.Data.Preset == i };
@@ -34,12 +34,12 @@ public sealed partial class HomePage : Page
 
     void Refresh()
     {
-        BackupSub.Text = $"Preset: {Presets.All[Settings.Data.Preset].Name}";
+        BackupSub.Text = L.F("Preset: {0}", Presets.All[Settings.Data.Preset].Label);
         var last = Destinations.Versions().FirstOrDefault();
         var root = Path.GetPathRoot(Settings.Data.Destination) ?? "";
         RestoreSub.Text = last == null
-            ? "Nenhum backup no destino ainda"
-            : $"Último backup: {VersionDate(last):dd/MM/yyyy HH:mm} · {root}";
+            ? L.T("Nenhum backup no destino ainda")
+            : L.F("Último backup: {0:g} · {1}", VersionDate(last), root);
     }
 
     public static DateTime? VersionDate(string versionPath)
@@ -60,34 +60,34 @@ public sealed partial class HomePage : Page
 
         var summary = new StackPanel { Spacing = 10, Padding = new Thickness(16, 14, 16, 14), CornerRadius = new CornerRadius(10),
             Background = UI.Brush("#0a1120"), BorderBrush = UI.Brush("#16223d"), BorderThickness = new Thickness(1) };
-        summary.Children.Add(Row("Preset", preset.Name, mono: false));
-        summary.Children.Add(Row("Destino", string.IsNullOrEmpty(spec.Destination) ? "Não escolhido" : spec.Destination, mono: true));
+        summary.Children.Add(Row(L.T("Preset"), preset.Label, mono: false));
+        summary.Children.Add(Row(L.T("Destino"), string.IsNullOrEmpty(spec.Destination) ? L.T("Não escolhido") : spec.Destination, mono: true));
         var runs = new List<string>();
         var personal = spec.Folders.Count(f => f.Group == "Arquivos");
-        if (personal > 0) runs.Add($"Arquivos pessoais ({personal} pastas)");
-        if (spec.Browsers) runs.Add("Navegadores");
-        if (spec.Programs) runs.Add("Programas");
-        if (spec.Drivers) runs.Add("Drivers");
-        summary.Children.Add(Row("Nesta versão", runs.Count > 0 ? string.Join(", ", runs) : "Nada ainda", mono: false));
+        if (personal > 0) runs.Add(L.F("Arquivos pessoais ({0} pastas)", personal));
+        if (spec.Browsers) runs.Add(L.T("Navegadores"));
+        if (spec.Programs) runs.Add(L.T("Programas"));
+        if (spec.Drivers) runs.Add(L.T("Drivers"));
+        summary.Children.Add(Row(L.T("Nesta versão"), runs.Count > 0 ? string.Join(", ", runs) : L.T("Nada ainda"), mono: false));
 
         var body = new StackPanel { Spacing = 18 };
         body.Children.Add(summary);
         if (spec.Unavailable.Count > 0)
-            body.Children.Add(Dialogs.Para($"Em breve: {string.Join(", ", spec.Unavailable)}. Essas etapas aparecem no progresso, mas ainda não salvam nada.", muted: true));
-        body.Children.Add(Dialogs.Para("Você pode continuar usando o PC enquanto o backup roda.", muted: true));
+            body.Children.Add(Dialogs.Para(L.F("Em breve: {0}. Essas etapas aparecem no progresso, mas ainda não salvam nada.", string.Join(", ", spec.Unavailable)), muted: true));
+        body.Children.Add(Dialogs.Para(L.T("Você pode continuar usando o PC enquanto o backup roda."), muted: true));
 
         if (string.IsNullOrEmpty(spec.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         if (!spec.HasWork)
         {
-            await Dialogs.InfoAsync(XamlRoot, $"{preset.Name}: em breve",
-                $"Este preset usa módulos que ainda não executam nesta versão ({string.Join(", ", spec.Unavailable)}). Escolha Backup completo ou Só documentos.");
+            await Dialogs.InfoAsync(XamlRoot, L.F("{0}: em breve", preset.Label),
+                L.F("Este preset usa módulos que ainda não executam nesta versão ({0}). Escolha Backup completo ou Só documentos.", string.Join(", ", spec.Unavailable)));
             return;
         }
-        if (await Dialogs.ConfirmAsync(XamlRoot, "Iniciar o backup agora?", body, "Sim, iniciar backup", "Agora não"))
+        if (await Dialogs.ConfirmAsync(XamlRoot, L.T("Iniciar o backup agora?"), body, L.T("Sim, iniciar backup"), L.T("Agora não")))
             App.Shell.Run(spec);
     }
 

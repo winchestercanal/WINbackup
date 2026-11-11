@@ -1,8 +1,7 @@
 <Application
     x:Class="WINbackup.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    RequestedTheme="Dark">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,6 +12,36 @@
             <!-- Ajustes leves nos controles nativos para seguirem a paleta -->
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="TextControlBackground" Color="#080d19"/>
+                    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#0b1222"/>
+                    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#080d19"/>
+                    <SolidColorBrush x:Key="TextControlBorderBrush" Color="#2a3b63"/>
+                    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#35508a"/>
+                    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#19e3ff"/>
+                    <SolidColorBrush x:Key="TextControlForeground" Color="#e8f0ff"/>
+                    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#e8f0ff"/>
+                    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#5f7398"/>
+                    <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#5f7398"/>
+                    <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+
+                    <SolidColorBrush x:Key="ContentDialogBackground" Color="#0e1526"/>
+                    <SolidColorBrush x:Key="ContentDialogTopOverlay" Color="#0e1526"/>
+                    <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#22407a"/>
+                    <SolidColorBrush x:Key="ContentDialogForeground" Color="#e8f0ff"/>
+                    <SolidColorBrush x:Key="ContentDialogSmokeFill" Color="#B802040A"/>
+
+                    <SolidColorBrush x:Key="FlyoutPresenterBackground" Color="#0e1526"/>
+                    <SolidColorBrush x:Key="FlyoutBorderThemeBrush" Color="#2f4a80"/>
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#0e1526"/>
+                    <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#2f4a80"/>
+
+                    <SolidColorBrush x:Key="ProgressRingForegroundThemeBrush" Color="#19e3ff"/>
+                    <Color x:Key="SystemAccentColor">#2f7bff</Color>
+                    <Color x:Key="SystemAccentColorLight1">#19e3ff</Color>
+                    <Color x:Key="SystemAccentColorLight2">#19e3ff</Color>
+                    <Color x:Key="SystemAccentColorDark1">#2f7bff</Color>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="TextControlBackground" Color="#080d19"/>
                     <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#0b1222"/>
                     <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#080d19"/>

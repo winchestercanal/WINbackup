@@ -20,10 +20,10 @@ public sealed partial class SaveTargetBar : UserControl
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
         var icon = new Icon { Data = Icons.DriveSmall, Width = 16, Height = 16, Foreground = UI.Neon, VerticalAlignment = VerticalAlignment.Center };
-        var label = new TextBlock { Text = "Salvando em", FontSize = 12, Foreground = UI.Muted2, VerticalAlignment = VerticalAlignment.Center };
+        var label = new TextBlock { Text = L.T("Salvando em"), FontSize = 12, Foreground = UI.Muted2, VerticalAlignment = VerticalAlignment.Center };
         _path = new TextBlock { FontSize = 12.5, FontFamily = (FontFamily)Application.Current.Resources["Mono"],
             TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center };
-        var hint = new TextBlock { Text = "Altere em Destino dos backups", FontSize = 11.5, Foreground = UI.Muted, VerticalAlignment = VerticalAlignment.Center };
+        var hint = new TextBlock { Text = L.T("Altere em Destino dos backups"), FontSize = 11.5, Foreground = UI.Muted, VerticalAlignment = VerticalAlignment.Center };
         Grid.SetColumn(label, 1);
         Grid.SetColumn(_path, 2);
         Grid.SetColumn(hint, 3);
@@ -48,6 +48,6 @@ public sealed partial class SaveTargetBar : UserControl
     void Refresh()
     {
         var dest = Settings.Data.Destination;
-        _path.Text = string.IsNullOrEmpty(dest) ? "Escolha o destino no menu lateral" : Path.Combine(dest, "WINbackup_[DATA]", Suffix);
+        _path.Text = string.IsNullOrEmpty(dest) ? L.T("Escolha o destino no menu lateral") : Path.Combine(dest, "WINbackup_[DATA]", Suffix);
     }
 }

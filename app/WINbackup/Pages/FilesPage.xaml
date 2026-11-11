@@ -2,6 +2,7 @@
     x:Class="WINbackup.Pages.FilesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls"
     xmlns:m="using:WINbackup.Models">
 
@@ -11,16 +12,16 @@
             <Grid ColumnSpacing="20">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="320"/></Grid.ColumnDefinitions>
                 <StackPanel Spacing="4" VerticalAlignment="Bottom">
-                    <TextBlock Text="Arquivos pessoais" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Suas pastas do usuário e as pastas que você escolher." Style="{StaticResource Sub}"/>
+                    <TextBlock Text="{s:T K='Arquivos pessoais'}" Style="{StaticResource H1}"/>
+                    <TextBlock Text="{s:T K='Suas pastas do usuário e as pastas que você escolher.'}" Style="{StaticResource Sub}"/>
                 </StackPanel>
                 <Border Grid.Column="1" Style="{StaticResource Card}" Padding="14,12" CornerRadius="10">
                     <StackPanel Spacing="8">
                         <Grid>
-                            <TextBlock Text="Estimativa do backup" FontSize="12" Foreground="{StaticResource TextMuted}"/>
-                            <TextBlock x:Name="EstText" Text="Calculando…" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                            <TextBlock Text="{s:T K='Estimativa do backup'}" FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock x:Name="EstText" Text="{s:T K='Calculando…'}" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                         </Grid>
-                        <Grid Height="8" CornerRadius="4" Background="#1a2847">
+                        <Grid Height="8" CornerRadius="4" Background="{StaticResource SidebarDivider}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="EstCol" Width="0*"/>
                                 <ColumnDefinition x:Name="RestCol" Width="1*"/>
@@ -40,12 +41,12 @@
                     <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                         <TextBlock x:Name="CloudTitle" FontWeight="SemiBold" TextWrapping="Wrap"/>
                         <TextBlock FontSize="12" Foreground="{StaticResource TextMuted2}" TextWrapping="Wrap">
-                            <Run Text="Vamos copiar das pastas reais em "/><Run Text="%OneDrive%\…" FontFamily="{StaticResource Mono}"/><Run Text=" em vez das pastas padrão, que estão vazias."/>
+                            <Run Text="{s:T K='Vamos copiar das pastas reais em '}"/><Run Text="{s:T K='%OneDrive%\…'}" FontFamily="{StaticResource Mono}"/><Run Text="{s:T K=' em vez das pastas padrão, que estão vazias.'}"/>
                         </TextBlock>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                        <TextBlock FontSize="12" Foreground="{StaticResource TextMuted2}" TextAlignment="Right" VerticalAlignment="Center">Baixar arquivos<LineBreak/>só na nuvem</TextBlock>
-                        <ToggleButton x:Name="CloudSwitch" Style="{StaticResource Switch}" AutomationProperties.Name="Baixar arquivos só na nuvem"/>
+                        <TextBlock FontSize="12" Foreground="{StaticResource TextMuted2}" TextAlignment="Right" VerticalAlignment="Center" Text="{s:T K='Baixar arquivos&#x0a;só na nuvem'}"/>
+                        <ToggleButton x:Name="CloudSwitch" Style="{StaticResource Switch}" AutomationProperties.Name="{s:T K='Baixar arquivos só na nuvem'}"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -53,8 +54,8 @@
             <Grid>
                 <Border Style="{StaticResource SegHost}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <RadioButton x:Name="ModeC" Style="{StaticResource Seg}" GroupName="mode" Content="Completo"/>
-                        <RadioButton x:Name="ModeS" Style="{StaticResource Seg}" GroupName="mode" Content="Seletivo"/>
+                        <RadioButton x:Name="ModeC" Style="{StaticResource Seg}" GroupName="mode" Content="{s:T K='Completo'}"/>
+                        <RadioButton x:Name="ModeS" Style="{StaticResource Seg}" GroupName="mode" Content="{s:T K='Seletivo'}"/>
                     </StackPanel>
                 </Border>
                 <TextBlock x:Name="SelCount" FontSize="12" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
@@ -87,7 +88,7 @@
                                 <Grid>
                                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M12 5v14M5 12h14"/>
-                                        <TextBlock Text="Adicionar pasta" FontSize="13" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{s:T K='Adicionar pasta'}" FontSize="13" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Grid>
                             </Button>
@@ -103,24 +104,24 @@
                 <Border Style="{StaticResource Card}">
                     <StackPanel Spacing="12">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="Exclusões" Style="{StaticResource CardTitle}"/>
-                            <TextBlock Text="Pastas e padrões que nunca entram no backup" Style="{StaticResource Small}"/>
+                            <TextBlock Text="{s:T K='Exclusões'}" Style="{StaticResource CardTitle}"/>
+                            <TextBlock Text="{s:T K='Pastas e padrões que nunca entram no backup'}" Style="{StaticResource Small}"/>
                         </StackPanel>
                         <c:WrapPanel x:Name="ExclChips"/>
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBox x:Name="ExclInput" Style="{StaticResource MonoInput}" PlaceholderText="Ex.: *.iso ou C:\Users\…\AppData"
-                                     AutomationProperties.Name="Nova exclusão" KeyDown="OnExclKey"/>
-                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="Adicionar" Click="OnAddExcl"/>
+                            <TextBox x:Name="ExclInput" Style="{StaticResource MonoInput}" PlaceholderText="{s:T K='Ex.: *.iso ou C:\\Users\\…\\AppData'}"
+                                     AutomationProperties.Name="{s:T K='Nova exclusão'}" KeyDown="OnExclKey"/>
+                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="{s:T K='Adicionar'}" Click="OnAddExcl"/>
                         </Grid>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource Card}">
                     <StackPanel Spacing="14">
-                        <TextBlock Text="Opções de cópia" Style="{StaticResource CardTitle}"/>
-                        <c:ToggleRow x:Name="OptVss" Title="Copiar arquivos em uso (Shadow Copy)" Description="Usa o VSS do Windows para não pular arquivos travados"/>
-                        <c:ToggleRow x:Name="OptIncr" Title="Incremental: copiar só o que mudou" Description="Mantém versões anteriores no destino"/>
-                        <c:ToggleRow x:Name="OptAcl" Title="Preservar permissões e datas" Description="Copia as permissões (ACLs) além das datas e atributos"/>
+                        <TextBlock Text="{s:T K='Opções de cópia'}" Style="{StaticResource CardTitle}"/>
+                        <c:ToggleRow x:Name="OptVss" Title="{s:T K='Copiar arquivos em uso (Shadow Copy)'}" Description="{s:T K='Usa o VSS do Windows para não pular arquivos travados'}"/>
+                        <c:ToggleRow x:Name="OptIncr" Title="{s:T K='Incremental: copiar só o que mudou'}" Description="{s:T K='Mantém versões anteriores no destino'}"/>
+                        <c:ToggleRow x:Name="OptAcl" Title="{s:T K='Preservar permissões e datas'}" Description="{s:T K='Copia as permissões (ACLs) além das datas e atributos'}"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -128,8 +129,8 @@
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <c:SaveTargetBar Suffix="Arquivos"/>
-                <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="Cancelar" Click="OnCancel"/>
-                <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="Iniciar backup" Click="OnStart"/>
+                <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="{s:T K='Cancelar'}" Click="OnCancel"/>
+                <Button Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="{s:T K='Iniciar backup'}" Click="OnStart"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

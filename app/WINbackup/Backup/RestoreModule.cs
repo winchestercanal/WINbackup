@@ -105,8 +105,8 @@ public static class RestoreModule
         if (filesStep == null) return;
 
         // 1. Plano
-        r.Activity = "arquivos";
-        r.Step(filesStep, StepState.Running, "Preparando…");
+        r.Activity = L.T("arquivos");
+        r.Step(filesStep, StepState.Running, L.T("Preparando…"));
         var destRoot = Path.GetDirectoryName(spec.RestoreSources[0].VersionPath)!;
         var work = new List<Work>();
         var emptyDirs = new List<string>();
@@ -125,12 +125,12 @@ public static class RestoreModule
             }
         }
         long total = work.Sum(w => w.Entry.Size), done = 0;
-        r.Info($"{work.Count:N0} arquivos para restaurar ({Sys.Bytes(total)})");
+        r.Info(L.F("{0:N0} arquivos para restaurar ({1})", work.Count, Sys.Bytes(total)));
 
         // 2. Cópia
         int restored = 0, skipped = 0, same = 0, failed = 0, mismatch = 0;
         r.SetPhase(0, total);
-        r.Step(filesStep, StepState.Running, "Restaurando…");
+        r.Step(filesStep, StepState.Running, L.T("Restaurando…"));
         foreach (var w in work)
         {
             r.Checkpoint(token);
@@ -166,7 +166,7 @@ public static class RestoreModule
                 if (w.Entry.Sha256 != null && hash != w.Entry.Sha256)
                 {
                     mismatch++;
-                    r.Error($"Conteúdo diferente do backup (SHA-256): {w.Entry.Path}");
+                    r.Error(L.F("Conteúdo diferente do backup (SHA-256): {0}", w.Entry.Path));
                 }
                 restored++;
             }
@@ -177,10 +177,10 @@ public static class RestoreModule
                 Advance(w.Entry.Size - fileDone);
                 r.Error(ex switch
                 {
-                    FileNotFoundException => $"Faltando no backup: {w.Entry.Path}",
-                    UnauthorizedAccessException => $"Sem permissão para gravar: {w.Target}",
-                    IOException io when (io.HResult & 0xFFFF) is 32 or 33 => $"Arquivo em uso no destino (feche o programa): {w.Target}",
-                    _ => $"Não foi possível restaurar {w.Entry.Path}: {ex.Message}",
+                    FileNotFoundException => L.F("Faltando no backup: {0}", w.Entry.Path),
+                    UnauthorizedAccessException => L.F("Sem permissão para gravar: {0}", w.Target),
+                    IOException io when (io.HResult & 0xFFFF) is 32 or 33 => L.F("Arquivo em uso no destino (feche o programa): {0}", w.Target),
+                    _ => L.F("Não foi possível restaurar {0}: {1}", w.Entry.Path, ex.Message),
                 });
             }
         }
@@ -190,13 +190,13 @@ public static class RestoreModule
         r.ItemsSaved += restored;
         r.StoredBytes += done;
         r.IntegrityOk = mismatch == 0;
-        r.Integrity = mismatch == 0 ? "SHA-256 OK" : $"{mismatch} divergentes";
-        var summary = $"{restored:N0} restaurados" + (same > 0 ? $" · {same:N0} já iguais" : "") +
-                      (skipped > 0 ? $" · {skipped:N0} pulados (já existiam)" : "") + (failed > 0 ? $" · {failed} com erro" : "");
+        r.Integrity = mismatch == 0 ? L.T("SHA-256 OK") : $"{mismatch} divergentes";
+        var summary = $"{restored:N0} restaurados" + (same > 0 ? L.F(" · {0:N0} já iguais", same) : "") +
+                      (skipped > 0 ? L.F(" · {0:N0} pulados (já existiam)", skipped) : "") + (failed > 0 ? L.F(" · {0} com erro", failed) : "");
         var state = failed + mismatch > 0 ? StepState.Warning : StepState.Done;
         r.Step(filesStep, state, summary);
-        r.Ok($"Restauração: {summary}");
-        r.Modules.Add(new ModuleResult("Arquivos", summary, state));
+        r.Ok(L.F("Restauração: {0}", summary));
+        r.Modules.Add(new ModuleResult(L.T("Arquivos"), summary, state));
 
         // Saves de jogos: a Steam precisa reconhecer as bibliotecas em outros discos
         foreach (var src in spec.RestoreSources)
@@ -204,7 +204,7 @@ public static class RestoreModule
             var games = src.Manifest.Folders.Any(f => (src.Folders == null || src.Folders.Contains(f.Key)) && GroupOf(src.Manifest, f).StartsWith("Saves de jogos"));
             var extra = src.Manifest.SteamLibraries.Skip(1).ToList();
             if (games && extra.Count > 0)
-                r.Warn($"Bibliotecas da Steam do PC antigo: {string.Join(", ", extra)}. Na Steam: Configurações → Armazenamento → Adicionar unidade.");
+                r.Warn(L.F("Bibliotecas da Steam do PC antigo: {0}. Na Steam: Configurações → Armazenamento → Adicionar unidade.", string.Join(", ", extra)));
         }
 
         void Advance(long n)

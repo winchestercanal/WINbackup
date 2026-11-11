@@ -82,8 +82,18 @@ WINbackup/
   Controls/                     Icon (SVG do protótipo), Sidebar, ToggleRow, SaveTargetBar, Dialogs…
   Pages/                        uma página por tela do protótipo
   Backup/                       JobSpec/presets, BackupRunner (etapas, pausa, log), FilesModule, DriversModule, ShadowCopies, Manifest
-  Services/                     Settings, Destinations, FileDialog (COM, funciona elevado), Notifier (toast via bandeja), Sys
+  Services/                     Settings, Destinations, FileDialog (COM, funciona elevado), Notifier (toast via bandeja), Sys,
+                                Loc (idiomas), Theme (temas)
+  Strings/en.json, es.json      traduções (texto em português → tradução), embutidas no .exe
 ```
+
+## Idiomas e temas
+
+- **Idiomas**: o texto em português é a chave. No C#, `L.T("Iniciar backup")`, `L.F("{0} pastas", n)` e `L.N(n, "1 pasta", "{0} pastas")`; no XAML, `Text="{s:T K='Iniciar backup'}"` (no XAML, `\` precisa ser escrito `\\`). Sem tradução, aparece o português. O idioma padrão segue o do Windows (pt, es; o resto vira inglês) e trocar em Opções reabre o app.
+- **O que fica em português de propósito**: tudo que é gravado no backup ou nas configurações (nomes das pastas do backup, `Title`, `Kind`, `Modules` e grupos do manifesto, nome das tarefas no Agendador). Assim um backup feito em um idioma restaura em outro e a retenção continua agrupando as versões. Esses textos são traduzidos só na hora de mostrar (`L.T(m.Title)`, `Preset.Label`).
+- **Temas**: as cores continuam escritas na paleta WINchester (Styles.xaml e `UI.Brush("#…")`); `Theme.cs` tem, para cada tema, a troca de cada cor. Os pincéis são compartilhados, então trocar entre os temas escuros é ao vivo. Entre claro e escuro o app reabre, porque o tema dos controles nativos (caixas de texto, rolagem) só pode ser escolhido antes de carregar o XAML.
+- **Cor nova**: use uma cor que já existe na paleta ou acrescente a cor nova nas três tabelas de `Theme.cs`.
+
 
 ## Diferenças em relação ao HANDOFF
 

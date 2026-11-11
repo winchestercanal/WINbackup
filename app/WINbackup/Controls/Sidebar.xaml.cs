@@ -18,20 +18,20 @@ public sealed partial class Sidebar : UserControl
 
     static readonly Group[] Groups =
     [
-        new("backup", "Backup", Icons.Download,
+        new("backup", L.T("Backup"), Icons.Download,
         [
-            new("files", "Arquivos pessoais", Icons.Folder), new("creators", "Criadores", Icons.Creator), new("apps", "Programas", Icons.Apps),
-            new("configs", "Configurações", Icons.Configs), new("games", "Saves de jogos", Icons.Games),
-            new("drivers", "Drivers", Icons.Drivers), new("browsers", "Navegadores", Icons.Browsers),
+            new("files", L.T("Arquivos pessoais"), Icons.Folder), new("creators", L.T("Criadores"), Icons.Creator), new("apps", L.T("Programas"), Icons.Apps),
+            new("configs", L.T("Configurações"), Icons.Configs), new("games", L.T("Saves de jogos"), Icons.Games),
+            new("drivers", L.T("Drivers"), Icons.Drivers), new("browsers", L.T("Navegadores"), Icons.Browsers),
         ]),
-        new("restaurar", "Restaurar", Icons.Restore,
+        new("restaurar", L.T("Restaurar"), Icons.Restore,
         [
-            new("restore", "Restaurar backup", Icons.Restore), new("wizard", "Pós-formatação", Icons.Wizard),
+            new("restore", L.T("Restaurar backup"), Icons.Restore), new("wizard", L.T("Pós-formatação"), Icons.Wizard),
         ]),
-        new("auto", "Painel", Icons.Gauge,
+        new("auto", L.T("Painel"), Icons.Gauge,
         [
-            new("activity", "Atividade", Icons.Activity), new("schedule", "Agendamentos", Icons.Clock),
-            new("history", "Histórico e versões", Icons.History),
+            new("activity", L.T("Atividade"), Icons.Activity), new("schedule", L.T("Agendamentos"), Icons.Clock),
+            new("history", L.T("Histórico e versões"), Icons.History),
         ]),
     ];
 
@@ -44,6 +44,7 @@ public sealed partial class Sidebar : UserControl
     {
         InitializeComponent();
         Settings.DestinationChanged += RefreshDestination;
+        Unloaded += (_, _) => Settings.DestinationChanged -= RefreshDestination;
         Loaded += (_, _) => RefreshDestination();
         Build();
     }
@@ -61,7 +62,7 @@ public sealed partial class Sidebar : UserControl
     void Build()
     {
         NavPanel.Children.Clear();
-        NavPanel.Children.Add(NavButton("home", "Início", Icons.Home, top: true));
+        NavPanel.Children.Add(NavButton("home", L.T("Início"), Icons.Home, top: true));
         foreach (var g in Groups)
         {
             var hasActive = g.Items.Any(i => i.Key == _active);
@@ -131,7 +132,7 @@ public sealed partial class Sidebar : UserControl
     }
 
     static void AutomationPropertiesHelper(Button b, string name, bool open) =>
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(b, $"{name} ({(open ? "aberto" : "recolhido")})");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(b, $"{name} ({(open ? L.T("aberto") : L.T("recolhido"))})");
 
     // ---------- Destino ----------
 
@@ -148,16 +149,16 @@ public sealed partial class Sidebar : UserControl
             var used = (double)(s.Total - s.Free) / s.Total;
             UsedCol.Width = new GridLength(used, GridUnitType.Star);
             FreeCol.Width = new GridLength(1 - used, GridUnitType.Star);
-            DestSpace.Text = $"{Sys.Bytes(s.Free)} livres de {Sys.Bytes(s.Total)}";
+            DestSpace.Text = L.F("{0} livres de {1}", Sys.Bytes(s.Free), Sys.Bytes(s.Total));
             DestDot.Fill = UI.Ok;
         }
         else
         {
             UsedCol.Width = new GridLength(0, GridUnitType.Star);
-            DestSpace.Text = string.IsNullOrEmpty(path) ? "Clique para escolher" : "Destino indisponível";
+            DestSpace.Text = string.IsNullOrEmpty(path) ? L.T("Clique para escolher") : L.T("Destino indisponível");
             DestDot.Fill = UI.Warn;
         }
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(DestButton, $"Destino dos backups: {d.Path}. Clique para alterar");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(DestButton, L.F("Destino dos backups: {0}. Clique para alterar", d.Path));
     }
 
     void OnDestOpening(object? sender, object e)
@@ -168,7 +169,7 @@ public sealed partial class Sidebar : UserControl
         if (!string.IsNullOrEmpty(current) && !options.Any(o => string.Equals(o.Path, current, StringComparison.OrdinalIgnoreCase)))
             options.Insert(0, Destinations.Describe(current));
         if (options.Count == 0)
-            DestList.Children.Add(new TextBlock { Text = "Nenhum outro disco encontrado. Conecte um HD externo ou escolha uma pasta.",
+            DestList.Children.Add(new TextBlock { Text = L.T("Nenhum outro disco encontrado. Conecte um HD externo ou escolha uma pasta."),
                 FontSize = 12, Foreground = UI.Muted, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(8, 4, 8, 4) });
 
         foreach (var o in options)
@@ -200,7 +201,7 @@ public sealed partial class Sidebar : UserControl
     void OnBrowse(object sender, RoutedEventArgs e)
     {
         DestFlyout.Hide();
-        var folder = FileDialog.PickFolder("Onde salvar os backups?");
+        var folder = FileDialog.PickFolder(L.T("Onde salvar os backups?"));
         if (folder != null) Settings.SetDestination(folder);
     }
 

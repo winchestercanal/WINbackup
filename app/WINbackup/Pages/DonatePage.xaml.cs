@@ -40,18 +40,18 @@ public sealed partial class DonatePage : Page
             var rb = new RadioButton
             {
                 Style = (Style)Application.Current.Resources["FilterRadio"], Height = 34, Padding = new Thickness(16, 0, 16, 0), GroupName = "amount",
-                Content = value is { } v ? $"R$ {v:0}" : "Valor livre", IsChecked = value == null,
+                Content = value is { } v ? $"R$ {v:0}" : L.T("Valor livre"), IsChecked = value == null,
             };
             rb.Checked += (_, _) => { _amount = value; Render(); };
             Amounts.Children.Add(rb);
         }
-        CopyKeyButton.Content = $"Copiar só a chave: {Donation.PixKey}";
+        CopyKeyButton.Content = L.F("Copiar só a chave: {0}", Donation.PixKey);
         Render();
     }
 
     void Render()
     {
-        AmountText.Text = _amount is { } v ? v.ToString("C0", CultureInfo.GetCultureInfo("pt-BR")) : "Valor livre";
+        AmountText.Text = _amount is { } v ? v.ToString("C0", CultureInfo.GetCultureInfo("pt-BR")) : L.T("Valor livre");
         using var generator = new QRCodeGenerator();
         using var data = generator.CreateQrCode(Donation.PixPayload(_amount), QRCodeGenerator.ECCLevel.M);
         var png = new PngByteQRCode(data).GetGraphic(10);
@@ -78,13 +78,13 @@ public sealed partial class DonatePage : Page
     void OnCopyCode(object sender, RoutedEventArgs e)
     {
         Copy(Donation.PixPayload(_amount));
-        CopyCodeButton.Content = "Copiado! Cole no app do banco";
+        CopyCodeButton.Content = L.T("Copiado! Cole no app do banco");
     }
 
     void OnCopyKey(object sender, RoutedEventArgs e)
     {
         Copy(Donation.PixKey);
-        CopyKeyButton.Content = "Chave copiada";
+        CopyKeyButton.Content = L.T("Chave copiada");
     }
 
     void OnLivePix(object sender, RoutedEventArgs e) => Sys.Open(Donation.LivePixUrl);

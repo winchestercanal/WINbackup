@@ -45,7 +45,7 @@ public sealed partial class DriversPage : Page
         {
             CrashLog.Write(ex);
             Loading.Children.Clear();
-            Loading.Children.Add(new TextBlock { Text = "Não foi possível ler os drivers: " + ex.Message, Foreground = UI.ErrSoft, TextWrapping = TextWrapping.Wrap });
+            Loading.Children.Add(new TextBlock { Text = L.T("Não foi possível ler os drivers: ") + ex.Message, Foreground = UI.ErrSoft, TextWrapping = TextWrapping.Wrap });
             return;
         }
 
@@ -55,11 +55,11 @@ public sealed partial class DriversPage : Page
             {
                 Key = d.Inf + "|" + d.Device,
                 Title = d.Device,
-                Subtitle = d.ThirdParty ? (d.DeviceCount > 1 ? $"{d.Inf} · +{d.DeviceCount - 1} dispositivos" : d.Inf) : "",
+                Subtitle = d.ThirdParty ? (d.DeviceCount > 1 ? L.F("{0} · +{1} dispositivos", d.Inf, d.DeviceCount - 1) : d.Inf) : "",
                 Col1 = string.IsNullOrEmpty(d.Provider) ? "—" : d.Provider,
                 Col2 = DriversModule.FriendlyClass(d.Class),
                 Col3 = d.Version,
-                Meta = !d.ThirdParty ? "Sim, já vem no Windows" : d.LikelyOnWindowsUpdate ? "Sim, encontra sozinho" : "Não garantido: guarde este",
+                Meta = !d.ThirdParty ? L.T("Sim, já vem no Windows") : d.LikelyOnWindowsUpdate ? L.T("Sim, encontra sozinho") : L.T("Não garantido: guarde este"),
                 MetaBrush = d.LikelyOnWindowsUpdate ? UI.Muted : UI.Warn,
                 Enabled = d.ThirdParty,
                 IsChecked = d.ThirdParty,
@@ -86,8 +86,8 @@ public sealed partial class DriversPage : Page
     {
         var n = _all.Count(i => i.Enabled && i.IsChecked);
         var third = _all.Count(i => i.Enabled);
-        SelText.Text = $"{n} de {third} drivers de terceiros selecionados";
-        ExportButton.Content = n == 1 ? "Exportar 1 driver" : $"Exportar {n} drivers";
+        SelText.Text = L.F("{0} de {1} drivers de terceiros selecionados", n, third);
+        ExportButton.Content = n == 1 ? L.T("Exportar 1 driver") : L.F("Exportar {0} drivers", n);
         ExportButton.IsEnabled = n > 0 && Sys.IsAdmin;
         foreach (var pill in new[] { QuickOut, QuickIn, QuickAll })
         {
@@ -117,7 +117,7 @@ public sealed partial class DriversPage : Page
     {
         if (string.IsNullOrEmpty(Settings.Data.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         var chosen = _all.Where(i => i.Enabled && i.IsChecked).Select(i => ((DriverInfo)i.Data!).Inf).Distinct().ToList();
@@ -127,13 +127,13 @@ public sealed partial class DriversPage : Page
 
     void OnPickZip(object sender, RoutedEventArgs e)
     {
-        var f = FileDialog.PickFile("Backup de drivers", "Backup de drivers (*.zip)", "*.zip");
+        var f = FileDialog.PickFile(L.T("Backup de drivers"), L.T("Backup de drivers (*.zip)"), "*.zip");
         if (f != null) SourceBox.Text = f;
     }
 
     void OnPickFolder(object sender, RoutedEventArgs e)
     {
-        var f = FileDialog.PickFolder("Pasta com os drivers (.inf)");
+        var f = FileDialog.PickFolder(L.T("Pasta com os drivers (.inf)"));
         if (f != null) SourceBox.Text = f;
     }
 
@@ -142,17 +142,17 @@ public sealed partial class DriversPage : Page
         var source = SourceBox.Text.Trim().Trim('"');
         if (!(File.Exists(source) && source.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) && !Directory.Exists(source))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Backup não encontrado", "Escolha a pasta Drivers do backup (ou outra pasta com arquivos .inf, ou um .zip).");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Backup não encontrado"), L.T("Escolha a pasta Drivers do backup (ou outra pasta com arquivos .inf, ou um .zip)."));
             return;
         }
         if (!Sys.IsAdmin)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Precisa de administrador", "Feche o WINbackup e abra de novo como administrador para instalar drivers.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Precisa de administrador"), L.T("Feche o WINbackup e abra de novo como administrador para instalar drivers."));
             return;
         }
-        var ok = await Dialogs.ConfirmAsync(XamlRoot, "Instalar os drivers agora?",
-            $"Todos os .inf de {Path.GetFileName(source.TrimEnd('\\'))} serão instalados com o PnPUtil. Pode ser preciso reiniciar no fim.",
-            "Instalar drivers", "Agora não");
+        var ok = await Dialogs.ConfirmAsync(XamlRoot, L.T("Instalar os drivers agora?"),
+            L.F("Todos os .inf de {0} serão instalados com o PnPUtil. Pode ser preciso reiniciar no fim.", Path.GetFileName(source.TrimEnd('\\'))),
+            L.T("Instalar drivers"), L.T("Agora não"));
         if (ok) App.Shell.Run(new JobSpec { Kind = JobKind.RestoreDrivers, Title = "Restaurar drivers", DriverSource = source });
     }
 }

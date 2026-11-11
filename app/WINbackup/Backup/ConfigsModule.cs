@@ -107,7 +107,7 @@ public static partial class ConfigsModule
     /// <summary>Exporta as configurações do Windows para Configuracoes\Windows (as de apps vão pelo motor de cópia).</summary>
     public static async Task BackupWindowsAsync(BackupRunner r, StepItem step, Manifest m, CancellationToken token)
     {
-        r.Activity = "Configurações";
+        r.Activity = L.T("Configurações");
         var dir = Path.Combine(r.VersionPath, "Configuracoes", "Windows");
         Directory.CreateDirectory(dir);
         var keys = r.Spec.WindowsKeys;
@@ -117,7 +117,7 @@ public static partial class ConfigsModule
             r.Checkpoint(token);
             var key = keys[i];
             r.CurrentFile = WindowsItems.First(w => w.Key == key).Name;
-            r.Step(step, StepState.Running, $"Exportando {r.CurrentFile}…");
+            r.Step(step, StepState.Running, L.F("Exportando {0}…", r.CurrentFile));
             try
             {
                 switch (key)
@@ -131,10 +131,10 @@ public static partial class ConfigsModule
                             // Sem administrador o netsh recusa exportar com senha: salva as redes sem a senha
                             await Proc.RunAsync(Proc.SystemExe("netsh.exe"), $"wlan export profile folder=\"{wifi}\"", null, token);
                             count = Directory.GetFiles(wifi, "*.xml").Length;
-                            if (count > 0) r.Warn("Sem administrador, as redes Wi-Fi foram salvas sem as senhas.");
+                            if (count > 0) r.Warn(L.T("Sem administrador, as redes Wi-Fi foram salvas sem as senhas."));
                         }
-                        if (count == 0) { Directory.Delete(wifi); r.Info("Nenhuma rede Wi-Fi salva"); continue; }
-                        r.Ok($"{count} redes Wi-Fi exportadas");
+                        if (count == 0) { Directory.Delete(wifi); r.Info(L.T("Nenhuma rede Wi-Fi salva")); continue; }
+                        r.Ok(L.F("{0} redes Wi-Fi exportadas", count));
                         break;
                     case "theme":
                         await RegExport(@"HKCU\Control Panel\Desktop", Path.Combine(dir, "tema_desktop.reg"), token);
@@ -146,11 +146,11 @@ public static partial class ConfigsModule
                         break;
                     case "print":
                         var brm = Path.Combine(Environment.SystemDirectory, @"spool\tools\PrintBrm.exe");
-                        if (!File.Exists(brm)) { r.Warn("PrintBrm não existe nesta edição do Windows: impressoras não exportadas."); continue; }
+                        if (!File.Exists(brm)) { r.Warn(L.T("PrintBrm não existe nesta edição do Windows: impressoras não exportadas.")); continue; }
                         var export = Path.Combine(dir, "impressoras.printerExport");
                         var code = await Proc.RunAsync(brm, $"-b -f \"{export}\" -O FORCE", null, token);
                         // Sem administrador o PrintBrm pode sair com 0 sem gerar nada
-                        if (code != 0 || !File.Exists(export)) { r.Warn("Impressoras não exportadas: o PrintBrm precisa de administrador."); continue; }
+                        if (code != 0 || !File.Exists(export)) { r.Warn(L.T("Impressoras não exportadas: o PrintBrm precisa de administrador.")); continue; }
                         break;
                     case "fonts":
                         await RegExport(@"HKCU\Software\Microsoft\Windows NT\CurrentVersion\Fonts", Path.Combine(dir, "fontes.reg"), token);
@@ -175,9 +175,9 @@ public static partial class ConfigsModule
         if (IsSelected("vscode") && r.Spec.Folders.Any(f => f.Key.StartsWith("config:vscode"))) await ExportVsCodeExtensions(Path.Combine(r.VersionPath, "Configuracoes"), r, token);
         m.WindowsSettings = done;
         r.StoredBytes += new DirectoryInfo(dir).EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
-        var names = done.Select(k => WindowsItems.First(w => w.Key == k).Name);
-        r.Step(step, StepState.Done, done.Count == 0 ? "Nada exportado" : $"{done.Count} itens do Windows");
-        r.Modules.Add(new ModuleResult("Configurações do Windows", done.Count == 0 ? "Nada exportado" : string.Join(", ", names), StepState.Done));
+        var names = done.Select(k => L.T(WindowsItems.First(w => w.Key == k).Name));
+        r.Step(step, StepState.Done, done.Count == 0 ? L.T("Nada exportado") : L.F("{0} itens do Windows", done.Count));
+        r.Modules.Add(new ModuleResult(L.T("Configurações do Windows"), done.Count == 0 ? L.T("Nada exportado") : string.Join(", ", names), StepState.Done));
     }
 
     static Task<int> RegExport(string key, string file, CancellationToken token) =>
@@ -216,7 +216,7 @@ public static partial class ConfigsModule
         var exts = lines.Where(l => l.Contains('.') && !l.Contains(' ')).ToList();
         if (exts.Count == 0) return;
         File.WriteAllLines(Path.Combine(dir, "vscode-extensoes.txt"), exts);
-        r.Ok($"{exts.Count} extensões do VS Code listadas");
+        r.Ok(L.F("{0} extensões do VS Code listadas", exts.Count));
     }
 
     // ---------- Restauração ----------
@@ -224,7 +224,7 @@ public static partial class ConfigsModule
     /// <summary>Reaplica as configurações do Windows salvas em Configuracoes\Windows.</summary>
     public static async Task RestoreWindowsAsync(BackupRunner r, StepItem step, string versionPath, Manifest m, CancellationToken token)
     {
-        r.Activity = "Configurações";
+        r.Activity = L.T("Configurações");
         var dir = Path.Combine(versionPath, "Configuracoes", "Windows");
         var applied = new List<string>();
         var keys = m.WindowsSettings;
@@ -232,9 +232,9 @@ public static partial class ConfigsModule
         {
             r.Checkpoint(token);
             var key = keys[i];
-            var name = WindowsItems.FirstOrDefault(w => w.Key == key)?.Name ?? key;
+            var name = L.T(WindowsItems.FirstOrDefault(w => w.Key == key)?.Name ?? key);
             r.CurrentFile = name;
-            r.Step(step, StepState.Running, $"Aplicando {name}…");
+            r.Step(step, StepState.Running, L.F("Aplicando {0}…", name));
             try
             {
                 switch (key)
@@ -245,7 +245,7 @@ public static partial class ConfigsModule
                         var ok = 0;
                         foreach (var xml in Directory.GetFiles(wifi, "*.xml"))
                             if (await Proc.RunAsync(Proc.SystemExe("netsh.exe"), $"wlan add profile filename=\"{xml}\" user=all", null, token) == 0) ok++;
-                        r.Ok($"{ok} redes Wi-Fi adicionadas");
+                        r.Ok(L.F("{0} redes Wi-Fi adicionadas", ok));
                         break;
                     case "theme":
                         foreach (var reg in Directory.GetFiles(dir, "tema_*.reg")) await RegImport(reg, m.UserProfile, token);
@@ -295,13 +295,13 @@ public static partial class ConfigsModule
                 r.CurrentFile = exts[i];
                 await Proc.RunAsync(Proc.SystemExe("cmd.exe"), $"/c \"\"{code}\" --install-extension {exts[i]}\"", null, token, Encoding.UTF8);
             }
-            applied.Add($"{exts.Count} extensões do VS Code");
+            applied.Add(L.F("{0} extensões do VS Code", exts.Count));
         }
 
-        r.Step(step, StepState.Done, applied.Count == 0 ? "Nada a aplicar" : $"{applied.Count} itens aplicados");
+        r.Step(step, StepState.Done, applied.Count == 0 ? L.T("Nada a aplicar") : L.F("{0} itens aplicados", applied.Count));
         if (keys.Contains("theme") || keys.Contains("fonts"))
-            r.Warn("Saia e entre de novo no Windows para o tema e as fontes aparecerem por completo.", report: true);
-        r.Modules.Add(new ModuleResult("Configurações do Windows", applied.Count == 0 ? "Nada a aplicar" : string.Join(", ", applied), StepState.Done));
+            r.Warn(L.T("Saia e entre de novo no Windows para o tema e as fontes aparecerem por completo."), report: true);
+        r.Modules.Add(new ModuleResult(L.T("Configurações do Windows"), applied.Count == 0 ? L.T("Nada a aplicar") : string.Join(", ", applied), StepState.Done));
     }
 
     /// <summary>

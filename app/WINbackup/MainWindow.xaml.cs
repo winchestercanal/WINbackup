@@ -47,25 +47,8 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(TitleBar);
 
-        var tb = AppWindow.TitleBar;
-        tb.PreferredHeightOption = TitleBarHeightOption.Tall;
-        tb.ButtonBackgroundColor = Colors.Transparent;
-        tb.ButtonInactiveBackgroundColor = Colors.Transparent;
-        tb.ButtonForegroundColor = UI.ParseColor("#c9d6ee");
-        tb.ButtonInactiveForegroundColor = UI.ParseColor("#5f7398");
-        tb.ButtonHoverBackgroundColor = UI.ParseColor("#1a2236");
-        tb.ButtonHoverForegroundColor = Colors.White;
-        tb.ButtonPressedBackgroundColor = UI.ParseColor("#22304a");
-
-        if (!Sys.IsAdmin)
-        {
-            AdminText.Text = "Sem administrador";
-            AdminText.Foreground = UI.Warn;
-            AdminIcon.Foreground = UI.Warn;
-            AdminBadge.Background = UI.Brush("#1d1608");
-            AdminBadge.BorderBrush = UI.Brush("#5c4413");
-            ToolTipService.SetToolTip(AdminBadge, "Abra o WINbackup como administrador para salvar drivers e arquivos protegidos.");
-        }
+        AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        ApplyChrome();
 
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "WINbackup.ico"));
         SizeAndCenter();
@@ -73,13 +56,59 @@ public sealed partial class MainWindow : Window
         AppWindow.Closing += OnClosing;
         Closed += (_, _) => Notifier.Shutdown();
 
-        Nav.Navigate += key => Navigate(key);
+        Nav = NewSidebar();
         BackButton.SizeChanged += (_, _) => UpdateTitleBarRegions();
         Root.Loaded += (_, _) => UpdateTitleBarRegions();
         Root.KeyboardAccelerators.Add(BackAccelerator());
         // Botão "voltar" lateral do mouse
         Root.PointerPressed += (_, e) => { if (e.GetCurrentPoint(Root).Properties.IsXButton1Pressed) GoBack(); };
         Navigate("home");
+    }
+
+    Sidebar Nav;
+
+    Sidebar NewSidebar()
+    {
+        var bar = new Sidebar();
+        bar.Navigate += key => Navigate(key);
+        NavHost.Child = bar;
+        return bar;
+    }
+
+    /// <summary>Cores da barra de título e o selo de administrador, no tema e idioma atuais.</summary>
+    void ApplyChrome()
+    {
+        Root.RequestedTheme = Theme.Element;
+        var tb = AppWindow.TitleBar;
+        tb.ButtonBackgroundColor = Colors.Transparent;
+        tb.ButtonInactiveBackgroundColor = Colors.Transparent;
+        tb.ButtonForegroundColor = UI.Color("#c9d6ee");
+        tb.ButtonInactiveForegroundColor = UI.Color("#5f7398");
+        tb.ButtonHoverBackgroundColor = UI.Color("#1a2236");
+        tb.ButtonHoverForegroundColor = UI.Color("#ffffff");
+        tb.ButtonPressedBackgroundColor = UI.Color("#22304a");
+        tb.ButtonPressedForegroundColor = UI.Color("#ffffff");
+
+        if (Sys.IsAdmin)
+        {
+            AdminText.Text = L.T("Administrador");
+            return;
+        }
+        AdminText.Text = L.T("Sem administrador");
+        AdminText.Foreground = UI.Warn;
+        AdminIcon.Foreground = UI.Warn;
+        AdminBadge.Background = UI.Brush("#1d1608");
+        AdminBadge.BorderBrush = UI.Brush("#5c4413");
+        ToolTipService.SetToolTip(AdminBadge, L.T("Abra o WINbackup como administrador para salvar drivers e arquivos protegidos."));
+    }
+
+    /// <summary>Refaz o menu e a tela atual depois de trocar o tema ou o idioma.</summary>
+    public void Reload()
+    {
+        ApplyChrome();
+        Nav = NewSidebar();
+        Nav.Active = _current is "progress" or "report" or null ? "home" : _current;
+        if (_current != null) Navigate(_current, null, back: true);
     }
 
     public void Navigate(string key, object? parameter = null) => Navigate(key, parameter, back: false);
@@ -148,6 +177,17 @@ public sealed partial class MainWindow : Window
         Navigate("progress");
     }
 
+    /// <summary>Abre o WINbackup de novo e fecha esta janela (troca de idioma).</summary>
+    public void Restart()
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!)
+        {
+            UseShellExecute = true, WorkingDirectory = AppContext.BaseDirectory,
+        });
+        _closeConfirmed = true;
+        Close();
+    }
+
     public void Minimize()
     {
         if (AppWindow.Presenter is OverlappedPresenter p) p.Minimize();
@@ -178,9 +218,9 @@ public sealed partial class MainWindow : Window
     {
         if (_closeConfirmed || BackupRunner.Current is not { IsFinished: false } runner) return;
         args.Cancel = true;
-        var ok = await Dialogs.ConfirmAsync(Root.XamlRoot, "Cancelar e sair?",
-            "Ainda há uma tarefa em andamento. Se sair agora, ela será cancelada e a versão ficará incompleta.",
-            "Cancelar e sair", "Continuar", danger: true);
+        var ok = await Dialogs.ConfirmAsync(Root.XamlRoot, L.T("Cancelar e sair?"),
+            L.T("Ainda há uma tarefa em andamento. Se sair agora, ela será cancelada e a versão ficará incompleta."),
+            L.T("Cancelar e sair"), L.T("Continuar"), danger: true);
         if (!ok) return;
         runner.Cancel();
         _closeConfirmed = true;

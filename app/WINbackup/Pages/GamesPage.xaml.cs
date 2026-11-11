@@ -40,7 +40,7 @@ public sealed partial class GamesPage : Page
         foreach (var lib in GamesModule.SteamLibraries())
             LibrariesPanel.Children.Add(new TextBlock { Text = lib, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontSize = 12.5, Foreground = UI.Brush("#d5e1f7") });
         if (LibrariesPanel.Children.Count == 0)
-            LibrariesPanel.Children.Add(new TextBlock { Text = "Steam não encontrada.", FontSize = 12.5, Foreground = UI.Muted });
+            LibrariesPanel.Children.Add(new TextBlock { Text = L.T("Steam não encontrada."), FontSize = 12.5, Foreground = UI.Muted });
 
         _ = LoadAsync();
     }
@@ -53,8 +53,8 @@ public sealed partial class GamesPage : Page
         {
             var i = new CheckItem
             {
-                Key = g.Key, Title = g.Name, Subtitle = Sys.Pretty(g.Path), Col1 = "…", Col2 = g.Source, Data = g,
-                Meta = g.Cloud ? "Já na nuvem" : "Só local", MetaBrush = g.Cloud ? UI.NeonSoft : UI.Warn, Flag = g.Cloud,
+                Key = g.Key, Title = g.Name, Subtitle = Sys.Pretty(g.Path), Col1 = "…", Col2 = L.T(g.Source), Data = g,
+                Meta = g.Cloud ? L.T("Já na nuvem") : L.T("Só local"), MetaBrush = g.Cloud ? UI.NeonSoft : UI.Warn, Flag = g.Cloud,
                 IsChecked = GamesModule.IsSelected(g),
             };
             i.Changed += item =>
@@ -76,7 +76,7 @@ public sealed partial class GamesPage : Page
         Measure();
     }
 
-    static string Jogos(int n) => n == 1 ? "1 jogo" : $"{n} jogos";
+    static string Jogos(int n) => n == 1 ? L.T("1 jogo") : L.F("{0} jogos", n);
 
     void Measure()
     {
@@ -101,8 +101,8 @@ public sealed partial class GamesPage : Page
     void Count()
     {
         var n = _games.Count(g => g.IsChecked);
-        SelText.Text = $"{n} de {_games.Count} selecionados";
-        SaveButton.Content = n == 1 ? "Salvar 1 save" : $"Salvar {n} saves";
+        SelText.Text = L.F("{0} de {1} selecionados", n, _games.Count);
+        SaveButton.Content = n == 1 ? L.T("Salvar 1 save") : L.F("Salvar {0} saves", n);
         SaveButton.IsEnabled = n > 0;
         foreach (var p in new[] { QuickLocal, QuickCloud, QuickAll })
         {
@@ -130,7 +130,7 @@ public sealed partial class GamesPage : Page
 
     async void OnAddGame(object sender, RoutedEventArgs e)
     {
-        var path = FileDialog.PickFolder("Pasta de save do jogo");
+        var path = FileDialog.PickFolder(L.T("Pasta de save do jogo"));
         if (path == null || S.GameCustomFolders.Contains(path, StringComparer.OrdinalIgnoreCase)) return;
         S.GameCustomFolders.Add(path);
         Settings.Save();
@@ -142,7 +142,7 @@ public sealed partial class GamesPage : Page
     {
         if (string.IsNullOrEmpty(S.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         App.Shell.Run(new JobSpec { Title = "Saves de jogos", FilesLabel = "Saves de jogos", Games = true, Folders = GamesModule.SelectedFolders(_found) });

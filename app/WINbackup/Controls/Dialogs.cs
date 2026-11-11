@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using WINbackup.Models;
+using WINbackup.Services;
 
 namespace WINbackup.Controls;
 
@@ -62,7 +63,7 @@ public static class Dialogs
 
     public static async Task InfoAsync(XamlRoot root, string title, string text)
     {
-        var d = Base(root, title, Para(text, muted: true), "Entendi", null);
+        var d = Base(root, title, Para(text, muted: true), L.T("Entendi"), null);
         await d.ShowAsync();
     }
 
@@ -70,11 +71,11 @@ public static class Dialogs
     public static async Task<bool> DonationReminderAsync(XamlRoot root)
     {
         var never = new ToggleButton { Style = S("CheckCard"), Background = UI.Brush("#0a1120"), BorderBrush = UI.Brush("#2a3b63"),
-            Content = new TextBlock { Text = "Não mostrar este lembrete de novo", FontSize = 13 } };
+            Content = new TextBlock { Text = L.T("Não mostrar este lembrete de novo"), FontSize = 13 } };
         var body = new StackPanel { Spacing = 14 };
-        body.Children.Add(Para($"Você já fez {Services.Settings.Data.SuccessfulBackups} backups com o WINbackup. Ele é gratuito e feito pelo Canal WINchester; se está sendo útil, apoie com o valor que achar justo."));
+        body.Children.Add(Para(L.F("Você já fez {0} backups com o WINbackup. Ele é gratuito e feito pelo Canal WINchester; se está sendo útil, apoie com o valor que achar justo.", Services.Settings.Data.SuccessfulBackups)));
         body.Children.Add(never);
-        var d = Base(root, "Curtindo o WINbackup?", body, "Quero apoiar", "Agora não");
+        var d = Base(root, L.T("Curtindo o WINbackup?"), body, L.T("Quero apoiar"), L.T("Agora não"));
         var result = await d.ShowAsync();
         if (never.IsChecked == true)
         {
@@ -91,13 +92,13 @@ public static class Dialogs
     public static async Task<bool> NoRebootAsync(XamlRoot root)
     {
         var ack = new ToggleButton { Style = S("CheckCard"), Background = UI.Brush("#0a1120"), BorderBrush = UI.Brush("#2a3b63"),
-            Content = new TextBlock { Text = "Entendo os riscos e quero continuar sem reiniciar, por minha conta.", FontSize = 13, TextWrapping = TextWrapping.Wrap } };
+            Content = new TextBlock { Text = L.T("Entendo os riscos e quero continuar sem reiniciar, por minha conta."), FontSize = 13, TextWrapping = TextWrapping.Wrap } };
         var body = new StackPanel { Spacing = 16 };
-        body.Children.Add(Para("Depois de instalar drivers, o Windows precisa reiniciar para carregá-los corretamente. Sem reiniciar, alguns dispositivos podem não funcionar, ter conflitos ou causar erros até o próximo reinício."));
-        body.Children.Add(Para("Os drivers serão instalados normalmente. Só o reinício automático será pulado, e você reinicia quando quiser.", muted: true));
+        body.Children.Add(Para(L.T("Depois de instalar drivers, o Windows precisa reiniciar para carregá-los corretamente. Sem reiniciar, alguns dispositivos podem não funcionar, ter conflitos ou causar erros até o próximo reinício.")));
+        body.Children.Add(Para(L.T("Os drivers serão instalados normalmente. Só o reinício automático será pulado, e você reinicia quando quiser."), muted: true));
         body.Children.Add(ack);
 
-        var d = Base(root, "Reiniciar é recomendado", body, "Continuar sem reiniciar", "Manter reinício", warn: true);
+        var d = Base(root, L.T("Reiniciar é recomendado"), body, L.T("Continuar sem reiniciar"), L.T("Manter reinício"), warn: true);
         d.DefaultButton = ContentDialogButton.Close;
         d.IsPrimaryButtonEnabled = false;
         ack.Checked += (_, _) => d.IsPrimaryButtonEnabled = true;

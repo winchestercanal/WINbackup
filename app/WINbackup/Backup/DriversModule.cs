@@ -67,20 +67,20 @@ public static class DriversModule
     };
 
     public static string FriendlyClass(string cls) =>
-        ClassNames.TryGetValue(cls, out var n) ? n : cls.Length == 0 ? "—" : char.ToUpper(cls[0]) + cls[1..].ToLowerInvariant();
+        ClassNames.TryGetValue(cls, out var n) ? L.T(n) : cls.Length == 0 ? "—" : char.ToUpper(cls[0]) + cls[1..].ToLowerInvariant();
 
     static bool IsThirdParty(string inf) => inf.StartsWith("oem", StringComparison.OrdinalIgnoreCase);
 
     public static async Task BackupAsync(BackupRunner r, StepItem step, Manifest m, CancellationToken token)
     {
-        r.Activity = "Drivers";
+        r.Activity = L.T("Drivers");
         r.CurrentFile = "";
-        r.Step(step, StepState.Running, "Lendo drivers instalados…");
+        r.Step(step, StepState.Running, L.T("Lendo drivers instalados…"));
         if (!Sys.IsAdmin)
         {
-            r.Step(step, StepState.Error, "Precisa de administrador");
-            r.Error("O backup de drivers precisa que o WINbackup rode como administrador.");
-            r.Modules.Add(new ModuleResult("Drivers", "Não feito: precisa de administrador", StepState.Error));
+            r.Step(step, StepState.Error, L.T("Precisa de administrador"));
+            r.Error(L.T("O backup de drivers precisa que o WINbackup rode como administrador."));
+            r.Modules.Add(new ModuleResult(L.T("Drivers"), L.T("Não feito: precisa de administrador"), StepState.Error));
             return;
         }
 
@@ -89,8 +89,8 @@ public static class DriversModule
                          r.Spec.DriverInfs.Contains(d.Inf, StringComparer.OrdinalIgnoreCase))).ToList();
         if (chosen.Count == 0)
         {
-            r.Step(step, StepState.Done, "Nenhum driver de terceiros");
-            r.Modules.Add(new ModuleResult("Drivers", "Nenhum driver de terceiros encontrado", StepState.Done));
+            r.Step(step, StepState.Done, L.T("Nenhum driver de terceiros"));
+            r.Modules.Add(new ModuleResult(L.T("Drivers"), L.T("Nenhum driver de terceiros encontrado"), StepState.Done));
             return;
         }
 
@@ -103,7 +103,7 @@ public static class DriversModule
             r.Checkpoint(token);
             var d = chosen[i];
             r.CurrentFile = $"{d.Device} ({d.Inf})";
-            r.Step(step, StepState.Running, $"Exportando {i + 1} de {chosen.Count}…");
+            r.Step(step, StepState.Running, L.F("Exportando {0} de {1}…", i + 1, chosen.Count));
             var target = Path.Combine(folder, Path.GetFileNameWithoutExtension(d.Inf) + "_" + Safe(d.Device));
             // O PnPUtil não cria a pasta de destino: sem ela devolve o código 2 (caminho não encontrado)
             Directory.CreateDirectory(target);
@@ -116,7 +116,7 @@ public static class DriversModule
             }
             else
             {
-                r.Warn($"Driver não exportado: {d.Device} ({d.Inf}), código {code}. {output.LastOrDefault()}");
+                r.Warn(L.F("Driver não exportado: {0} ({1}), código {2}. {3}", d.Device, d.Inf, code, output.LastOrDefault()));
             }
             r.Progress(step, (i + 1.0) / chosen.Count);
         }
@@ -124,9 +124,9 @@ public static class DriversModule
         if (ok == 0)
         {
             Directory.Delete(folder, true);
-            r.Step(step, StepState.Error, "Nenhum driver exportado");
-            r.Error("Nenhum driver foi exportado. Veja os avisos no log para o motivo de cada um.");
-            r.Modules.Add(new ModuleResult("Drivers", $"0 de {chosen.Count} exportados", StepState.Error));
+            r.Step(step, StepState.Error, L.T("Nenhum driver exportado"));
+            r.Error(L.T("Nenhum driver foi exportado. Veja os avisos no log para o motivo de cada um."));
+            r.Modules.Add(new ModuleResult(L.T("Drivers"), L.F("0 de {0} exportados", chosen.Count), StepState.Error));
             return;
         }
 
@@ -139,22 +139,22 @@ public static class DriversModule
         r.ItemsSaved += ok;
 
         var failed = chosen.Count - ok;
-        var status = $"{ok} drivers de terceiros" + (failed > 0 ? $" · {failed} com erro" : "");
+        var status = L.F("{0} drivers de terceiros", ok) + (failed > 0 ? L.F(" · {0} com erro", failed) : "");
         r.Step(step, failed > 0 ? StepState.Warning : StepState.Done, status);
-        if (failed > 0) r.Warn($"{failed} drivers não foram exportados. Veja o log para o motivo de cada um.");
-        r.Ok($"Drivers: {status} na pasta Drivers ({Sys.Bytes(size)})");
-        r.Modules.Add(new ModuleResult("Drivers", status, failed > 0 ? StepState.Warning : StepState.Done));
+        if (failed > 0) r.Warn(L.F("{0} drivers não foram exportados. Veja o log para o motivo de cada um.", failed));
+        r.Ok(L.F("Drivers: {0} na pasta Drivers ({1})", status, Sys.Bytes(size)));
+        r.Modules.Add(new ModuleResult(L.T("Drivers"), status, failed > 0 ? StepState.Warning : StepState.Done));
     }
 
     public static async Task RestoreAsync(BackupRunner r, StepItem prep, StepItem install, string source, CancellationToken token)
     {
-        r.Activity = "Drivers";
-        r.Step(prep, StepState.Running, "Abrindo o backup…");
+        r.Activity = L.T("Drivers");
+        r.Step(prep, StepState.Running, L.T("Abrindo o backup…"));
         if (!Sys.IsAdmin)
         {
-            r.Step(prep, StepState.Error, "Precisa de administrador");
-            r.Error("Instalar drivers precisa que o WINbackup rode como administrador.");
-            r.Modules.Add(new ModuleResult("Drivers", "Não feito: precisa de administrador", StepState.Error));
+            r.Step(prep, StepState.Error, L.T("Precisa de administrador"));
+            r.Error(L.T("Instalar drivers precisa que o WINbackup rode como administrador."));
+            r.Modules.Add(new ModuleResult(L.T("Drivers"), L.T("Não feito: precisa de administrador"), StepState.Error));
             return;
         }
 
@@ -164,7 +164,7 @@ public static class DriversModule
         {
             temp = Path.Combine(Path.GetTempPath(), "WINbackup_drivers_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
             r.CurrentFile = Path.GetFileName(source);
-            r.Info($"Extraindo {source} para uma pasta temporária");
+            r.Info(L.F("Extraindo {0} para uma pasta temporária", source));
             await Task.Run(() => ZipFile.ExtractToDirectory(source, temp, overwriteFiles: true), token);
             folder = temp;
         }
@@ -174,7 +174,7 @@ public static class DriversModule
         }
         else
         {
-            throw new FileNotFoundException("Não encontrei o backup de drivers: " + source);
+            throw new FileNotFoundException(L.T("Não encontrei o backup de drivers: ") + source);
         }
 
         try
@@ -183,13 +183,13 @@ public static class DriversModule
             r.Step(prep, StepState.Done, $"{infs.Count} arquivos .inf");
             if (infs.Count == 0)
             {
-                r.Step(install, StepState.Error, "Nenhum .inf encontrado");
-                r.Error("Nenhum arquivo .inf foi encontrado no backup escolhido.");
-                r.Modules.Add(new ModuleResult("Drivers", "Nenhum .inf encontrado", StepState.Error));
+                r.Step(install, StepState.Error, L.T("Nenhum .inf encontrado"));
+                r.Error(L.T("Nenhum arquivo .inf foi encontrado no backup escolhido."));
+                r.Modules.Add(new ModuleResult(L.T("Drivers"), L.T("Nenhum .inf encontrado"), StepState.Error));
                 return;
             }
 
-            r.Step(install, StepState.Running, "Instalando…");
+            r.Step(install, StepState.Running, L.T("Instalando…"));
             int seen = 0;
             var code = await Proc.RunAsync(Proc.SystemExe("pnputil.exe"), $"/add-driver \"{Path.Combine(folder, "*.inf")}\" /subdirs /install", line =>
             {
@@ -206,24 +206,24 @@ public static class DriversModule
             switch (code)
             {
                 case 0:
-                    r.Step(install, StepState.Done, "Drivers instalados");
-                    r.Modules.Add(new ModuleResult("Drivers", $"{infs.Count} pacotes processados", StepState.Done));
+                    r.Step(install, StepState.Done, L.T("Drivers instalados"));
+                    r.Modules.Add(new ModuleResult(L.T("Drivers"), L.F("{0} pacotes processados", infs.Count), StepState.Done));
                     break;
                 case 3010:
                     r.RebootRequired = true;
-                    r.Step(install, StepState.Done, "Instalados · reinício necessário");
-                    r.Warn("Reinicie o computador para terminar a instalação dos drivers.");
-                    r.Modules.Add(new ModuleResult("Drivers", $"{infs.Count} pacotes · reinício necessário", StepState.Warning));
+                    r.Step(install, StepState.Done, L.T("Instalados · reinício necessário"));
+                    r.Warn(L.T("Reinicie o computador para terminar a instalação dos drivers."));
+                    r.Modules.Add(new ModuleResult(L.T("Drivers"), L.F("{0} pacotes · reinício necessário", infs.Count), StepState.Warning));
                     break;
                 case 259:
-                    r.Step(install, StepState.Warning, "Nada novo para instalar");
-                    r.Warn("Nenhum driver foi instalado: eles já estavam presentes ou não servem para este PC.");
-                    r.Modules.Add(new ModuleResult("Drivers", "Nenhum driver novo instalado", StepState.Warning));
+                    r.Step(install, StepState.Warning, L.T("Nada novo para instalar"));
+                    r.Warn(L.T("Nenhum driver foi instalado: eles já estavam presentes ou não servem para este PC."));
+                    r.Modules.Add(new ModuleResult(L.T("Drivers"), L.T("Nenhum driver novo instalado"), StepState.Warning));
                     break;
                 default:
-                    r.Step(install, StepState.Warning, $"Terminou com código {code}");
-                    r.Warn($"O PnPUtil terminou com o código {code}. Veja o log para os detalhes.");
-                    r.Modules.Add(new ModuleResult("Drivers", $"PnPUtil terminou com o código {code}", StepState.Warning));
+                    r.Step(install, StepState.Warning, L.F("Terminou com código {0}", code));
+                    r.Warn(L.F("O PnPUtil terminou com o código {0}. Veja o log para os detalhes.", code));
+                    r.Modules.Add(new ModuleResult(L.T("Drivers"), L.F("PnPUtil terminou com o código {0}", code), StepState.Warning));
                     break;
             }
         }

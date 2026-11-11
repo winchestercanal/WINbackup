@@ -38,5 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\WINbackup.ico" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Strings\*.json" LogicalName="WINbackup.Strings.%(Filename).json" />
   </ItemGroup>
 </Project>

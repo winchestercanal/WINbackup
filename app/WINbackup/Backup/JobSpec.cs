@@ -88,7 +88,12 @@ public static class PersonalFolders
 /// <summary>Presets do Início. Só Arquivos pessoais e Drivers já executam nesta versão.</summary>
 public static class Presets
 {
-    public record Preset(string Name, string Description, string Slug, string Icon);
+    /// <summary>Name e Description ficam em português (o Name vira o título gravado no manifesto); Label e Info são para a tela.</summary>
+    public record Preset(string Name, string Description, string Slug, string Icon)
+    {
+        public string Label => L.T(Name);
+        public string Info => L.T(Description);
+    }
 
     public static readonly Preset[] All =
     [

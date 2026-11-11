@@ -51,6 +51,10 @@ public class SettingsData
     public bool NotifyErrors { get; set; } = true;
     public bool NotifyReminder { get; set; } = true;
     public int KeepVersions { get; set; } = 5;
+
+    // Aparência: tema ("winchester", "neutral", "oled", "light") e idioma ("auto", "pt", "en", "es")
+    public string Theme { get; set; } = "winchester";
+    public string Language { get; set; } = "auto";
 }
 
 /// <summary>Configurações do app em %APPDATA%\WINbackup\settings.json.</summary>

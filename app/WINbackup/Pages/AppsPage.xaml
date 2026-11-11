@@ -2,6 +2,7 @@
     x:Class="WINbackup.Pages.AppsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls"
     xmlns:m="using:WINbackup.Models">
 
@@ -10,13 +11,13 @@
             <Grid ColumnSpacing="20">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Programas" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Salva a lista dos seus programas e reinstala tudo depois, sozinho, via winget." Style="{StaticResource Sub}"/>
+                    <TextBlock Text="{s:T K='Programas'}" Style="{StaticResource H1}"/>
+                    <TextBlock Text="{s:T K='Salva a lista dos seus programas e reinstala tudo depois, sozinho, via winget.'}" Style="{StaticResource Sub}"/>
                 </StackPanel>
                 <Button x:Name="ScanButton" Grid.Column="1" Style="{StaticResource SmallButton}" VerticalAlignment="Bottom" Click="OnScan">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="14" Height="14" StrokeThickness="2" Data="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/>
-                        <TextBlock Text="Escanear novamente"/>
+                        <TextBlock Text="{s:T K='Escanear novamente'}"/>
                     </StackPanel>
                 </Button>
             </Grid>
@@ -24,39 +25,39 @@
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                 <Border Style="{StaticResource Card}" Padding="18,16">
-                    <StackPanel Spacing="4"><TextBlock Text="Programas encontrados" Style="{StaticResource Small}"/><TextBlock x:Name="StatAll" FontSize="24" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="4"><TextBlock Text="{s:T K='Programas encontrados'}" Style="{StaticResource Small}"/><TextBlock x:Name="StatAll" FontSize="24" FontWeight="Bold"/></StackPanel>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource Card}" Padding="18,16" Background="{StaticResource CyanBg}" BorderBrush="{StaticResource CyanLine}">
-                    <StackPanel Spacing="4"><TextBlock Text="Reinstalação automática" FontSize="12" Foreground="{StaticResource NeonSoft}"/><TextBlock x:Name="StatAuto" FontSize="24" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="4"><TextBlock Text="{s:T K='Reinstalação automática'}" FontSize="12" Foreground="{StaticResource NeonSoft}"/><TextBlock x:Name="StatAuto" FontSize="24" FontWeight="Bold"/></StackPanel>
                 </Border>
                 <Border Grid.Column="2" Style="{StaticResource Card}" Padding="18,16" Background="{StaticResource WarnBg}" BorderBrush="{StaticResource WarnLine}">
-                    <StackPanel Spacing="4"><TextBlock Text="Sem pacote: instalar à mão" FontSize="12" Foreground="{StaticResource WarnText}"/><TextBlock x:Name="StatManual" FontSize="24" FontWeight="Bold"/></StackPanel>
+                    <StackPanel Spacing="4"><TextBlock Text="{s:T K='Sem pacote: instalar à mão'}" FontSize="12" Foreground="{StaticResource WarnText}"/><TextBlock x:Name="StatManual" FontSize="24" FontWeight="Bold"/></StackPanel>
                 </Border>
             </Grid>
 
             <Grid>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="Todos" Tag="all" IsChecked="True" Checked="OnFilter"/>
-                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="winget" Tag="winget" Checked="OnFilter"/>
-                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="Microsoft Store" Tag="msstore" Checked="OnFilter"/>
-                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="Sem pacote" Tag="none" Checked="OnFilter"/>
+                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="{s:T K='Todos'}" Tag="all" IsChecked="True" Checked="OnFilter"/>
+                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="{s:T K='winget'}" Tag="winget" Checked="OnFilter"/>
+                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="{s:T K='Microsoft Store'}" Tag="msstore" Checked="OnFilter"/>
+                    <RadioButton Style="{StaticResource FilterRadio}" GroupName="f" Content="{s:T K='Sem pacote'}" Tag="none" Checked="OnFilter"/>
                 </StackPanel>
-                <TextBox x:Name="Search" Style="{StaticResource Input}" Width="240" Height="34" MinHeight="34" FontSize="13" PlaceholderText="Buscar programa…"
-                         HorizontalAlignment="Right" AutomationProperties.Name="Buscar programa" TextChanged="OnSearch"/>
+                <TextBox x:Name="Search" Style="{StaticResource Input}" Width="240" Height="34" MinHeight="34" FontSize="13" PlaceholderText="{s:T K='Buscar programa…'}"
+                         HorizontalAlignment="Right" AutomationProperties.Name="{s:T K='Buscar programa'}" TextChanged="OnSearch"/>
             </Grid>
 
             <Border Style="{StaticResource TableCard}">
                 <StackPanel>
                     <Grid Padding="54,10,18,10" ColumnSpacing="12" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="2.2*"/><ColumnDefinition Width="0.8*"/><ColumnDefinition Width="1.3*"/></Grid.ColumnDefinitions>
-                        <TextBlock Text="Programa" Style="{StaticResource Small}"/>
-                        <TextBlock Grid.Column="1" Text="ID do pacote" Style="{StaticResource Small}"/>
-                        <TextBlock Grid.Column="2" Text="Versão" Style="{StaticResource Small}"/>
-                        <TextBlock Grid.Column="3" Text="Origem" Style="{StaticResource Small}"/>
+                        <TextBlock Text="{s:T K='Programa'}" Style="{StaticResource Small}"/>
+                        <TextBlock Grid.Column="1" Text="{s:T K='ID do pacote'}" Style="{StaticResource Small}"/>
+                        <TextBlock Grid.Column="2" Text="{s:T K='Versão'}" Style="{StaticResource Small}"/>
+                        <TextBlock Grid.Column="3" Text="{s:T K='Origem'}" Style="{StaticResource Small}"/>
                     </Grid>
                     <StackPanel x:Name="Loading" Orientation="Horizontal" Spacing="12" Padding="18,22">
                         <ProgressRing IsActive="True" Width="20" Height="20" Foreground="{StaticResource Neon}"/>
-                        <TextBlock x:Name="LoadingText" Text="Perguntando ao winget o que está instalado…" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="LoadingText" Text="{s:T K='Perguntando ao winget o que está instalado…'}" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     </StackPanel>
                     <ItemsRepeater x:Name="Rows">
                         <ItemsRepeater.ItemTemplate>
@@ -82,9 +83,9 @@
             <Border Style="{StaticResource ConsoleCard}" Padding="18,14">
                 <Grid ColumnSpacing="14">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                    <TextBlock Text="Na restauração:" Style="{StaticResource Small}" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="winget import -i Programas.json --accept-package-agreements" FontFamily="{StaticResource Mono}" FontSize="12.5" Foreground="{StaticResource NeonSoft}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" Text="+ lista dos sem pacote, com link de download" Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{s:T K='Na restauração:'}" Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{s:T K='winget import -i Programas.json --accept-package-agreements'}" FontFamily="{StaticResource Mono}" FontSize="12.5" Foreground="{StaticResource NeonSoft}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="2" Text="{s:T K='+ lista dos sem pacote, com link de download'}" Style="{StaticResource Small}" VerticalAlignment="Center"/>
                 </Grid>
             </Border>
 
@@ -93,17 +94,17 @@
                 <Button Style="{StaticResource AccentButton}" Click="OnImport">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M12 15V4M7 9l5-5 5 5M5 20h14"/>
-                        <TextBlock Text="Importar lista e instalar"/>
+                        <TextBlock Text="{s:T K='Importar lista e instalar'}"/>
                     </StackPanel>
                 </Button>
-                <TextBlock Grid.Column="1" Text="Só instala os programas de um arquivo .json, sem restaurar o resto" Style="{StaticResource Small}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{s:T K='Só instala os programas de um arquivo .json, sem restaurar o resto'}" Style="{StaticResource Small}" VerticalAlignment="Center"/>
                 <Button x:Name="ExportButton" Grid.Column="2" Style="{StaticResource SecondaryButton}" Click="OnExport">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <c:Icon Width="16" Height="16" StrokeThickness="2" Data="M12 4v11M7 10l5 5 5-5M5 20h14"/>
-                        <TextBlock Text="Exportar lista (.json)"/>
+                        <TextBlock Text="{s:T K='Exportar lista (.json)'}"/>
                     </StackPanel>
                 </Button>
-                <Button x:Name="SaveButton" Grid.Column="3" Style="{StaticResource PrimaryButton}" Content="Salvar programas" IsEnabled="False" Click="OnSave"/>
+                <Button x:Name="SaveButton" Grid.Column="3" Style="{StaticResource PrimaryButton}" Content="{s:T K='Salvar programas'}" IsEnabled="False" Click="OnSave"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

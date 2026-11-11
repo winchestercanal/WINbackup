@@ -209,11 +209,11 @@ public static class BrowsersModule
     {
         static string H(string s) => WebUtility.HtmlEncode(s);
         var sb = new StringBuilder()
-            .Append("<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><title>Extensões · WINbackup</title><style>")
+            .Append($"<!doctype html><html lang=\"{L.Culture.Name}\"><head><meta charset=\"utf-8\"><title>{H(L.T("Extensões"))} · WINbackup</title><style>")
             .Append("body{margin:0;background:#0a0f1c;color:#e8f0ff;font:14px 'Segoe UI',system-ui,sans-serif;padding:32px}h1{font-size:24px;margin:0 0 6px}")
             .Append("h2{font-size:16px;margin:24px 0 8px}p{color:#8ea3c7;margin:0 0 16px}ul{margin:0;padding-left:20px}li{margin:4px 0}a{color:#19e3ff}")
-            .Append("</style></head><body><h1>Extensões dos navegadores</h1>")
-            .Append("<p>No Firefox as extensões voltam junto com o perfil. Nos outros, entre na sua conta para sincronizar ou instale pelos links abaixo.</p>");
+            .Append($"</style></head><body><h1>{H(L.T("Extensões dos navegadores"))}</h1>")
+            .Append($"<p>{H(L.T("No Firefox as extensões voltam junto com o perfil. Nos outros, entre na sua conta para sincronizar ou instale pelos links abaixo."))}</p>");
         var any = false;
         foreach (var b in browsers)
             foreach (var p in b.Profiles.Where(p => IsSelected(b, p)))
@@ -221,7 +221,7 @@ public static class BrowsersModule
                 var exts = b.Firefox ? FirefoxExtensions(p.Path) : ChromiumExtensions(p.Path);
                 if (exts.Count == 0) continue;
                 any = true;
-                sb.Append($"<h2>{H(b.Name)} · {H(p.Name)}</h2><ul>");
+                sb.Append($"<h2>{H(b.Name)} · {H(L.T(p.Name))}</h2><ul>");
                 foreach (var (id, name) in exts)
                     sb.Append($"<li><a href=\"{H(string.Format(b.StoreUrl, Uri.EscapeDataString(id)))}\">{H(name)}</a></li>");
                 sb.Append("</ul>");

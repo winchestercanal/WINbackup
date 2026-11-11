@@ -50,6 +50,18 @@
     <SolidColorBrush x:Key="TrackOff" Color="#2a3350"/>
     <SolidColorBrush x:Key="BoxOff" Color="#3a4b70"/>
     <SolidColorBrush x:Key="DangerTrack" Color="#d9534f"/>
+    <SolidColorBrush x:Key="TextStrong" Color="#ffffff"/>
+    <SolidColorBrush x:Key="HoverOverlay" Color="#ffffff"/>
+    <SolidColorBrush x:Key="SidebarCard" Color="#0c1426"/>
+    <SolidColorBrush x:Key="SidebarDivider" Color="#1a2847"/>
+    <SolidColorBrush x:Key="BadgeBg" Color="#0f1d36"/>
+    <SolidColorBrush x:Key="BadgeLine" Color="#1f3560"/>
+    <SolidColorBrush x:Key="ChipWarnBg" Color="#2a1f0b"/>
+    <SolidColorBrush x:Key="PinkText" Color="#ff8fb8"/>
+    <SolidColorBrush x:Key="PinkBg" Color="#2a0d1f"/>
+    <SolidColorBrush x:Key="CyanChipBg" Color="#0b2a2e"/>
+    <SolidColorBrush x:Key="ProgressTrack" Color="#13213f"/>
+    <SolidColorBrush x:Key="RowLine" Color="#121c33"/>
 
     <FontFamily x:Key="Mono">Cascadia Mono, Consolas</FontFamily>
 
@@ -125,7 +137,7 @@
     <ControlTemplate x:Key="FlatButtonTemplate" TargetType="Button">
         <Grid x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
-            <Border x:Name="Hover" Background="White" Opacity="0"/>
+            <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0"/>
             <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               Padding="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -173,7 +185,7 @@
     <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
         <Setter Property="Background" Value="{StaticResource Selected}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Blue}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Foreground" Value="{StaticResource TextStrong}"/>
     </Style>
     <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
         <Setter Property="Background" Value="{StaticResource ErrorBg}"/>
@@ -219,8 +231,8 @@
                     <Grid x:Name="Root" Background="{StaticResource Surface}" BorderBrush="{StaticResource Blue}" BorderThickness="1" CornerRadius="16">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
                             <Border x:Name="Circle" Width="72" Height="72" CornerRadius="36" HorizontalAlignment="Center"
-                                    Background="#1a2b52" BorderBrush="{StaticResource Blue}" BorderThickness="1.5">
-                                <c:Icon x:Name="Glyph" Width="34" Height="34" StrokeThickness="2.25" Foreground="White"
+                                    Background="{StaticResource SegOn}" BorderBrush="{StaticResource Blue}" BorderThickness="1.5">
+                                <c:Icon x:Name="Glyph" Width="34" Height="34" StrokeThickness="2.25" Foreground="{StaticResource TextStrong}"
                                         Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
                             </Border>
                             <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center"/>
@@ -302,7 +314,7 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <Grid x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
-                        <Border x:Name="Hover" Background="White" Opacity="0"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0"/>
                         <Grid Padding="{TemplateBinding Padding}" ColumnSpacing="18">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <Border x:Name="Box" Width="18" Height="18" CornerRadius="5" BorderThickness="1.5" BorderBrush="{StaticResource BoxOff}" VerticalAlignment="Center">
@@ -341,7 +353,7 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <Grid x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
-                        <Border x:Name="Hover" Background="White" Opacity="0"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0"/>
                         <Grid Padding="{TemplateBinding Padding}" ColumnSpacing="12">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <Border x:Name="Box" Width="20" Height="20" CornerRadius="5" BorderThickness="1.5" BorderBrush="{StaticResource BoxOff}" VerticalAlignment="Center">
@@ -380,7 +392,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
                     <Grid x:Name="Root" Background="Transparent" BorderBrush="{StaticResource LineButton}" BorderThickness="1" CornerRadius="7">
-                        <Border x:Name="Hover" Background="White" Opacity="0" CornerRadius="7"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0" CornerRadius="7"/>
                         <ContentPresenter x:Name="CP" Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
                                           Foreground="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <VisualStateManager.VisualStateGroups>
@@ -389,9 +401,9 @@
                                 <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.06"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.1"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.45"/></VisualState.Setters></VisualState>
-                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
-                                <VisualState x:Name="CheckedPointerOver"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.06"/><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
-                                <VisualState x:Name="CheckedPressed"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="CheckedPointerOver"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.06"/><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="CheckedPressed"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="CheckedDisabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.45"/><Setter Target="Root.Background" Value="{StaticResource Selected}"/></VisualState.Setters></VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
@@ -420,7 +432,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid x:Name="Root" Background="Transparent" CornerRadius="7">
-                        <Border x:Name="Hover" Background="White" Opacity="0" CornerRadius="7"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0" CornerRadius="7"/>
                         <ContentPresenter x:Name="CP" Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
                                           Foreground="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <VisualStateManager.VisualStateGroups>
@@ -431,7 +443,7 @@
                                 <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.45"/></VisualState.Setters></VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="CheckStates">
-                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource SegOn}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource SegOn}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="Unchecked"/>
                                 <VisualState x:Name="Indeterminate"/>
                             </VisualStateGroup>
@@ -460,7 +472,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid x:Name="Root" Background="Transparent" BorderBrush="{StaticResource LineButton}" BorderThickness="1" CornerRadius="7">
-                        <Border x:Name="Hover" Background="White" Opacity="0" CornerRadius="7"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0" CornerRadius="7"/>
                         <ContentPresenter x:Name="CP" Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
                                           Foreground="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <VisualStateManager.VisualStateGroups>
@@ -471,7 +483,7 @@
                                 <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.45"/></VisualState.Setters></VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="CheckStates">
-                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource Selected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Blue}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="Unchecked"/>
                                 <VisualState x:Name="Indeterminate"/>
                             </VisualStateGroup>
@@ -493,7 +505,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid x:Name="Root" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="12" Padding="10,14">
-                        <Border x:Name="Hover" Background="White" Opacity="0" CornerRadius="12" Margin="-10,-14"/>
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0" CornerRadius="12" Margin="-10,-14"/>
                         <StackPanel Spacing="8" HorizontalAlignment="Center">
                             <c:Icon x:Name="Glyph" Width="20" Height="20" Foreground="{StaticResource BlueSoft}"
                                     Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -507,7 +519,39 @@
                                 <VisualState x:Name="Disabled"/>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="CheckStates">
-                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource SurfaceSelected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Neon}"/><Setter Target="Glyph.Foreground" Value="{StaticResource Neon}"/><Setter Target="CP.Foreground" Value="White"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource SurfaceSelected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Neon}"/><Setter Target="Glyph.Foreground" Value="{StaticResource Neon}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Unchecked"/>
+                                <VisualState x:Name="Indeterminate"/>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Cartão de escolha sem ícone (tema e idioma em Opções) -->
+    <Style x:Key="ChoiceCard" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource TextNav}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="UseSystemFocusVisuals" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid x:Name="Root" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="10" Padding="10">
+                        <Border x:Name="Hover" Background="{StaticResource HoverOverlay}" Opacity="0" CornerRadius="10" Margin="-10"/>
+                        <ContentPresenter x:Name="CP" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="Stretch"/>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.05"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Pressed"><VisualState.Setters><Setter Target="Hover.Opacity" Value="0.09"/></VisualState.Setters></VisualState>
+                                <VisualState x:Name="Disabled"><VisualState.Setters><Setter Target="Root.Opacity" Value="0.5"/></VisualState.Setters></VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="CheckStates">
+                                <VisualState x:Name="Checked"><VisualState.Setters><Setter Target="Root.Background" Value="{StaticResource SurfaceSelected}"/><Setter Target="Root.BorderBrush" Value="{StaticResource Neon}"/><Setter Target="CP.Foreground" Value="{StaticResource TextStrong}"/></VisualState.Setters></VisualState>
                                 <VisualState x:Name="Unchecked"/>
                                 <VisualState x:Name="Indeterminate"/>
                             </VisualStateGroup>

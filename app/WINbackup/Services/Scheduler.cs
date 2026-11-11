@@ -26,15 +26,15 @@ public class ScheduleDef
 
     public string TaskName => $"Backup {Id}";
 
-    static readonly string[] DayNames = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
-    static readonly string[] DayFull = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+    static readonly string[] DayNames = [L.T("dom"), L.T("seg"), L.T("ter"), L.T("qua"), L.T("qui"), L.T("sex"), L.T("sáb")];
+    static readonly string[] DayFull = [L.T("domingo"), L.T("segunda"), L.T("terça"), L.T("quarta"), L.T("quinta"), L.T("sexta"), L.T("sábado")];
 
     public string When => Kind switch
     {
-        "drive" => $"Ao conectar {VolumeLabel ?? "o disco"}",
-        "logon" => "Ao entrar no Windows",
-        _ when Days.Count == 7 => $"Todo dia, {Time}",
-        _ when Days.Count == 1 => $"Toda {DayFull[(int)Days[0]]}, {Time}",
+        "drive" => L.F("Ao conectar {0}", VolumeLabel ?? L.T("o disco")),
+        "logon" => L.T("Ao entrar no Windows"),
+        _ when Days.Count == 7 => L.F("Todo dia, {0}", Time),
+        _ when Days.Count == 1 => L.F("Toda {0}, {1}", DayFull[(int)Days[0]], Time),
         _ => $"{string.Join(", ", Days.OrderBy(d => d).Select(d => DayNames[(int)d]))}, {Time}",
     };
 }
@@ -64,8 +64,8 @@ public static partial class Scheduler
     {
         try
         {
-            if (on) Folder().RegisterTask("Lembrete", Xml(null), 6, null, null, 3);
-            else Folder().DeleteTask("Lembrete", 0);
+            if (on) Folder().RegisterTask(L.T("Lembrete"), Xml(null), 6, null, null, 3);
+            else Folder().DeleteTask(L.T("Lembrete"), 0);
         }
         catch (Exception ex) when (ex is COMException or FileNotFoundException) { }
     }
@@ -121,7 +121,7 @@ public static partial class Scheduler
 
         var ac = def?.AcOnly == true ? "true" : "false";
         var wake = def?.Wake == true ? "true" : "false";
-        var description = SecurityElement.Escape(def == null ? "WINbackup: lembrete de backup" : $"WINbackup: {def.When} · preset {def.Preset}");
+        var description = SecurityElement.Escape(def == null ? L.T("WINbackup: lembrete de backup") : L.F("WINbackup: {0} · preset {1}", def.When, def.Preset));
         return $"""
             <?xml version="1.0" encoding="UTF-16"?>
             <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">

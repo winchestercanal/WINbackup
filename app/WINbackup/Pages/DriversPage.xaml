@@ -2,14 +2,15 @@
     x:Class="WINbackup.Pages.DriversPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="using:WINbackup.Services"
     xmlns:c="using:WINbackup.Controls"
     xmlns:m="using:WINbackup.Models">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="20" Padding="36,28,36,36">
             <StackPanel Spacing="4">
-                <TextBlock Text="Drivers" Style="{StaticResource H1}"/>
-                <TextBlock Text="Exporta os drivers com PnPUtil e reinstala depois, do .zip ou de uma pasta com .inf." Style="{StaticResource Sub}"/>
+                <TextBlock Text="{s:T K='Drivers'}" Style="{StaticResource H1}"/>
+                <TextBlock Text="{s:T K='Exporta os drivers com PnPUtil e reinstala depois, do .zip ou de uma pasta com .inf.'}" Style="{StaticResource Sub}"/>
             </StackPanel>
 
             <Border x:Name="AdminWarn" Style="{StaticResource WarnCard}" Visibility="Collapsed">
@@ -17,21 +18,21 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                     <c:Icon Width="20" Height="20" Data="M12 3 2 20h20zM12 10v4M12 17h.01" Foreground="{StaticResource Warn}" VerticalAlignment="Center"/>
                     <TextBlock Grid.Column="1" Foreground="{StaticResource WarnText}" TextWrapping="Wrap" LineHeight="20"
-                               Text="O WINbackup não está rodando como administrador. Dá para ver a lista, mas exportar e instalar drivers exige abrir o app como administrador."/>
+                               Text="{s:T K='O WINbackup não está rodando como administrador. Dá para ver a lista, mas exportar e instalar drivers exige abrir o app como administrador.'}"/>
                 </Grid>
             </Border>
 
             <Grid>
                 <Border Style="{StaticResource SegHost}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <RadioButton x:Name="TabBackup" Style="{StaticResource Seg}" GroupName="tab" Content="Fazer backup" IsChecked="True"/>
-                        <RadioButton x:Name="TabRestore" Style="{StaticResource Seg}" GroupName="tab" Content="Restaurar"/>
+                        <RadioButton x:Name="TabBackup" Style="{StaticResource Seg}" GroupName="tab" Content="{s:T K='Fazer backup'}" IsChecked="True"/>
+                        <RadioButton x:Name="TabRestore" Style="{StaticResource Seg}" GroupName="tab" Content="{s:T K='Restaurar'}"/>
                     </StackPanel>
                 </Border>
                 <Border x:Name="FilterHost" Style="{StaticResource SegHost}" HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <RadioButton x:Name="FilterThird" Style="{StaticResource SegSmall}" GroupName="filter" Content="Só de terceiros" IsChecked="True"/>
-                        <RadioButton x:Name="FilterAll" Style="{StaticResource SegSmall}" GroupName="filter" Content="Todos"/>
+                        <RadioButton x:Name="FilterThird" Style="{StaticResource SegSmall}" GroupName="filter" Content="{s:T K='Só de terceiros'}" IsChecked="True"/>
+                        <RadioButton x:Name="FilterAll" Style="{StaticResource SegSmall}" GroupName="filter" Content="{s:T K='Todos'}"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -43,25 +44,25 @@
                         <Grid Padding="18,10,14,10" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
                             <TextBlock x:Name="SelText" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
-                                <TextBlock Text="Marcar:" FontSize="11.5" Foreground="{StaticResource TextLabel}" VerticalAlignment="Center" Margin="0,0,2,0"/>
-                                <ToggleButton x:Name="QuickOut" Style="{StaticResource PillToggle}" Content="Fora do Windows Update" Click="OnQuick"/>
-                                <ToggleButton x:Name="QuickIn" Style="{StaticResource PillToggle}" Content="No Windows Update" Click="OnQuick"/>
-                                <ToggleButton x:Name="QuickAll" Style="{StaticResource PillToggle}" Content="Todos" Click="OnQuick"/>
+                                <TextBlock Text="{s:T K='Marcar:'}" FontSize="11.5" Foreground="{StaticResource TextLabel}" VerticalAlignment="Center" Margin="0,0,2,0"/>
+                                <ToggleButton x:Name="QuickOut" Style="{StaticResource PillToggle}" Content="{s:T K='Fora do Windows Update'}" Click="OnQuick"/>
+                                <ToggleButton x:Name="QuickIn" Style="{StaticResource PillToggle}" Content="{s:T K='No Windows Update'}" Click="OnQuick"/>
+                                <ToggleButton x:Name="QuickAll" Style="{StaticResource PillToggle}" Content="{s:T K='Todos'}" Click="OnQuick"/>
                             </StackPanel>
                         </Grid>
                         <Grid Padding="54,10,18,10" ColumnSpacing="12" BorderBrush="{StaticResource Divider}" BorderThickness="0,0,0,1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/><ColumnDefinition Width="1.2*"/><ColumnDefinition Width="0.9*"/><ColumnDefinition Width="0.9*"/><ColumnDefinition Width="1.4*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Dispositivo" Style="{StaticResource Small}"/>
-                            <TextBlock Grid.Column="1" Text="Fabricante" Style="{StaticResource Small}"/>
-                            <TextBlock Grid.Column="2" Text="Classe" Style="{StaticResource Small}"/>
-                            <TextBlock Grid.Column="3" Text="Versão" Style="{StaticResource Small}"/>
-                            <TextBlock Grid.Column="4" Text="Windows Update" Style="{StaticResource Small}"/>
+                            <TextBlock Text="{s:T K='Dispositivo'}" Style="{StaticResource Small}"/>
+                            <TextBlock Grid.Column="1" Text="{s:T K='Fabricante'}" Style="{StaticResource Small}"/>
+                            <TextBlock Grid.Column="2" Text="{s:T K='Classe'}" Style="{StaticResource Small}"/>
+                            <TextBlock Grid.Column="3" Text="{s:T K='Versão'}" Style="{StaticResource Small}"/>
+                            <TextBlock Grid.Column="4" Text="{s:T K='Windows Update'}" Style="{StaticResource Small}"/>
                         </Grid>
                         <StackPanel x:Name="Loading" Orientation="Horizontal" Spacing="12" Padding="18,22">
                             <ProgressRing IsActive="True" Width="20" Height="20" Foreground="{StaticResource Neon}"/>
-                            <TextBlock Text="Lendo os drivers instalados…" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{s:T K='Lendo os drivers instalados…'}" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                         </StackPanel>
                         <ItemsRepeater x:Name="Rows">
                             <ItemsRepeater.ItemTemplate>
@@ -90,16 +91,16 @@
 
                 <Border Style="{StaticResource Card}" Padding="18,14">
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Dica" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock Text="{s:T K='Dica'}" FontSize="13" FontWeight="SemiBold"/>
                         <TextBlock FontSize="13" Foreground="{StaticResource TextMuted2}" LineHeight="20" TextWrapping="Wrap"
-                                   Text="Drivers marcados como &quot;Não garantido&quot; são os mais importantes de guardar: depois de formatar, o Windows pode não achar sozinho. Os que já vêm com o Windows não precisam de backup."/>
+                                   Text="{s:T K='Drivers marcados como &quot;Não garantido&quot; são os mais importantes de guardar: depois de formatar, o Windows pode não achar sozinho. Os que já vêm com o Windows não precisam de backup.'}"/>
                     </StackPanel>
                 </Border>
 
                 <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                     <c:SaveTargetBar Suffix="Drivers"/>
-                    <Button x:Name="ExportButton" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="Exportar drivers" Click="OnExport"/>
+                    <Button x:Name="ExportButton" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="{s:T K='Exportar drivers'}" Click="OnExport"/>
                 </Grid>
             </StackPanel>
 
@@ -107,20 +108,20 @@
             <StackPanel x:Name="RestorePanel" Spacing="16" Visibility="Collapsed">
                 <Border Style="{StaticResource Card}">
                     <StackPanel Spacing="10">
-                        <TextBlock Text="Backup de drivers (pasta Drivers, pasta com .inf ou .zip)" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock Text="{s:T K='Backup de drivers (pasta Drivers, pasta com .inf ou .zip)'}" FontSize="13" FontWeight="SemiBold"/>
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                            <TextBox x:Name="SourceBox" Style="{StaticResource MonoInput}" Height="38" FontSize="13" AutomationProperties.Name="Backup de drivers"/>
-                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Height="38" Content="Procurar…">
+                            <TextBox x:Name="SourceBox" Style="{StaticResource MonoInput}" Height="38" FontSize="13" AutomationProperties.Name="{s:T K='Backup de drivers'}"/>
+                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Height="38" Content="{s:T K='Procurar…'}">
                                 <Button.Flyout>
                                     <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                        <MenuFlyoutItem Text="Arquivo .zip…" Click="OnPickZip"/>
-                                        <MenuFlyoutItem Text="Pasta com .inf…" Click="OnPickFolder"/>
+                                        <MenuFlyoutItem Text="{s:T K='Arquivo .zip…'}" Click="OnPickZip"/>
+                                        <MenuFlyoutItem Text="{s:T K='Pasta com .inf…'}" Click="OnPickFolder"/>
                                     </MenuFlyout>
                                 </Button.Flyout>
                             </Button>
                         </Grid>
-                        <TextBlock Text="O ZIP é extraído para uma pasta temporária antes da instalação." Style="{StaticResource Small}"/>
+                        <TextBlock Text="{s:T K='O ZIP é extraído para uma pasta temporária antes da instalação.'}" Style="{StaticResource Small}"/>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource WarnCard}" Padding="18,16">
@@ -128,10 +129,10 @@
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
                         <c:Icon Width="20" Height="20" Data="M12 3 2 20h20zM12 10v4M12 17h.01" Foreground="{StaticResource Warn}"/>
                         <TextBlock Grid.Column="1" Foreground="{StaticResource WarnText}" LineHeight="20" TextWrapping="Wrap"
-                                   Text="Todos os .inf encontrados serão instalados com PnPUtil. Melhor fazer logo depois de formatar. Pode ser preciso reiniciar no fim; o WINbackup não reinicia sozinho."/>
+                                   Text="{s:T K='Todos os .inf encontrados serão instalados com PnPUtil. Melhor fazer logo depois de formatar. Pode ser preciso reiniciar no fim; o WINbackup não reinicia sozinho.'}"/>
                     </Grid>
                 </Border>
-                <Button x:Name="InstallButton" Style="{StaticResource PrimaryButton}" Content="Instalar drivers" HorizontalAlignment="Right" Click="OnInstall"/>
+                <Button x:Name="InstallButton" Style="{StaticResource PrimaryButton}" Content="{s:T K='Instalar drivers'}" HorizontalAlignment="Right" Click="OnInstall"/>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

@@ -33,16 +33,16 @@ public static partial class Destinations
         if (!string.IsNullOrWhiteSpace(d.VolumeLabel)) return $"{d.VolumeLabel} ({letter})";
         return d.DriveType switch
         {
-            DriveType.Removable => $"Disco removível ({letter})",
-            DriveType.Network => $"Unidade de rede ({letter})",
-            _ => $"Disco local ({letter})",
+            DriveType.Removable => L.F("Disco removível ({0})", letter),
+            DriveType.Network => L.F("Unidade de rede ({0})", letter),
+            _ => L.F("Disco local ({0})", letter),
         };
     }
 
     /// <summary>Nome amigável para qualquer caminho (inclusive pastas escolhidas à mão).</summary>
     public static DestOption Describe(string path)
     {
-        if (string.IsNullOrEmpty(path)) return new DestOption("Nenhum destino", "Escolha onde salvar", Icons.Drive);
+        if (string.IsNullOrEmpty(path)) return new DestOption(L.T("Nenhum destino"), L.T("Escolha onde salvar"), Icons.Drive);
         var match = Candidates().FirstOrDefault(c => string.Equals(c.Path, path, StringComparison.OrdinalIgnoreCase));
         if (match != null) return match;
         if (path.StartsWith(@"\\")) return new DestOption("Pasta na rede", path, Icons.Network);
@@ -57,7 +57,7 @@ public static partial class Destinations
         }
         catch (ArgumentException) { }
         catch (IOException) { }
-        return new DestOption("Pasta escolhida", path, Icons.Drive);
+        return new DestOption(L.T("Pasta escolhida"), path, Icons.Drive);
     }
 
     /// <summary>Espaço livre e total do volume do caminho (funciona com caminhos de rede).</summary>

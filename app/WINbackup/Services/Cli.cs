@@ -43,18 +43,18 @@ public static class Cli
         else if (Get("--preset") is { } slug)
         {
             var index = Array.FindIndex(Presets.All, p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-            if (index < 0) { Fail($"Preset desconhecido: {slug}. Use: {string.Join(", ", Presets.All.Select(p => p.Slug))}."); return true; }
+            if (index < 0) { Fail(L.F("Preset desconhecido: {0}. Use: {1}.", slug, string.Join(", ", Presets.All.Select(p => p.Slug)))); return true; }
             spec = Presets.Build(index, Get("--dest"), Has("--full") ? false : null);
         }
         else if (Get("--only") is { } only)
         {
             spec = Only(only.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), Get("--dest"));
-            if (spec == null) { Fail("Módulos válidos em --only: files, creators, apps, configs, games, browsers, drivers."); return true; }
+            if (spec == null) { Fail(L.T("Módulos válidos em --only: files, creators, apps, configs, games, browsers, drivers.")); return true; }
         }
         else if (Get("--restore") is { } from)
         {
             var plan = RestorePlan.Latest(from);
-            if (plan.Empty) { Fail($"Nenhum backup do WINbackup em {from}."); return true; }
+            if (plan.Empty) { Fail(L.F("Nenhum backup do WINbackup em {0}.", from)); return true; }
             spec = new JobSpec
             {
                 Kind = JobKind.Restore, Title = "Pós-formatação", RestoreSources = plan.Sources(),
@@ -66,7 +66,7 @@ public static class Cli
             return false;
         }
 
-        if (spec.Kind == JobKind.Backup && string.IsNullOrEmpty(spec.Destination)) { Fail("Sem destino: use --dest ou escolha o destino no app."); return true; }
+        if (spec.Kind == JobKind.Backup && string.IsNullOrEmpty(spec.Destination)) { Fail(L.T("Sem destino: use --dest ou escolha o destino no app.")); return true; }
         if (BackupRunner.IsAnotherRunning()) { Exit(3); return true; }
 
         App.Shell.Activate();
@@ -136,8 +136,8 @@ public static class Cli
     {
         var days = DaysSinceLastBackup();
         if (Settings.Data.NotifyReminder && days is null or > 30)
-            Notifier.Show(days == null ? "Você ainda não fez backup" : $"Faz {days} dias desde o último backup",
-                "Abra o WINbackup para salvar seus arquivos antes que algo aconteça.");
+            Notifier.Show(days == null ? L.T("Você ainda não fez backup") : L.F("Faz {0} dias desde o último backup", days),
+                L.T("Abra o WINbackup para salvar seus arquivos antes que algo aconteça."));
         Exit(0, TimeSpan.FromSeconds(20));
     }
 
@@ -153,7 +153,7 @@ public static class Cli
         App.Shell.DispatcherQueue.TryEnqueue(async () =>
         {
             await Task.Delay(500);
-            await Controls.Dialogs.InfoAsync(App.Shell.Content.XamlRoot, "Linha de comando", message);
+            await Controls.Dialogs.InfoAsync(App.Shell.Content.XamlRoot, L.T("Linha de comando"), message);
         });
     }
 

@@ -21,17 +21,17 @@ public sealed partial class ConfigsPage : Page
         Unloaded += (_, _) => _cts.Cancel();
 
         foreach (var w in ConfigsModule.WindowsItems)
-            _win.Add(Item(w.Key, w.Name, w.Description, w.Key is "theme" or "env" or "hosts" ? "" : "…"));
+            _win.Add(Item(w.Key, L.T(w.Name), L.T(w.Description), w.Key is "theme" or "env" or "hosts" ? "" : "…"));
         WinRows.ItemsSource = _win;
 
         foreach (var app in ConfigsModule.Apps)
         {
             var paths = ConfigsModule.Resolve(app);
             if (paths.Count == 0) continue;
-            _apps.Add(Item(app.Key, app.Name, app.Note, "Detectado"));
+            _apps.Add(Item(app.Key, L.T(app.Name), L.T(app.Note), L.T("Detectado")));
         }
         AppRows.ItemsSource = _apps;
-        AppCount.Text = _apps.Count == 1 ? "1 detectado" : $"{_apps.Count} detectados";
+        AppCount.Text = _apps.Count == 1 ? L.T("1 detectado") : L.F("{0} detectados", _apps.Count);
         LoadCustom();
         Count();
         _ = FillCountsAsync();
@@ -58,9 +58,9 @@ public sealed partial class ConfigsPage : Page
             var wifi = await ConfigsModule.WifiProfilesAsync(_cts.Token);
             var printers = await Task.Run(ConfigsModule.Printers);
             var fonts = ConfigsModule.UserFontCount();
-            Set("wifi", wifi.Count == 1 ? "1 rede" : $"{wifi.Count} redes");
-            Set("print", printers.Count == 1 ? "1 impressora" : $"{printers.Count} impressoras");
-            Set("fonts", fonts == 1 ? "1 fonte" : $"{fonts} fontes");
+            Set("wifi", wifi.Count == 1 ? L.T("1 rede") : L.F("{0} redes", wifi.Count));
+            Set("print", printers.Count == 1 ? L.T("1 impressora") : L.F("{0} impressoras", printers.Count));
+            Set("fonts", fonts == 1 ? L.T("1 fonte") : L.F("{0} fontes", fonts));
         }
         catch (OperationCanceledException) { }
     }
@@ -74,7 +74,7 @@ public sealed partial class ConfigsPage : Page
 
     void Count()
     {
-        WinCount.Text = $"{_win.Count(i => i.IsChecked)} de {_win.Count}";
+        WinCount.Text = L.F("{0} de {1}", _win.Count(i => i.IsChecked), _win.Count);
         var any = _win.Any(i => i.IsChecked) || _apps.Any(i => i.IsChecked) || S.ConfigCustomFolders.Count > 0;
         SaveButton.IsEnabled = any;
     }
@@ -89,7 +89,7 @@ public sealed partial class ConfigsPage : Page
             g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             g.Children.Add(new TextBlock { Text = path, FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Mono"], FontSize = 12,
                 VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
-            var remove = new Button { Style = (Style)Application.Current.Resources["SmallButton"], Height = 28, FontSize = 12, Content = "Remover" };
+            var remove = new Button { Style = (Style)Application.Current.Resources["SmallButton"], Height = 28, FontSize = 12, Content = L.T("Remover") };
             remove.Click += (_, _) => { S.ConfigCustomFolders.Remove(path); Settings.Save(); LoadCustom(); Count(); };
             Grid.SetColumn(remove, 1);
             g.Children.Add(remove);
@@ -99,7 +99,7 @@ public sealed partial class ConfigsPage : Page
 
     void OnAddFolder(object sender, RoutedEventArgs e)
     {
-        var path = FileDialog.PickFolder("Pasta de configuração para incluir no backup");
+        var path = FileDialog.PickFolder(L.T("Pasta de configuração para incluir no backup"));
         if (path == null || S.ConfigCustomFolders.Contains(path, StringComparer.OrdinalIgnoreCase)) return;
         S.ConfigCustomFolders.Add(path);
         Settings.Save();
@@ -113,7 +113,7 @@ public sealed partial class ConfigsPage : Page
     {
         if (string.IsNullOrEmpty(S.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         App.Shell.Run(new JobSpec

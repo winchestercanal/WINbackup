@@ -27,14 +27,14 @@ public sealed partial class BrowsersPage : Page
         foreach (var b in _browsers.Where(b => b.Installed))
         {
             var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-            row.Children.Add(new TextBlock { Text = $"Abrir no {b.Name.Replace("Microsoft ", "").Replace("Google ", "").Replace("Mozilla ", "")}", FontSize = 12.5, VerticalAlignment = VerticalAlignment.Center });
+            row.Children.Add(new TextBlock { Text = L.F("Abrir no {0}", b.Name.Replace("Microsoft ", "").Replace("Google ", "").Replace("Mozilla ", "")), FontSize = 12.5, VerticalAlignment = VerticalAlignment.Center });
             row.Children.Add(new TextBlock { Text = b.PasswordUrl, FontSize = 11.5, Foreground = UI.Muted, FontFamily = Mono, VerticalAlignment = VerticalAlignment.Center });
             var btn = new Button { Style = S_("SmallButton"), Height = 34, Padding = new Thickness(12, 0, 12, 0), Content = row };
             btn.Click += async (_, _) => await OpenPasswords(b);
             PwButtons.Children.Add(btn);
         }
         if (PwButtons.Children.Count == 0)
-            PwButtons.Children.Add(new TextBlock { Text = "Nenhum navegador encontrado.", Foreground = UI.Muted, FontSize = 12.5 });
+            PwButtons.Children.Add(new TextBlock { Text = L.T("Nenhum navegador encontrado."), Foreground = UI.Muted, FontSize = 12.5 });
 
         LoadCsvs();
         CheckRunning();
@@ -71,26 +71,26 @@ public sealed partial class BrowsersPage : Page
         var titles = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
         titles.Children.Add(new TextBlock { Text = b.Name, FontSize = 15, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
         titles.Children.Add(new TextBlock { FontSize = 12, Foreground = b.Installed ? UI.Muted : UI.Label,
-            Text = b.Installed ? $"Instalado · {b.Profiles.Count} {(b.Profiles.Count > 1 ? "perfis" : "perfil")}" : "Não instalado" });
+            Text = b.Installed ? L.N(b.Profiles.Count, "Instalado · {0} perfil", "Instalado · {0} perfis") : L.T("Não instalado") });
         Grid.SetColumn(titles, 1);
         head.Children.Add(titles);
         body.Children.Add(head);
 
         var chips = new WrapPanel { Spacing = 6, LineSpacing = 6 };
-        var items = new List<string> { b.Key == "vivaldi" ? "Favoritos e Speed Dial" : "Favoritos" };
+        var items = new List<string> { b.Key == "vivaldi" ? L.T("Favoritos e Speed Dial") : L.T("Favoritos") };
         var extCount = b.Profiles.Sum(p => p.Extensions);
-        items.Add(b.Firefox ? $"Extensões ({extCount})" : $"Lista de extensões ({extCount})");
-        items.Add(b.Firefox ? "about:config" : "Configurações");
+        items.Add(b.Firefox ? L.F("Extensões ({0})", extCount) : L.F("Lista de extensões ({0})", extCount));
+        items.Add(b.Firefox ? "about:config" : L.T("Configurações"));
 
         if (b.Installed)
         {
             var sw = new ToggleButton { Style = S_("Switch"), IsChecked = browserOn };
-            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, "Incluir " + b.Name);
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sw, L.T("Incluir ") + b.Name);
             Grid.SetColumn(sw, 2);
             head.Children.Add(sw);
 
             var list = new StackPanel { Spacing = 6 };
-            list.Children.Add(new TextBlock { Text = "PERFIS ENCONTRADOS", FontSize = 11, FontWeight = FontWeights.Bold, CharacterSpacing = 90, Foreground = UI.Label });
+            list.Children.Add(new TextBlock { Text = L.T("PERFIS ENCONTRADOS"), FontSize = 11, FontWeight = FontWeights.Bold, CharacterSpacing = 90, Foreground = UI.Label });
             var toggles = new List<ToggleButton>();
             for (var i = 0; i < b.Profiles.Count; i++)
             {
@@ -103,9 +103,9 @@ public sealed partial class BrowsersPage : Page
                     Child = new TextBlock { Text = p.Name.Length > 0 ? p.Name[..1].ToUpperInvariant() : "?", FontSize = 12, FontWeight = FontWeights.Bold,
                         Foreground = UI.Brush("#04121a"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } });
                 var t = new StackPanel { Spacing = 1 };
-                t.Children.Add(new TextBlock { Text = p.Name, FontSize = 13, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
+                t.Children.Add(new TextBlock { Text = L.T(p.Name), FontSize = 13, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
                 if (p.Account.Length > 0)
-                    t.Children.Add(new TextBlock { Text = p.Account, FontSize = 11.5, Foreground = UI.Muted, TextTrimming = TextTrimming.CharacterEllipsis });
+                    t.Children.Add(new TextBlock { Text = L.T(p.Account), FontSize = 11.5, Foreground = UI.Muted, TextTrimming = TextTrimming.CharacterEllipsis });
                 Grid.SetColumn(t, 1);
                 g.Children.Add(t);
                 var folder = new TextBlock { Text = p.Folder, FontSize = 11, Foreground = UI.Label, FontFamily = Mono, VerticalAlignment = VerticalAlignment.Center,
@@ -165,7 +165,7 @@ public sealed partial class BrowsersPage : Page
     void UpdateSave()
     {
         var profiles = _browsers.Sum(b => b.Profiles.Count(p => BrowsersModule.IsSelected(b, p)));
-        SaveButton.Content = profiles == 0 ? "Nada selecionado" : profiles == 1 ? "Salvar 1 perfil" : $"Salvar {profiles} perfis";
+        SaveButton.Content = profiles == 0 ? L.T("Nada selecionado") : profiles == 1 ? L.T("Salvar 1 perfil") : L.F("Salvar {0} perfis", profiles);
         SaveButton.IsEnabled = profiles > 0 || S.PasswordCsvs.Count > 0;
     }
 
@@ -173,7 +173,7 @@ public sealed partial class BrowsersPage : Page
     {
         var running = BrowsersModule.Running(_browsers.Where(b => b.Installed));
         RunningWarn.Visibility = running.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        RunningText.Text = $"{string.Join(", ", running)} {(running.Count > 1 ? "estão abertos" : "está aberto")}. Feche antes de salvar para garantir que favoritos e configurações estejam atualizados no disco.";
+        RunningText.Text = L.F(running.Count > 1 ? "{0} estão abertos. Feche antes de salvar para garantir que favoritos e configurações estejam atualizados no disco." : "{0} está aberto. Feche antes de salvar para garantir que favoritos e configurações estejam atualizados no disco.", string.Join(", ", running));
     }
 
     void OnRecheck(object sender, RoutedEventArgs e) => CheckRunning();
@@ -185,11 +185,11 @@ public sealed partial class BrowsersPage : Page
         var exe = BrowsersModule.FindExe(b);
         if (exe == null)
         {
-            await Dialogs.InfoAsync(XamlRoot, "Navegador não encontrado", $"Abra o {b.Name} e digite na barra de endereço: {b.PasswordUrl}");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Navegador não encontrado"), L.F("Abra o {0} e digite na barra de endereço: {1}", b.Name, b.PasswordUrl));
             return;
         }
         try { ShellLauncher.Run(exe, b.PasswordUrl); }
-        catch (Exception ex) { await Dialogs.InfoAsync(XamlRoot, "Não foi possível abrir", ex.Message); }
+        catch (Exception ex) { await Dialogs.InfoAsync(XamlRoot, L.T("Não foi possível abrir"), ex.Message); }
     }
 
     void LoadCsvs()
@@ -202,20 +202,20 @@ public sealed partial class BrowsersPage : Page
             g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             g.Children.Add(new TextBlock { Text = path, FontFamily = Mono, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis, Foreground = File.Exists(path) ? UI.Text : UI.Warn });
-            var remove = new Button { Style = S_("SmallButton"), Height = 28, FontSize = 12, Content = "Remover" };
+            var remove = new Button { Style = S_("SmallButton"), Height = 28, FontSize = 12, Content = L.T("Remover") };
             remove.Click += (_, _) => { S.PasswordCsvs.Remove(path); Settings.Save(); LoadCsvs(); UpdateSave(); };
             Grid.SetColumn(remove, 1);
             g.Children.Add(remove);
             CsvList.Children.Add(g);
         }
         if (S.PasswordCsvs.Count == 0)
-            CsvList.Children.Add(new TextBlock { Text = "Nenhum .csv de senhas adicionado.", FontSize = 12.5, Foreground = UI.Muted });
+            CsvList.Children.Add(new TextBlock { Text = L.T("Nenhum .csv de senhas adicionado."), FontSize = 12.5, Foreground = UI.Muted });
         CsvWarn.Visibility = S.PasswordCsvs.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     void OnAddCsv(object sender, RoutedEventArgs e)
     {
-        var file = FileDialog.PickFile("Senhas exportadas pelo navegador", "Senhas exportadas (*.csv)", "*.csv");
+        var file = FileDialog.PickFile(L.T("Senhas exportadas pelo navegador"), L.T("Senhas exportadas (*.csv)"), "*.csv");
         if (file == null || S.PasswordCsvs.Contains(file, StringComparer.OrdinalIgnoreCase)) return;
         S.PasswordCsvs.Add(file);
         Settings.Save();
@@ -229,13 +229,13 @@ public sealed partial class BrowsersPage : Page
     {
         if (string.IsNullOrEmpty(S.Destination))
         {
-            await Dialogs.InfoAsync(XamlRoot, "Escolha o destino", "Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta.");
+            await Dialogs.InfoAsync(XamlRoot, L.T("Escolha o destino"), L.T("Clique em Destino dos backups, no menu lateral, e escolha um HD externo ou uma pasta."));
             return;
         }
         var running = BrowsersModule.Running(_browsers.Where(b => b.Installed));
-        if (running.Count > 0 && !await Dialogs.ConfirmAsync(XamlRoot, "Navegador aberto",
-                $"{string.Join(", ", running)} {(running.Count > 1 ? "estão abertos" : "está aberto")}. O backup funciona, mas as últimas mudanças podem ficar de fora. Continuar mesmo assim?",
-                "Continuar", "Vou fechar"))
+        if (running.Count > 0 && !await Dialogs.ConfirmAsync(XamlRoot, L.T("Navegador aberto"),
+                L.F(running.Count > 1 ? "{0} estão abertos. O backup funciona, mas as últimas mudanças podem ficar de fora. Continuar mesmo assim?" : "{0} está aberto. O backup funciona, mas as últimas mudanças podem ficar de fora. Continuar mesmo assim?", string.Join(", ", running)),
+                L.T("Continuar"), L.T("Vou fechar")))
             return;
         App.Shell.Run(new JobSpec
         {

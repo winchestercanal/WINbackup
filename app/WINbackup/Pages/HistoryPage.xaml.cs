@@ -31,7 +31,7 @@ public sealed partial class HistoryPage : Page
         var mono = (FontFamily)Application.Current.Resources["Mono"];
         if (versions.Count == 0)
         {
-            VersionsPanel.Children.Add(new TextBlock { Text = "Nenhuma versão no destino atual ainda.", Foreground = UI.Muted, Margin = new Thickness(18, 14, 18, 14) });
+            VersionsPanel.Children.Add(new TextBlock { Text = L.T("Nenhuma versão no destino atual ainda."), Foreground = UI.Muted, Margin = new Thickness(18, 14, 18, 14) });
             return;
         }
         var removable = Retention.Removable(Settings.Data.Destination, Settings.Data.KeepVersions);
@@ -45,21 +45,21 @@ public sealed partial class HistoryPage : Page
             foreach (var w in new[] { 1.8, 1, 0.9, 1.2, 1, 1.6 }) g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(w, GridUnitType.Star) });
 
             Add(g, 0, new TextBlock { Text = HomePage.VersionDate(v)?.ToString("yyyy-MM-dd HH:mm") ?? Path.GetFileName(v), FontFamily = mono, FontSize = 12.5 });
-            Add(g, 1, new TextBlock { Text = m == null ? "?" : m.Completed ? m.Kind : $"{m.Kind} (incompleto)", TextTrimming = TextTrimming.CharacterEllipsis });
+            Add(g, 1, new TextBlock { Text = m == null ? "?" : m.Completed ? L.T(m.Kind) : L.F("{0} (incompleto)", L.T(m.Kind)), TextTrimming = TextTrimming.CharacterEllipsis });
             Add(g, 2, new TextBlock { Text = m == null ? "—" : Sys.Bytes(m.BytesStored), Foreground = UI.Muted2 });
 
-            var (hash, color) = m == null || !m.HashChecked ? ("Não verificado", UI.Muted)
-                : m.HashMismatches == 0 ? ("SHA-256 conferido", UI.Ok) : ($"{m.HashMismatches} arquivos divergentes", UI.Warn);
+            var (hash, color) = m == null || !m.HashChecked ? (L.T("Não verificado"), UI.Muted)
+                : m.HashMismatches == 0 ? (L.T("SHA-256 conferido"), UI.Ok) : (L.F("{0} arquivos divergentes", m.HashMismatches), UI.Warn);
             var hs = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
             hs.Children.Add(new Microsoft.UI.Xaml.Shapes.Ellipse { Width = 7, Height = 7, Fill = color, VerticalAlignment = VerticalAlignment.Center });
             hs.Children.Add(new TextBlock { Text = hash, FontSize = 12, Foreground = color });
             Add(g, 3, hs);
-            Add(g, 4, new TextBlock { Text = m?.Encrypted == true ? "AES-256" : "Sem criptografia", FontSize = 12, Foreground = m?.Encrypted == true ? UI.NeonSoft : UI.Muted });
+            Add(g, 4, new TextBlock { Text = m?.Encrypted == true ? "AES-256" : L.T("Sem criptografia"), FontSize = 12, Foreground = m?.Encrypted == true ? UI.NeonSoft : UI.Muted });
 
             var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, HorizontalAlignment = HorizontalAlignment.Right };
-            var open = SmallButton("Abrir");
+            var open = SmallButton(L.T("Abrir"));
             open.Click += (_, _) => Sys.Open(v);
-            var restore = SmallButton("Restaurar");
+            var restore = SmallButton(L.T("Restaurar"));
             restore.Click += (_, _) => App.Shell.Navigate("restore");
             actions.Children.Add(open);
             actions.Children.Add(restore);
@@ -94,7 +94,7 @@ public sealed partial class HistoryPage : Page
 
         if (_logFile == null)
         {
-            LogSource.Text = "Nenhum log ainda.";
+            LogSource.Text = L.T("Nenhum log ainda.");
             return;
         }
         LogSource.Text = _logFile;
@@ -108,7 +108,7 @@ public sealed partial class HistoryPage : Page
         }
         catch (IOException ex)
         {
-            LogSource.Text = "Não foi possível ler o log: " + ex.Message;
+            LogSource.Text = L.T("Não foi possível ler o log: ") + ex.Message;
         }
         LogLines.ItemsSource = _log;
     }

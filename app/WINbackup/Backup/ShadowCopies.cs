@@ -1,4 +1,5 @@
 using System.Management;
+using WINbackup.Services;
 
 namespace WINbackup.Backup;
 
@@ -36,7 +37,7 @@ public sealed class ShadowCopies : IDisposable
     {
         try
         {
-            _runner.Info($"Criando Shadow Copy (VSS) de {volume.TrimEnd('\\')}");
+            _runner.Info(L.F("Criando Shadow Copy (VSS) de {0}", volume.TrimEnd('\\')));
             using var cls = new ManagementClass(@"\\.\root\cimv2", "Win32_ShadowCopy", null);
             using var inParams = cls.GetMethodParameters("Create");
             inParams["Volume"] = volume;
@@ -45,19 +46,19 @@ public sealed class ShadowCopies : IDisposable
             var code = Convert.ToUInt32(result["ReturnValue"]);
             if (code != 0)
             {
-                _runner.Warn($"Não foi possível criar a Shadow Copy de {volume.TrimEnd('\\')} (código {code})");
+                _runner.Warn(L.F("Não foi possível criar a Shadow Copy de {0} (código {1})", volume.TrimEnd('\\'), code));
                 return null;
             }
             var id = (string)result["ShadowID"];
             using var sc = new ManagementObject($@"\\.\root\cimv2:Win32_ShadowCopy.ID='{id}'");
             sc.Get();
             var device = (string)sc["DeviceObject"];
-            _runner.Info($"Shadow Copy criada para {volume.TrimEnd('\\')}");
+            _runner.Info(L.F("Shadow Copy criada para {0}", volume.TrimEnd('\\')));
             return (id, device);
         }
         catch (Exception ex)
         {
-            _runner.Warn($"Shadow Copy indisponível em {volume.TrimEnd('\\')}: {ex.Message}");
+            _runner.Warn(L.F("Shadow Copy indisponível em {0}: {1}", volume.TrimEnd('\\'), ex.Message));
             return null;
         }
     }
@@ -74,7 +75,7 @@ public sealed class ShadowCopies : IDisposable
             }
             catch (Exception ex)
             {
-                _runner.Warn($"Não foi possível apagar a Shadow Copy {shadow.Value.Id}: {ex.Message}", report: false);
+                _runner.Warn(L.F("Não foi possível apagar a Shadow Copy {0}: {1}", shadow.Value.Id, ex.Message), report: false);
             }
         }
         _byVolume.Clear();
