@@ -14,7 +14,7 @@ public static class Theme
 {
     public static readonly (string Code, string Name)[] Themes =
     [
-        ("winchester", "WINchester"), ("neutral", "Escuro neutro"), ("oled", "Preto OLED"), ("light", "Claro"),
+        ("light", "Claro"), ("neutral", "Escuro"), ("oled", "Escuro OLED"), ("winchester", "Winchester"),
     ];
 
     public static string Current { get; private set; } = "winchester";
@@ -97,7 +97,7 @@ public static class Theme
 
     // ---------- Paletas: cor original → cor do tema ----------
 
-    /// <summary>Escuro neutro, no estilo do Windows 11: cinzas no lugar do azul-marinho e azul do Windows no destaque.</summary>
+    /// <summary>Escuro, no estilo do Windows 11: cinzas no lugar do azul-marinho e azul do Windows no destaque.</summary>
     static readonly Dictionary<string, string> Neutral = new()
     {
         // fundos
@@ -121,7 +121,7 @@ public static class Theme
         ["#0b2a2e"] = "#1d3540", ["#0b1f24"] = "#1d2c33", ["#17616a"] = "#3a7186",
     };
 
-    /// <summary>Preto OLED: fundo preto puro, superfícies quase pretas e o mesmo destaque ciano.</summary>
+    /// <summary>Escuro OLED: fundo preto puro, superfícies quase pretas e o mesmo destaque ciano.</summary>
     static readonly Dictionary<string, string> Oled = new()
     {
         ["#0a0f1c"] = "#000000", ["#070b15"] = "#000000", ["#080d19"] = "#0a0a0a", ["#0a1120"] = "#050505",

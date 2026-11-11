@@ -287,6 +287,8 @@
  "Escolha onde salvar": "Choose where to save",
  "Escolha os dias": "Choose the days",
  "Escolha um valor (opcional)": "Choose an amount (optional)",
+ "Escuro": "Dark",
+ "Escuro OLED": "OLED dark",
  "Escuro neutro": "Neutral dark",
  "Esse arquivo não parece uma lista do winget (Programas.json). ": "This file doesn't look like a winget list (Programas.json). ",
  "Esta versão não tem arquivos.": "This version has no files.",
