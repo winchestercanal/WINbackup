@@ -11,7 +11,7 @@ public class Manifest
     public const string FileName = "manifest.json";
 
     public int Format { get; set; } = 1;
-    public string App { get; set; } = "WINbackup 0.1 beta";
+    public string App { get; set; } = "WINbackup 0.2 beta";
     public DateTime CreatedAt { get; set; }
     public string Title { get; set; } = "";
     public string Kind { get; set; } = "Completo";

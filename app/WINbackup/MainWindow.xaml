@@ -29,7 +29,7 @@
                     <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource Neon}" CornerRadius="2"/>
                 </Grid>
                 <TextBlock Text="WINbackup" FontSize="12" FontWeight="SemiBold" CharacterSpacing="16" VerticalAlignment="Center"/>
-                <TextBlock Text="{s:T K='v0.1 beta · Canal WINchester'}" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                <TextBlock Text="{s:T K='v0.2 beta · Canal WINchester'}" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
             </StackPanel>
             <Border x:Name="AdminBadge" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,150,0"
                     Padding="10,3" CornerRadius="6" Background="{StaticResource BadgeBg}" BorderBrush="{StaticResource BadgeLine}" BorderThickness="1">

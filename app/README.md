@@ -1,4 +1,4 @@
-# WINbackup 0.1 (beta): app para Windows
+# WINbackup 0.2 (beta): app para Windows
 
 App do **Canal WINchester** feito a partir do protótipo em [`../interface`](../interface/HANDOFF.md).
 WinUI 3 + .NET 10 (C#), Windows App SDK 2.5, autocontido (não precisa instalar nada no PC formatado) e roda como Administrador.

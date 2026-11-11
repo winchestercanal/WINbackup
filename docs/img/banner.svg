@@ -42,7 +42,7 @@
     <!-- Selos -->
     <g font-family="Segoe UI, Inter, system-ui, sans-serif" font-size="14" font-weight="600">
       <rect x="72" y="326" width="112" height="28" rx="7" fill="#04121a" stroke="#19e3ff"/>
-      <text x="128" y="345" text-anchor="middle" fill="#7befff">v0.1 beta</text>
+      <text x="128" y="345" text-anchor="middle" fill="#7befff">v0.2 beta</text>
       <rect x="194" y="326" width="166" height="28" rx="7" fill="#0f1b33" stroke="#2a3b63"/>
       <text x="277" y="345" text-anchor="middle" fill="#c9d6ee">Windows 10 e 11</text>
       <rect x="370" y="326" width="206" height="28" rx="7" fill="#0f1b33" stroke="#2a3b63"/>
